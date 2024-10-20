@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap');
+
+.admin-dashboard {
+  font-family: Plus Jakarta Sans;
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 11.34px;
+  text-align: left;
+  max-width: 390px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+
+header {
+  margin-bottom: 20px;
+}
+header h1{
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 25.2px;
+  text-align: center;
+}
+header h2{
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 18.9px;
+  text-align: left;
+  color: black;
+  }
+header h3{
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 13.86px;
+  }
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+header p {
+  margin: 0;
+  color: #666;
+}
+
+section {
+  background-color: white;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  font-family: Plus Jakarta Sans;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 16.38px;
+  text-align: left;
+  color: white;  
+}
+
+.inventory-alerts{
+  background-color: #d32f2f;
+}
+
+.recent-activities{
+  background-color: #1976d2;
+}
+
+.item-tracking{
+  background-color: #7b1fa2;
+}
+
+button {
+  background-color: #242423;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  float: right;
+  font-family: Plus Jakarta Sans;
+  font-size: 10px;
+  font-weight: 400;
+  text-align: left;
+}
+
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  background-color: white;
+  padding: 10px 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Placeholder for navigation icons */
+.bottom-nav::before {
+  content: "Home Chart QR Code Profile Box";
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  color: #999;
+  font-size: 12px;
+}
