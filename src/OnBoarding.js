@@ -49,6 +49,10 @@ const OnBoarding = () => {
     }
   };
 
+  const skipOnboarding = () => {
+    navigate('/login'); // Redirect to LoginComponent
+  };
+
   const handlers = useSwipeable({
     onSwipedLeft: goToNextStep,
     onSwipedRight: goToPreviousStep,
@@ -75,6 +79,10 @@ const OnBoarding = () => {
 
   return (
     <div {...handlers} className="mobile-container">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+      <button className="close-button" onClick={skipOnboarding}>
+        <i className="fas fa-times" /> {/* Font Awesome icon for "X" */}
+      </button>
       <img className="onboarding-image" src={steps[currentStep].image} alt={steps[currentStep].title} />
       <h2 className="onboarding-title">{steps[currentStep].title}</h2>
       <p className="onboarding-description">{steps[currentStep].description}</p>

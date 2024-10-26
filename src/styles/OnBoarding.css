@@ -80,3 +80,22 @@
     display: none;
   }
 }
+
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 24px; /* Adjust size as needed */
+  cursor: pointer;
+  color: #333; /* Change color as needed */
+}
+
+.close-button:hover {
+  color: red; /* Change color on hover if desired */
+}
+
+.close-button i {
+  font-size: 24px; /* Ensure the icon size matches the button size */
+}
