@@ -1,24 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './styles/App.css';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Splash from './Splash.js';
 import LoginComponent from './LoginComponent.js';
-import AdminDash from './dashboards/AdminDash.js';
+
+import OnBoarding from './OnBoarding.js';
+
 function App() {
-  const [showSplash, setShowSplash] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSplash(false);
-    }, 2500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
-    <div className="App">
-      {showSplash ? <Splash /> : <LoginComponent />}
-      {/* <AdminDash /> */}
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Splash />} />
+        <Route path="/onboarding" element={<OnBoarding />} />
+        <Route path="/login" element={<LoginComponent />} />
+        {/* Other routes */}
+      </Routes>
+    </Router>
   );
 }
 
