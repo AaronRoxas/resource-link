@@ -5,6 +5,7 @@ import Splash from './Splash.js';
 import LoginComponent from './LoginComponent.js';
 
 import OnBoarding from './OnBoarding.js';
+import AddUser from './dashboards/AddUser.js';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<Splash />} />
         <Route path="/onboarding" element={<OnBoarding />} />
         <Route path="/login" element={<LoginComponent />} />
+        <Route path="/addUser" element={<AddUser />} />
         {/* Other routes */}
       </Routes>
     </Router>

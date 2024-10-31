@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import './styles/LoginComponent.css' 
+import axios from 'axios'; // Import axios for making HTTP requests
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const LoginComponent = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [username, setUsername] = useState(''); // State for username
+  const [password, setPassword] = useState(''); // State for password
+  const [error, setError] = useState(''); // State for error messages
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -26,6 +32,27 @@ const LoginComponent = () => {
     setIsDarkMode(!isDarkMode);
   };
 
+  const handleLogin = async (e) => {
+    e.preventDefault(); // Prevent default form submission
+    try {
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
+        username,
+        password,
+      });
+      console.log(response.data); // Handle successful login
+
+      // Check if the user role is admin
+      if (response.data.role === 'Admin' || response.data.role === 'admin') {
+        navigate('/addUser'); // Navigate to AddUser if the role is admin
+      } else {
+        setError('You do not have permission to access this page.'); // Set error message for non-admin users
+      }
+    } catch (err) {
+      console.error('Login error:', err.response ? err.response.data : err.message);
+      setError('Invalid username or password'); // Set error message on failure
+    }
+  };
+
   return (
     <div className="login-container">
       <div className="logo">
@@ -35,9 +62,22 @@ const LoginComponent = () => {
           </svg>
       </div>
       <h1 className="app-name">ResourceLink</h1>
-      <form className="login-form">
-        <input type="text" placeholder="Username" className="login-input" />
-        <input type="password" placeholder="Password" className="login-input" />
+      <form className="login-form" onSubmit={handleLogin}>
+        <input 
+          type="text" 
+          placeholder="Username" 
+          className="login-input" 
+          value={username} 
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input 
+          type="password" 
+          placeholder="Password" 
+          className="login-input" 
+          value={password} 
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {error && <p className="error-message">{error}</p>}
         <div className="login-options">
           <label className="remember-me">
             <input type="checkbox" />
