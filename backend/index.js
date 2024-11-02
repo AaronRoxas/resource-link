@@ -18,14 +18,18 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes); // Mount auth routes
 
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on https://resource-link-99pdn276e-aaronroxas-projects.vercel.app/${PORT}`);
+});
+
 // Export the app for Vercel
 module.exports = app;
 
-// Start the server only for local testing
+// Start the server (for local testing)
 if (require.main === module) {
-  const PORT = process.env.PORT || 3000; // Use the environment variable PORT
   app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on https://resource-link-99pdn276e-aaronroxas-projects.vercel.app/${PORT}`);
   });
 }
 
