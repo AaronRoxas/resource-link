@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+.mobile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 75vh;
+  padding: 20px;
+  background-color: white;
+  transition: transform 0.3s ease-out;
+}
+
+.onboarding-image {
+  width: 300px;
+  height: 300px;
+  object-fit: contain;
+  margin-bottom: 20px;
+}
+
+.onboarding-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 25px;
+    text-align: center;
+    color: #006C3A;
+    padding-bottom: 10px;
+}
+
+.onboarding-description {
+    font-family: 'Inter', sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 25px;
+    text-align: center;
+    color: #A6A6A6;
+    padding-top: 10px;
+}
+
+.progress-dots {
+  display: flex;
+  justify-content: center;
+  margin:10px 0;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #E0E0E0;
+  margin: 0 5px;
+
+}
+
+.dot.active {
+  background-color: #006C3A;
+}
+
+.next-button {
+  background-color: #006C3A;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 200px;
+  text-align: center;
+}
+
+.next-button:hover {
+  background-color: #45a049;
+}
+
+@media (min-width: 768px) {
+  .mobile-container {
+    display: none;
+  }
+}
+
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 24px; /* Adjust size as needed */
+  cursor: pointer;
+  color: #333; /* Change color as needed */
+}
+
+.close-button:hover {
+  color: red; /* Change color on hover if desired */
+}
+
+.close-button i {
+  font-size: 24px; /* Ensure the icon size matches the button size */
+}
