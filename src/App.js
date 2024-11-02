@@ -6,6 +6,8 @@ import LoginComponent from './LoginComponent.js';
 
 import OnBoarding from './OnBoarding.js';
 import AddUser from './dashboards/AddUser.js';
+import TeacherDash from './dashboards/TeacherDash.js';
+import AdminDash from './dashboards/AdminDash.js';
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
         <Route path="/onboarding" element={<OnBoarding />} />
         <Route path="/login" element={<LoginComponent />} />
         <Route path="/addUser" element={<AddUser />} />
+        <Route path="/teacher" element={<TeacherDash />} />
+        <Route path="/admin" element={<AdminDash />} />
         {/* Other routes */}
       </Routes>
     </Router>

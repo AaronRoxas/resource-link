@@ -43,7 +43,10 @@ const LoginComponent = () => {
 
       // Check if the user role is admin
       if (response.data.role === 'Admin' || response.data.role === 'admin') {
-        navigate('/addUser'); // Navigate to AddUser if the role is admin
+        navigate('/admin'); // Navigate to AddUser if the role is admin
+      }
+      if (response.data.role === 'Teacher' || response.data.role === 'teacher') {
+        navigate('/teacher'); // Navigate to AddUser if the role is admin
       } else {
         setError('You do not have permission to access this page.'); // Set error message for non-admin users
       }

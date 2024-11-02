@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios'; // Import axios for making HTTP requests
 import Modal from '../components/Modal'; // Import the Modal component
 import '../styles/AddUser.css'; 
+import BottomNav from '../components/BottomNav'; // Import the BottomNav component
 
 const AddUser = () => {
   const [name, setName] = useState('');
@@ -50,6 +51,15 @@ const AddUser = () => {
   const closeModal = () => {
     setShowModal(false);
   };
+
+    // Define the navigation items
+    const navItems = [
+      { path: '/admin', icon: 'home', label: 'Home' },
+      { path: '/chart', icon: 'chart', label: 'Chart' },
+      { path: '/qr-code', icon: 'qr', label: 'QR Code' },
+      { path: '/addUser', icon: 'active-profile', label: 'Add User' },
+      { path: '/categories', icon: 'cube', label: 'Categories' },
+    ];
 
   return (
     <div className="add-user-container">
@@ -100,7 +110,9 @@ const AddUser = () => {
       {showModal && (
         <Modal message="User created successfully!" onClose={closeModal} />
       )}
+            <BottomNav navItems={navItems} /> {/* Use the BottomNav component */}
     </div>
+    
   );
 };
 
