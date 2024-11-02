@@ -50,8 +50,11 @@
   padding: 15px;
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
 }
-
+.bottom-nav img{
+  cursor: pointer;
+}
 .admin-dashboard h2 {
   font-family: Plus Jakarta Sans;
   font-size: 13px;
@@ -98,50 +101,49 @@
   left: 0;
   right: 0;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
 }
 
 .bottom-nav div {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: black; /* Default color */
+  color: black; 
 }
 
 .bottom-nav div.active {
-  color: green; /* Active color */
+  color: green; 
 }
 
 .bottom-nav img {
-  width: 24px; /* Adjust size as needed */
-  height: 24px; /* Adjust size as needed */
+  width: 24px; 
+  height: 24px; 
 }
 
 .bottom-nav span {
-  font-size: 10px; /* Adjust font size for labels */
-  color: #999; /* Adjust color for labels */
-  margin-top: 4px; /* Space between icon and label */
+  font-size: 10px; 
+  color: #999; 
+  margin-top: 4px;
+  cursor: pointer;
 }
 
-/* Add this media query for responsiveness */
 @media (max-width: 600px) {
   .bottom-nav {
-    flex-direction: row; /* Change to row for smaller screens */
-    padding: 5px 0; /* Adjust padding */
+    flex-direction: row; 
+    padding: 5px 0; 
   }
 
   .bottom-nav div {
-    flex: 1; /* Allow each icon to take equal space */
-    text-align: center; /* Center align text */
+    flex: 1; 
+    text-align: center; 
   }
 
   .bottom-nav img {
-    width: 20px; /* Adjust size for smaller screens */
-    height: 20px; /* Adjust size for smaller screens */
+    width: 20px; 
+    height: 20px; 
   }
 
   .bottom-nav span {
-    font-size: 9px; /* Adjust font size for smaller screens */
+    font-size: 9px; 
   }
 }
 
