@@ -8,12 +8,16 @@ const TeacherDash = () => {
   return (
     <div className="dashboard">
       <header>
-        <h1>Teacher</h1>
+        <h1>User</h1>
         <h2>Hi, Welcome Back!</h2>
         <h3>{formattedDate}</h3>
       </header>
+      <label>Request Item</label>
       <div className="search-container">
-        <input type="text" className="search-input" placeholder="search" />
+        <div className="search-input-container">
+          <img src='dashboard-imgs/search.svg' alt='Search Icon' className="search-icon" />
+          <input type="text" className="search-input" placeholder="Search" />
+        </div>
       </div>
       <div className="grid">
         <div className="card devices">
@@ -32,7 +36,7 @@ const TeacherDash = () => {
 
       <nav className="bottom-nav">
         <div className="home-icon">
-          <img src="footer-imgs/home.svg" alt="Home" />
+          <img src="footer-imgs/active-home.svg" alt="Home" />
           <span>Home</span>
         </div>
         </nav>

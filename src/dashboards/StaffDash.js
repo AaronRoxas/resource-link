@@ -3,40 +3,31 @@ import '../styles/AdminDash.css'
 import { getFormattedDate } from '../utils/dateUtils'; // Import the function
 import BottomNav from '../components/BottomNav'; // Import the BottomNav component
 
-const AdminDash = () => {
+const StaffDash = () => {
   const formattedDate = getFormattedDate(); // Call the function
 
   // Define the navigation items
   const navItems = [
-    { path: '/admin', icon: 'active-home', label: 'Home' },
-    { path: '/chart', icon: 'chart', label: 'Chart' },
+    { path: '/staff', icon: 'active-home', label: 'Home' },
     { path: '/qr-code', icon: 'qr', label: 'QR Code' },
-    { path: '/addUser', icon: 'profile', label: 'Add User' },
     { path: '/categories', icon: 'cube', label: 'Categories' },
   ];
 
   return (
     <div className="admin-dashboard">
       <header>
-        <h1>Inventory Admin</h1>
+        <h1>Inventory Manager</h1>
         <h2>Hi, Welcome Back!</h2>
         <h3>{formattedDate}</h3>
       </header>
 
       <section className="inventory-alerts">
-        <h2 className="heading-with-icon">
-          <img src='table-imgs/alert.svg' alt='Alert Icon' className="icon" />
+        <span>
+          <h2 className="heading-with-icon">
+            <img src='table-imgs/alert.svg' alt='Alert Icon' className="icon" />
             Inventory Alerts
-        </h2>
-        {/* Table will be added here */}
-        <button>View all</button>
-      </section>
-
-      <section className="recent-activities">
-        <h2 className="heading-with-icon">
-          <img src='table-imgs/recent.svg' alt='Alert Icon' className="icon" />
-          Recent Activities
-        </h2>
+          </h2>
+        </span>
         {/* Table will be added here */}
         <button>View all</button>
       </section>
@@ -55,4 +46,4 @@ const AdminDash = () => {
   )
 }
 
-export default AdminDash
+export default StaffDash
