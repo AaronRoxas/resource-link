@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
-
 const connectDB = async () => {
   try {
-    await mongoose.connect('mongodb+srv://aaronroxas49:ZlUBfpxeO9qkgMTR@resourcelink.5iuii.mongodb.net/ResourceLink');
-    console.log('MongoDB connected');
-  } catch (err) {
-    console.error(err.message);
-    process.exit(1);
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Database connected");
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    process.exit(1); // Exit process with failure
   }
 };
+
 module.exports = connectDB;

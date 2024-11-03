@@ -42,5 +42,6 @@
   "description": "https://resource-link.vercel.app/",
   "main": "index.js",
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {}
 }
