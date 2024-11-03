@@ -9,7 +9,7 @@ app.use(cors()); // Enable CORS
 app.use(express.json()); // Parse JSON request bodies
 // Allow specific origin(s)
 app.use(cors({
-  origin: 'https://rlback.vercel.app/'
+  origin: ['https://rlback.vercel.app/', 'https://resource-link.vercel.app']
 }));
 
 // Connect to the database
