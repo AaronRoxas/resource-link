@@ -11,7 +11,7 @@ const LoginComponent = () => {
   const [loading, setLoading] = useState(false); // New loading state
   const navigate = useNavigate(); // Initialize useNavigate
 
-  axios.defaults.withCredentials = true; // Enable sending cookies with requests
+
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
@@ -33,7 +33,7 @@ const LoginComponent = () => {
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
-
+  axios.defaults.withCredentials = true; // Enable sending cookies with requests
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent default form submission
     setLoading(true); // Set loading to true when login starts
