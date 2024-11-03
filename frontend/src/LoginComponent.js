@@ -11,6 +11,7 @@ const LoginComponent = () => {
   const [loading, setLoading] = useState(false); // New loading state
   const navigate = useNavigate(); // Initialize useNavigate
 
+  axios.defaults.withCredentials = true; // Enable sending cookies with requests
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
@@ -37,7 +38,7 @@ const LoginComponent = () => {
     e.preventDefault(); // Prevent default form submission
     setLoading(true); // Set loading to true when login starts
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post('https://resource-link-back.vercel.app/api/auth/login', {
         username,
         password,
       });
