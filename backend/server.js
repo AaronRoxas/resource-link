@@ -7,6 +7,10 @@ const connectDB = require('./config/db'); // Import the connectDB function
 const app = express();
 app.use(cors()); // Enable CORS
 app.use(express.json()); // Parse JSON request bodies
+// Allow specific origin(s)
+app.use(cors({
+  origin: 'https://rlback.vercel.app/'
+}));
 
 // Connect to the database
 connectDB(); // Call the connectDB function
