@@ -35,7 +35,7 @@ const LoginComponent = () => {
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent default form submission
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post('https://rlback.vercel.app/api/auth/login', {
         username,
         password,
       });
