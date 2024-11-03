@@ -7,7 +7,7 @@ const connectDB = require('./config/db'); // Import the connectDB function
 const app = express();
 app.use(cors(
   {
-    origin: ['https://rlback.vercel.app', 'https://resource-link.vercel.app'],
+    origin: ['https://resource-link.vercel.app'],
     methods: ['GET', 'POST'],
     credentials: true
   }
