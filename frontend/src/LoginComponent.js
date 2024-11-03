@@ -8,6 +8,7 @@ const LoginComponent = () => {
   const [username, setUsername] = useState(''); // State for username
   const [password, setPassword] = useState(''); // State for password
   const [error, setError] = useState(''); // State for error messages
+  const [loading, setLoading] = useState(false); // New loading state
   const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
@@ -34,6 +35,7 @@ const LoginComponent = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent default form submission
+    setLoading(true); // Set loading to true when login starts
     try {
       const response = await axios.post('http://localhost:5000/api/auth/login', {
         username,
@@ -41,18 +43,24 @@ const LoginComponent = () => {
       });
       console.log(response.data); // Handle successful login
 
-      // Check if the user role is admin
+      // Check if the user role is admin or teacher
       if (response.data.role === 'Admin' || response.data.role === 'admin') {
         navigate('/admin'); // Navigate to AddUser if the role is admin
-      }
-      if (response.data.role === 'Teacher' || response.data.role === 'teacher') {
+      } else if (response.data.role === 'Teacher' || response.data.role === 'teacher') {
         navigate('/teacher'); // Navigate to AddUser if the role is admin
       } else {
         setError('You do not have permission to access this page.'); // Set error message for non-admin users
       }
     } catch (err) {
       console.error('Login error:', err.response ? err.response.data : err.message);
-      setError('Invalid username or password'); // Set error message on failure
+      // Check for specific error messages related to device restrictions
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message); // Set specific error message
+      } else {
+        setError('Invalid username or password'); // Set error message on failure
+      }
+    } finally {
+      setLoading(false); // Reset loading state
     }
   };
 
@@ -80,6 +88,7 @@ const LoginComponent = () => {
           value={password} 
           onChange={(e) => setPassword(e.target.value)}
         />
+        {loading && <p className="loading-message">Logging in...</p>} {/* Loading message */}
         {error && <p className="error-message">{error}</p>}
         <div className="login-options">
           <label className="remember-me">

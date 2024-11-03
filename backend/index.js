@@ -5,7 +5,13 @@ const authRoutes = require('./routes/auth'); // Import your auth routes
 const connectDB = require('./config/db'); // Import the connectDB function
 
 const app = express();
-app.use(cors()); // Enable CORS
+app.use(cors(
+  {
+    origin: ['https://rlback.vercel.app', 'https://resource-link.vercel.app'],
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+)); // Enable CORS
 app.use(express.json()); // Parse JSON request bodies
 
 // Connect to the database
