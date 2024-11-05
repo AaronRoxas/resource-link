@@ -21,7 +21,21 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
 
-    res.status(200).json({ message: 'Login successful' });
+    // Redirect to the user's dashboard based on their role
+    let dashboardUrl;
+    switch (user.role) {
+      case 'admin':
+        dashboardUrl = '/admin'; // Admin dashboard URL
+        break;
+      case 'teacher':
+        dashboardUrl = '/teacher'; // User dashboard URL
+        break;
+      case 'staff':
+        dashboardUrl = '/staff'; // Manager dashboard URL
+        break;
+    }
+
+    res.status(200).json({ message: 'Login successful', dashboardUrl });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -49,7 +63,7 @@ router.post('/register', async (req, res) => {
 
 router.get('/data', async (req, res) => {
     try {
-      const data = await User.find(); // Fetch all user documents
+      const data = await Users.find(); // Fetch all user documents
       res.json(data);
     } catch (error) {
       console.error('Error fetching data:', error);

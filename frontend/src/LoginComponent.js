@@ -38,19 +38,15 @@ const LoginComponent = () => {
     e.preventDefault(); // Prevent default form submission
     setLoading(true); // Set loading to true when login starts
     try {
-      const response = await axios.post('https://resource-link-back.vercel.app/api/auth/login', {
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
         username,
         password,
       });
       console.log(response.data); // Handle successful login
 
-      // Check if the user role is admin or teacher
-      if (response.data.role === 'Admin' || response.data.role === 'admin') {
-        navigate('/admin'); // Navigate to AddUser if the role is admin
-      } else if (response.data.role === 'Teacher' || response.data.role === 'teacher') {
-        navigate('/teacher'); // Navigate to AddUser if the role is admin
-      } else {
-        setError('You do not have permission to access this page.'); // Set error message for non-admin users
+      // Redirect to the dashboard URL returned from the server
+      if (response.data.dashboardUrl) {
+        navigate(response.data.dashboardUrl); // Navigate to the dashboard URL
       }
     } catch (err) {
       console.error('Login error:', err.response ? err.response.data : err.message);
