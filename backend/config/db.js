@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect('mongodb+srv://aaronroxas49:ZlUBfpxeO9qkgMTR@resourcelink.5iuii.mongodb.net/?retryWrites=true&w=majority&appName=ResourceLink');
     console.log("Database connected");
   } catch (error) {
     console.error("Database connection failed:", error);
