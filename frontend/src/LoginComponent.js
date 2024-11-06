@@ -42,6 +42,11 @@ const LoginComponent = () => {
         username,
         password,
       });
+
+      // Store token in localStorage
+      localStorage.setItem('authToken', response.data.token);
+      localStorage.setItem('userRole', response.data.role); // Store user role
+
       console.log(response.data); // Handle successful login
 
       // Redirect to the dashboard URL returned from the server

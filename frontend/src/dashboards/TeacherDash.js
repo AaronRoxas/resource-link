@@ -1,6 +1,7 @@
 import React from 'react'
 import '../styles/TeacherDash.css'
 import { getFormattedDate } from '../utils/dateUtils'
+import LogoutButton from '../components/LogoutButton'
 
 const TeacherDash = () => {
   const formattedDate = getFormattedDate()
@@ -8,6 +9,7 @@ const TeacherDash = () => {
   return (
     <div className="dashboard">
       <header>
+        <LogoutButton />
         <h1>User</h1>
         <h2>Hi, Welcome Back!</h2>
         <h3>{formattedDate}</h3>
@@ -39,7 +41,7 @@ const TeacherDash = () => {
           <img src="footer-imgs/active-home.svg" alt="Home" />
           <span>Home</span>
         </div>
-        </nav>
+      </nav>
     </div>
   )
 }

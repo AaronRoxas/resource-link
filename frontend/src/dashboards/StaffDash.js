@@ -2,6 +2,7 @@ import React from 'react'
 import '../styles/AdminDash.css'
 import { getFormattedDate } from '../utils/dateUtils'; // Import the function
 import BottomNav from '../components/BottomNav'; // Import the BottomNav component
+import LogoutButton from '../components/LogoutButton';
 
 const StaffDash = () => {
   const formattedDate = getFormattedDate(); // Call the function
@@ -15,6 +16,7 @@ const StaffDash = () => {
 
   return (
     <div className="admin-dashboard">
+      <LogoutButton />
       <header>
         <h1>Inventory Manager</h1>
         <h2>Hi, Welcome Back!</h2>

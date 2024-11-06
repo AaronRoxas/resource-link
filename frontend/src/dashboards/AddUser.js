@@ -10,7 +10,9 @@ const AddUser = () => {
   const [department, setDepartment] = useState('');
   const [role, setRole] = useState('');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [showModal, setShowModal] = useState(false); // State for modal visibility
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // State for success modal visibility
+  const [showErrorModal, setShowErrorModal] = useState(false); // State for error modal visibility
+  const [errorMessage, setErrorMessage] = useState(''); // State for error message
 
   useEffect(() => {
     const handleResize = () => {
@@ -36,7 +38,7 @@ const AddUser = () => {
       console.log('User created:', response.data);
       
       // Show success modal
-      setShowModal(true);
+      setShowSuccessModal(true);
 
       // Optionally reset the form
       setName('');
@@ -45,21 +47,30 @@ const AddUser = () => {
       setRole('');
     } catch (error) {
       console.error('Error creating user:', error.response ? error.response.data : error.message);
+      if (error.response && error.response.status === 400) {
+        // Show error modal if user already exists
+        setErrorMessage('User already exists');
+        setShowErrorModal(true);
+      }
     }
   };
 
-  const closeModal = () => {
-    setShowModal(false);
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
   };
 
-    // Define the navigation items
-    const navItems = [
-      { path: '/admin', icon: 'home', label: 'Home' },
-      { path: '/chart', icon: 'chart', label: 'Chart' },
-      { path: '/qr-code', icon: 'qr', label: 'QR Code' },
-      { path: '/addUser', icon: 'active-profile', label: 'Add User' },
-      { path: '/categories', icon: 'cube', label: 'Categories' },
-    ];
+  const closeErrorModal = () => {
+    setShowErrorModal(false);
+  };
+
+  // Define the navigation items
+  const navItems = [
+    { path: '/admin', icon: 'home', label: 'Home' },
+    { path: '/chart', icon: 'chart', label: 'Chart' },
+    { path: '/qr-code', icon: 'qr', label: 'QR Code' },
+    { path: '/addUser', icon: 'active-profile', label: 'Add User' },
+    { path: '/adminCategories', icon: 'cube', label: 'Categories' },
+  ];
 
   return (
     <div className="add-user-container">
@@ -92,11 +103,11 @@ const AddUser = () => {
         <div className="form-group">
           <label>Role</label>
           <select
-              defaultValue="Teacher" // This should be set directly in the select element
-              value={role}
-              onChange={(e) => setRole(e.target.value)} // Corrected this line
-             
+            defaultValue="Teacher" // This should be set directly in the select element
+            value={role}
+            onChange={(e) => setRole(e.target.value)} // Corrected this line
           >
+            <option value="" disabled selected></option>
             <option value="Teacher">Teacher</option>
             <option value="Staff">Staff</option>
             <option value="Admin">Admin</option>
@@ -107,12 +118,14 @@ const AddUser = () => {
         </button>
       </form>
 
-      {showModal && (
-        <Modal message="User created successfully!" onClose={closeModal} />
+      {showSuccessModal && (
+        <Modal message="User created successfully!" onClose={closeSuccessModal} />
       )}
-            <BottomNav navItems={navItems} /> {/* Use the BottomNav component */}
+      {showErrorModal && (
+        <Modal message={errorMessage} onClose={closeErrorModal} />
+      )}
+      <BottomNav navItems={navItems} /> {/* Use the BottomNav component */}
     </div>
-    
   );
 };
 
