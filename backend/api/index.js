@@ -5,10 +5,16 @@ const authRoutes = require('../routes/auth'); // Ensure this path is correct
 const connectDB = require('../config/db'); // Import the connectDB function
 
 const app = express();
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? "https://resource-link.vercel.app"
+  : ["https://resource-link.vercel.app", "http://localhost:3000"];
+
 app.use(cors({
-  origin: ["https://resource-link.vercel.app", "http://localhost:3000"],
+  origin: allowedOrigins,
   methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
+  credentials: true,
+  preflightContinue: true,
+  optionsSuccessStatus: 204
 }));
 app.use(express.json()); // Parse JSON request bodies
 
