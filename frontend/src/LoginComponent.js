@@ -41,7 +41,10 @@ const LoginComponent = () => {
       const response = await axios.post('http://localhost:5000/api/auth/login', {
         username,
         password,
-      });
+      },
+    {
+      withCredentials: true
+    });
 
       // Store token in localStorage
       localStorage.setItem('authToken', response.data.token);
