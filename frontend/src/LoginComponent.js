@@ -38,12 +38,15 @@ const LoginComponent = () => {
     e.preventDefault(); // Prevent default form submission
     setLoading(true); // Set loading to true when login starts
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post('https://resource-link-back.vercel.app/api/auth/login', {
         username,
         password,
       },
     {
-      withCredentials: true
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
 
       // Store token in localStorage
