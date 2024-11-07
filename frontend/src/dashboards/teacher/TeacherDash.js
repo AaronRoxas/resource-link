@@ -1,7 +1,7 @@
 import React from 'react'
-import '../styles/TeacherDash.css'
-import { getFormattedDate } from '../utils/dateUtils'
-import LogoutButton from '../components/LogoutButton'
+import '../../styles/TeacherDash.css'
+import { getFormattedDate } from '../../utils/dateUtils'
+import LogoutButton from '../../components/LogoutButton'
 
 const TeacherDash = () => {
   const formattedDate = getFormattedDate()

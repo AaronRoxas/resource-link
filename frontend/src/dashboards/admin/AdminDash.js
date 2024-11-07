@@ -1,8 +1,8 @@
 import React from 'react'
-import '../styles/AdminDash.css'
-import { getFormattedDate } from '../utils/dateUtils'; // Import the function
-import BottomNav from '../components/BottomNav'; // Import the BottomNav component
-import LogoutButton from '../components/LogoutButton';
+import '../../styles/AdminDash.css'
+import { getFormattedDate } from '../../utils/dateUtils'; // Import the function
+import BottomNav from '../../components/BottomNav'; // Import the BottomNav component
+import LogoutButton from '../../components/LogoutButton';
 
 const AdminDash = () => {
   const formattedDate = getFormattedDate(); // Call the function
@@ -10,7 +10,7 @@ const AdminDash = () => {
   // Define the navigation items
   const navItems = [
     { path: '/admin', icon: 'active-home', label: 'Home' },
-    { path: '/chart', icon: 'chart', label: 'Chart' },
+    { path: '/adminChart', icon: 'chart', label: 'Chart' },
     { path: '/qr-code', icon: 'qr', label: 'QR Code' },
     { path: '/addUser', icon: 'profile', label: 'Add User' },
     { path: '/adminCategories', icon: 'cube', label: 'Categories' },

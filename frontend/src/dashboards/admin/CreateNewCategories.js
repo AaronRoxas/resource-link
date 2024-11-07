@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import BottomNav from '../components/BottomNav';
-import '../styles/CreateNewCategories.css';
+import BottomNav from '../../components/BottomNav';
+import '../../styles/CreateNewCategories.css';
 
 const CreateNewCategories = () => {
     const navItems = [
         { path: '/admin', icon: 'home', label: 'Home' },
-        { path: '/chart', icon: 'chart', label: 'Chart' },
+        { path: '/adminChart', icon: 'chart', label: 'Chart' },
         { path: '/qr-code', icon: 'qr', label: 'QR Code' },
         { path: '/addUser', icon: 'profile', label: 'Add User' },
         { path: '/adminCategories', icon: 'active-cube', label: 'Categories' },

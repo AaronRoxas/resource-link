@@ -39,7 +39,7 @@ const LoginComponent = () => {
     setLoading(true); // Set loading to true when login starts
     try {
       const response = await axios.post(
-        'https://resource-link-back.vercel.app/api/auth/login',
+        'http://localhost:5000/api/auth/login',
         { username, password },
         {
           withCredentials: true,
@@ -61,11 +61,10 @@ const LoginComponent = () => {
       }
     } catch (err) {
       console.error('Login error:', err.response ? err.response.data : err.message);
-      // Check for specific error messages related to device restrictions
+    
       if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message); // Set specific error message
-      } else {
-        setError('Invalid username or password'); // Set error message on failure
+        setError(err.response.data.message); 
+        setError('Invalid username or password'); 
       }
     } finally {
       setLoading(false); // Reset loading state

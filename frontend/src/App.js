@@ -4,15 +4,16 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Splash from './Splash.js';
 import LoginComponent from './LoginComponent.js';
 import OnBoarding from './OnBoarding.js';
-import AddUser from './dashboards/AddUser.js';
-import TeacherDash from './dashboards/TeacherDash.js';
-import AdminDash from './dashboards/AdminDash.js';
-import StaffDash from './dashboards/StaffDash.js';
-import AdminCategories from './dashboards/AdminCategories.js';
-import CreateNewCategories from './dashboards/CreateNewCategories.js';
+import AddUser from './dashboards/admin/AddUser.js';
+import TeacherDash from './dashboards/teacher/TeacherDash.js';
+import AdminDash from './dashboards/admin/AdminDash.js';
+import StaffDash from './dashboards/staff/StaffDash.js';
+import AdminCategories from './dashboards/admin/AdminCategories.js';
+import CreateNewCategories from './dashboards/admin/CreateNewCategories.js';
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
 import ChangePassword from './components/ChangePassword.js';
+import AdminChart from './dashboards/admin/AdminChart.js';
 
 function App() {
   return (
@@ -65,6 +66,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <AdminCategories />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/adminChart"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminChart />
             </ProtectedRoute>
           }
         />

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'; // Import axios for making HTTP requests
-import Modal from '../components/Modal'; // Import the Modal component
-import '../styles/AddUser.css'; 
-import BottomNav from '../components/BottomNav'; // Import the BottomNav component
+import Modal from '../../components/Modal'; // Import the Modal component
+import '../../styles/AddUser.css'; 
+import BottomNav from '../../components/BottomNav'; // Import the BottomNav component
 
 const AddUser = () => {
   const [name, setName] = useState('');
@@ -66,7 +66,7 @@ const AddUser = () => {
   // Define the navigation items
   const navItems = [
     { path: '/admin', icon: 'home', label: 'Home' },
-    { path: '/chart', icon: 'chart', label: 'Chart' },
+    { path: '/adminChart', icon: 'chart', label: 'Chart' },
     { path: '/qr-code', icon: 'qr', label: 'QR Code' },
     { path: '/addUser', icon: 'active-profile', label: 'Add User' },
     { path: '/adminCategories', icon: 'cube', label: 'Categories' },
