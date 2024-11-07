@@ -1,5 +1,14 @@
 {
   "dependencies": {
     "cors": "^2.8.5"
-  }
+  },
+  "name": "resourcelink",
+  "version": "1.0.0",
+  "description": "[Project URL](https://resource-link.vercel.app/)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
 }
