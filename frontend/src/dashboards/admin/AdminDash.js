@@ -15,7 +15,7 @@ const AdminDash = () => {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/inventory', {
+        const response = await axios.get('https://resource-link.onrender.com/api/inventory', {
           withCredentials: true
         });
         setInventory(response.data);
@@ -26,7 +26,7 @@ const AdminDash = () => {
 
     const fetchRecentActivities = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/activities', {
+        const response = await axios.get('https://resource-link.onrender.com/api/activities', {
           withCredentials: true
         });
         setRecentActivities(response.data);
@@ -37,7 +37,7 @@ const AdminDash = () => {
 
     const fetchItemTracking = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/item-tracking', {
+        const response = await axios.get('https://resource-link.onrender.com/api/item-tracking', {
           withCredentials: true
         });
         setItemTracking(response.data);
