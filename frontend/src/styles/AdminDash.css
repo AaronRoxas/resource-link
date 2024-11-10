@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap');
+
 .admin-dashboard {
-  font-family: Plus Jakarta Sans;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 9px;
   font-weight: 400;
   line-height: 11.34px;
@@ -9,71 +10,78 @@
   height: 100%;
   margin: 0 auto;
   padding: 20px;
-  background-color: #f5f5f5;
 }
 
 .admin-dashboard header {
   margin-bottom: 20px;
 }
-.admin-dashboard header h1{
+
+.admin-dashboard header h1 {
   font-size: 20px;
   font-weight: 600;
   line-height: 25.2px;
-
 }
-.admin-dashboard header h2{
+
+.admin-dashboard header h2 {
   font-size: 15px;
   font-weight: 700;
   line-height: 18.9px;
   text-align: left;
   color: black;
-  }
-.admin-dashboard header h3{
+}
+
+.admin-dashboard header h3 {
   font-size: 11px;
   font-weight: 700;
   line-height: 13.86px;
-  }
-
-.admin-dashboard h1 {
-  font-size: 24px;
-  margin-bottom: 5px;
-}
-
-.admin-dashboard header p {
-  margin: 0;
-  color: #666;
 }
 
 .admin-dashboard section {
   background-color: white;
   border-radius: 10px;
-  padding: 15px;
+  padding: 0;
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-size: 142px;
-}
-.bottom-nav img{
-  cursor: pointer;
-}
-.admin-dashboard h2 {
-  font-family: Plus Jakarta Sans;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 16.38px;
-  text-align: left;
-  color: white;  
+  position: relative;
 }
 
-.admin-dashboard .inventory-alerts{
+.admin-dashboard .inventory-alerts {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+}
+
+.inventory-alerts .card-header{
   background-color: #d32f2f;
-}
-
-.admin-dashboard .recent-activities{
+} 
+.recent-activities .card-header{
   background-color: #1976d2;
+} 
+.item-tracking .card-header{
+  background-color: #7b1fa2;
+} 
+
+.card-header h2 {
+  color: white;
+  margin: 0;
+  font-size: 1.2rem;
 }
 
-.admin-dashboard .item-tracking{
-  background-color: #7b1fa2;
+.admin-dashboard .recent-activities {
+  border-radius: 10px;
+  overflow: hidden; 
+  margin-bottom: 20px;
+}
+
+.admin-dashboard .item-tracking {
+  border-radius: 10px;
+  overflow: hidden; /* Ensure no content spills out */
+  margin-bottom: 20px;
 }
 
 .admin-dashboard section button {
@@ -85,10 +93,8 @@
   font-weight: bold;
   cursor: pointer;
   float: right;
-  font-family: Plus Jakarta Sans;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 10px;
-  font-weight: 400;
-  text-align: left;
 }
 
 .bottom-nav {
@@ -103,59 +109,64 @@
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.bottom-nav div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: black; 
-}
-
-.bottom-nav div.active {
-  color: green; 
-}
-
-.bottom-nav img {
-  width: 24px; 
-  height: 24px; 
-}
-
-.bottom-nav span {
-  font-size: 10px; 
-  color: #999; 
-  margin-top: 4px;
-  cursor: pointer;
-}
-
-@media (max-width: 600px) {
-  .bottom-nav {
-    flex-direction: row; 
-    padding: 5px 0; 
-  }
-
-  .bottom-nav div {
-    flex: 1; 
-    text-align: center; 
-  }
-
-  .bottom-nav img {
-    width: 20px; 
-    height: 20px; 
-  }
-
-  .bottom-nav span {
-    font-size: 9px; 
-  }
-}
-
 .heading-with-icon {
   display: flex;
   align-items: center;
 }
 
 .icon {
-  width: 24px; 
-  height: 24px; 
+  width: 24px;
+  height: 24px;
   margin-right: 8px; /* Space between the icon and text */
+}
+
+.table-container {
+  overflow-x: auto;
+  margin: 1rem 0;
+  padding: 15px;
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+}
+
+.table-container table th,
+.table-container table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.table-container table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.status-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.table-container table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.view-all-btn {
+  background-color: #242423;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  position: absolute;
+  right: 20px;
+  bottom: 15px;
+  cursor: pointer;
+  font-size: 10px;
 }
 
 

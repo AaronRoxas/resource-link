@@ -14,6 +14,7 @@ import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
 import ChangePassword from './components/ChangePassword.js';
 import AdminChart from './dashboards/admin/AdminChart.js';
+import AddItem from './dashboards/admin/AddItem.js';
 
 function App() {
   return (
@@ -34,6 +35,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <AddUser />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/addItem"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AddItem />
             </ProtectedRoute>
           }
         />

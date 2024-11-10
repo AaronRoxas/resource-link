@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Import axios for making HTTP requests
-import Modal from '../../components/Modal'; // Import the Modal component
+import axios from 'axios'; 
+import Modal from '../../components/Modal'; 
 import '../../styles/AddUser.css'; 
-import BottomNav from '../../components/BottomNav'; // Import the BottomNav component
+import BottomNav from '../../components/BottomNav'; 
 
 const AddUser = () => {
   const [name, setName] = useState('');
@@ -40,7 +40,6 @@ const AddUser = () => {
       // Show success modal
       setShowSuccessModal(true);
 
-      // Optionally reset the form
       setName('');
       setUsername('');
       setDepartment('');
@@ -63,11 +62,11 @@ const AddUser = () => {
     setShowErrorModal(false);
   };
 
-  // Define the navigation items
+
   const navItems = [
     { path: '/admin', icon: 'home', label: 'Home' },
     { path: '/adminChart', icon: 'chart', label: 'Chart' },
-    { path: '/qr-code', icon: 'qr', label: 'QR Code' },
+    { path: '/addItem', icon: 'qr', label: 'Add Item' },
     { path: '/addUser', icon: 'active-profile', label: 'Add User' },
     { path: '/adminCategories', icon: 'cube', label: 'Categories' },
   ];
@@ -103,9 +102,9 @@ const AddUser = () => {
         <div className="form-group">
           <label>Role</label>
           <select
-            defaultValue="Teacher" // This should be set directly in the select element
+            defaultValue="" 
             value={role}
-            onChange={(e) => setRole(e.target.value)} // Corrected this line
+            onChange={(e) => setRole(e.target.value)} 
           >
             <option value="" disabled selected></option>
             <option value="Teacher">Teacher</option>

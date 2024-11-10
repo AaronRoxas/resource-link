@@ -5,7 +5,7 @@ const AdminChart = () => {
     const navItems = [
         { path: '/admin', icon: 'home', label: 'Home' },
         { path: '/adminChart', icon: 'active-chart', label: 'Chart' },
-        { path: '/qr-code', icon: 'qr', label: 'QR Code' },
+        { path: '/addItem', icon: 'qr', label: 'Add Item' },
         { path: '/addUser', icon: 'profile', label: 'Add User' },
         { path: '/adminCategories', icon: 'cube', label: 'Categories' },
       ];

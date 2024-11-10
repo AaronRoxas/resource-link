@@ -2,12 +2,12 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const BottomNav = ({ navItems }) => {
-  const navigate = useNavigate(); // Initialize useNavigate
-  const location = useLocation(); // Get the current location
+  const navigate = useNavigate(); 
+  const location = useLocation(); 
 
-  // Function to handle navigation
+
   const handleNavigation = (path) => {
-    navigate(path); // Redirect to the specified path
+    navigate(path); 
   };
 
   return (
@@ -15,7 +15,7 @@ const BottomNav = ({ navItems }) => {
       {navItems.map((item) => (
         <div
           key={item.path}
-          className={`${item.icon}-icon ${location.pathname === item.path ? 'active' : ''}`} // Add active class
+          className={`${item.icon}-icon ${location.pathname === item.path ? 'active' : ''} ${item.label === 'QR Code' ? 'qr-icon' : ''}`} // Add qr-icon class for QR Code
           onClick={() => handleNavigation(item.path)}
         >
           <img src={`footer-imgs/${item.icon}.svg`} alt={item.label} />

@@ -1,8 +1,13 @@
-require('dotenv').config(); // Load environment variables from .env file
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const authRoutes = require('../routes/auth'); // Ensure this path is correct
-const connectDB = require('../config/db'); // Import the connectDB function
+const authRoutes = require('../routes/auth'); 
+const itemRoutes = require('../routes/items');
+const connectDB = require('../config/db'); 
+const recentActivitiesRoutes = require('../routes/activities');
+const itemTrackingRoutes = require('../routes/itemTracking');
+
+
 
 const app = express();
 app.use(cors({
@@ -12,7 +17,7 @@ app.use(cors({
 }));
 app.use(express.json()); // Parse JSON request bodies
 
-// Connect to the database
+
 connectDB()
   .catch(err => console.error('Database connection error:', err));
 
@@ -23,6 +28,13 @@ app.get('/', (req, res) => {
 
 // Mount auth routes
 app.use('/api/auth', authRoutes); 
+app.use('/api/items', itemRoutes);
+
+// Mount recent activities and item tracking routes
+app.use('/api/activities', recentActivitiesRoutes);
+app.use('/api/item-tracking', itemTrackingRoutes);
+
+
 
 // Improved error handling for undefined routes
 app.use((req, res) => {

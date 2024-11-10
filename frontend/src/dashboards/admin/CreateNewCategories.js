@@ -6,7 +6,7 @@ const CreateNewCategories = () => {
     const navItems = [
         { path: '/admin', icon: 'home', label: 'Home' },
         { path: '/adminChart', icon: 'chart', label: 'Chart' },
-        { path: '/qr-code', icon: 'qr', label: 'QR Code' },
+        { path: '/addItem', icon: 'qr', label: 'Add Item' },
         { path: '/addUser', icon: 'profile', label: 'Add User' },
         { path: '/adminCategories', icon: 'active-cube', label: 'Categories' },
     ];
@@ -83,6 +83,7 @@ const CreateNewCategories = () => {
                     </div>
                 </div>
                 <button className="create-new-category-button" type="submit">Create</button>
+                <a href="/admin">View Inventory</a>
             </form>
             <BottomNav navItems={navItems} />
         </div>
