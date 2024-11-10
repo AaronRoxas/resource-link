@@ -18,7 +18,7 @@ const AdminCategories = () => {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/inventory', {
+        const response = await axios.get('https://resource-link.onrender.com/api/inventory', {
           withCredentials: true
         });
         setInventory(response.data);
