@@ -28,7 +28,7 @@ const AddUser = () => {
     const password = '1234'; // Default password
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
+      const response = await axios.post('https://resource-link.onrender.com/api/auth/register', {
         username,
         password,
         name,
