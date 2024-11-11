@@ -18,7 +18,7 @@ const AdminCategories = () => {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const response = await axios.get('https://resource-link.onrender.com/api/inventory', {
+        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', {
           withCredentials: true
         });
         setInventory(response.data);

@@ -34,7 +34,7 @@ const AddItem = () => {
 
     // Send data to the backend
     try {
-      const response = await axios.post('https://resource-link.onrender.com/api/items', { ...formData, id: currentId });
+      const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/items', { ...formData, id: currentId });
       console.log('Item added:', response.data);
       setFormData({
         name: '',
@@ -54,7 +54,7 @@ const AddItem = () => {
   useEffect(() => {
     const fetchLastId = async () => {
       try {
-        const response = await axios.get('https://resource-link.onrender.com/api/items/last-id');
+        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/items/last-id');
         setCurrentId(response.data.lastId + 1); // Increment for the next item
       } catch (error) {
         console.error('Error fetching last ID:', error);

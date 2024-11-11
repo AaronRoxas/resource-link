@@ -17,7 +17,7 @@ const AdminDash = () => {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const response = await axios.get('https://resource-link.onrender.com/api/inventory', {
+        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', {
           withCredentials: true
         });
         setInventory(response.data);
@@ -28,7 +28,7 @@ const AdminDash = () => {
 
     const fetchRecentActivities = async () => {
       try {
-        const response = await axios.get('https://resource-link.onrender.com/api/activities', {
+        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/activities', {
           withCredentials: true
         });
         setRecentActivities(response.data);
@@ -39,7 +39,7 @@ const AdminDash = () => {
 
     const fetchItemTracking = async () => {
       try {
-        const response = await axios.get('https://resource-link.onrender.com/api/item-tracking', {
+        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/item-tracking', {
           withCredentials: true
         });
         setItemTracking(response.data);
