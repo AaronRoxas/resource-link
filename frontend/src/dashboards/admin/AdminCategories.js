@@ -11,14 +11,14 @@ const AdminCategories = () => {
     { path: '/adminChart', icon: 'chart', label: 'Chart' },
     { path: '/addItem', icon: 'qr', label: 'Add Item' },
     { path: '/addUser', icon: 'profile', label: 'Add User' },
-    { path: '/adminCategories', icon: 'active-cube', label: 'Categories' },
+    { path: '/adminCategories', icon: 'active-cube', label: 'Inventory' },
   ];
 
   // Fetch inventory data
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/inventory', {
+        const response = await axios.get('https://resource-link.onrender.com/api/inventory', {
           withCredentials: true
         });
         setInventory(response.data);
@@ -37,19 +37,19 @@ const AdminCategories = () => {
         <table>
           <thead>
             <tr>
-              <th>Tag</th>
               <th>Item</th>
+              <th>Status</th>
               <th>Serial No.</th>
               <th>Category</th>
             </tr>
           </thead>
           <tbody>
             {inventory.map((item) => (
-              <tr key={item.tag}>
-                <td>{item.tag}</td>
-                <td>{item.name}</td>
-                <td>{item.serialNo}</td>
-                <td>{item.category}</td>
+              <tr key={item.id}>
+                <td data-label="Item">{item.name}</td>
+                <td data-label="Status">{item.status}</td>
+                <td data-label="Serial No.">{item.serialNo}</td>
+                <td data-label="Category">{item.category}</td>
               </tr>
             ))}
           </tbody>

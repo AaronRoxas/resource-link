@@ -21,7 +21,7 @@ const AddItem = () => {
     { path: '/adminChart', icon: 'chart', label: 'Chart' },
     { path: '/addItem', icon: 'qr', label: 'Add Item' },
     { path: '/addUser', icon: 'profile', label: 'Add User' },
-    { path: '/createcategories', icon: 'cube', label: 'Categories' },
+    { path: '/adminCategories', icon: 'cube', label: 'Inventory' },
   ];
 
   const handleChange = (e) => {
@@ -34,7 +34,7 @@ const AddItem = () => {
 
     // Send data to the backend
     try {
-      const response = await axios.post('http://localhost:5000/api/items', { ...formData, id: currentId });
+      const response = await axios.post('https://resource-link.onrender.com/api/items', { ...formData, id: currentId });
       console.log('Item added:', response.data);
       setFormData({
         name: '',
@@ -54,7 +54,7 @@ const AddItem = () => {
   useEffect(() => {
     const fetchLastId = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/items/last-id');
+        const response = await axios.get('https://resource-link.onrender.com/api/items/last-id');
         setCurrentId(response.data.lastId + 1); // Increment for the next item
       } catch (error) {
         console.error('Error fetching last ID:', error);
@@ -78,9 +78,20 @@ const AddItem = () => {
             <label>Name</label>
             <input type="text" name="name" value={formData.name} onChange={handleChange} required />
           </div>
+
           <div className="field">
             <label>Status</label>
-            <input type="text" name="status" value={formData.status} onChange={handleChange} required />
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+            >
+              <option value="" disabled></option>
+              <option value="">Good</option>
+              <option value="For repair">For repair</option>
+              <option value="For maintenance">For maintenance</option>
+              <option value="Low stock">Low stock</option>
+            </select>
           </div>
           <div className="field">
             <label>Category</label>

@@ -6,6 +6,7 @@ const itemRoutes = require('../routes/items');
 const connectDB = require('../config/db'); 
 const recentActivitiesRoutes = require('../routes/activities');
 const itemTrackingRoutes = require('../routes/itemTracking');
+const inventoryRoutes = require('../routes/inventory');
 
 
 
@@ -33,6 +34,7 @@ app.use('/api/items', itemRoutes);
 // Mount recent activities and item tracking routes
 app.use('/api/activities', recentActivitiesRoutes);
 app.use('/api/item-tracking', itemTrackingRoutes);
+app.use('/', inventoryRoutes);
 
 
 

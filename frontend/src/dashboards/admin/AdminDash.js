@@ -4,18 +4,20 @@ import '../../styles/AdminDash.css';
 import { getFormattedDate } from '../../utils/dateUtils'; 
 import BottomNav from '../../components/BottomNav'; 
 import LogoutButton from '../../components/LogoutButton';
+import InventoryModal from '../../components/InventoryAlertModal'; // Import the modal component
 
 const AdminDash = () => {
   const [inventory, setInventory] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
   const [itemTracking, setItemTracking] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
   const formattedDate = getFormattedDate(); 
 
   // Fetch inventory data
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/inventory', {
+        const response = await axios.get('https://resource-link.onrender.com/api/inventory', {
           withCredentials: true
         });
         setInventory(response.data);
@@ -26,7 +28,7 @@ const AdminDash = () => {
 
     const fetchRecentActivities = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/activities', {
+        const response = await axios.get('https://resource-link.onrender.com/api/activities', {
           withCredentials: true
         });
         setRecentActivities(response.data);
@@ -37,7 +39,7 @@ const AdminDash = () => {
 
     const fetchItemTracking = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/item-tracking', {
+        const response = await axios.get('https://resource-link.onrender.com/api/item-tracking', {
           withCredentials: true
         });
         setItemTracking(response.data);
@@ -91,7 +93,7 @@ const AdminDash = () => {
           <table>
             <thead>
               <tr>
-                <th>Tag</th>
+                <th>ID</th>
                 <th>Item</th>
                 <th>Status</th>
               </tr>
@@ -99,12 +101,12 @@ const AdminDash = () => {
             <tbody>
               {inventory
                 .filter(item => item.status !== 'Good')
-                .slice(0, 5)
+                .slice(0, 3)
                 .map((item) => (
                   <tr key={item.tag}>
-                    <td>{item.tag}</td>
-                    <td>{item.item}</td>
-                    <td>
+                    <td data-label="ID">{item.id}</td>
+                    <td data-label="Item">{item.name}</td>
+                    <td data-label="Status" > 
                       <img 
                         src={getStatusIcon(item.status)} 
                         alt={item.status} 
@@ -117,7 +119,7 @@ const AdminDash = () => {
             </tbody>
           </table>
         </div>
-        <button className="view-all-btn">View all</button>
+        <button className="view-all-btn" onClick={() => setIsModalOpen(true)}>View all</button> {/* View All button */}
       </section>
 
       <section className="recent-activities">
@@ -181,6 +183,11 @@ const AdminDash = () => {
       </section>
 
       <BottomNav navItems={navItems} />
+      <InventoryModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        inventory={inventory} 
+      /> {/* Modal component */}
     </div>
   );
 }

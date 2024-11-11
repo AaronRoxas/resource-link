@@ -39,7 +39,7 @@ const LoginComponent = () => {
     setLoading(true); // Set loading to true when login starts
     try {
       const response = await axios.post(
-        'https://resource-link.onrender.com/api/auth/login',
+        'https://resource-link.onrender.com/api/auth/login' || 'http://localhost:5000/api/auth/login', // Login endpoint
         { username, password },
         {
           withCredentials: true,
