@@ -4,7 +4,6 @@ import { Navigate, useLocation } from 'react-router-dom';
 const ProtectedRoute = ({ children, requiredRole }) => {
   const authToken = localStorage.getItem('authToken');
   const userRole = localStorage.getItem('userRole');
-  const location = useLocation();
 
   if (!authToken) {
     return <Navigate to="/login" />;

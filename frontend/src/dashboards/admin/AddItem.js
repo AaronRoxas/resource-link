@@ -123,8 +123,11 @@ const AddItem = () => {
             <label>Notes</label>
             <textarea name="notes" value={formData.notes} onChange={handleChange}></textarea>
           </div>
+          <div className="field">
+            <button type="submit" className="submit-button">Add Item</button>
+          </div>
         </div>
-        <button type="submit" className="submit-button">Add Item</button>
+        
       </form>
 
       <BottomNav navItems={navItems} />

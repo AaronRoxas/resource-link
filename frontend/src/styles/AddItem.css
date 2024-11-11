@@ -5,6 +5,11 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   max-width: 400px;
   margin: auto;
+  min-height: 400px; 
+  display: flex;
+  flex-direction: column; 
+  justify-content: flex-start; /* Keep items at the top */
+  padding-bottom: 80px; /* Add padding to the bottom for the BottomNav */
 }
 
 .add-item-container h1 {
@@ -13,28 +18,10 @@
   margin-bottom: 20px;
 }
 
-.image-upload {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 2px dashed #d32f2f;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.upload-icon {
-  font-size: 40px;
-  color: #d32f2f;
-}
-
 .fields-container {
   margin-bottom: 20px;
-}
-
-.add-item-container h2 {
-  font-size: 18px;
-  margin-bottom: 10px;
+  flex-grow: 1; 
+  overflow-y: auto; 
 }
 
 .field {
@@ -57,10 +44,6 @@
   resize: none;
 }
 
-.field textarea {
-  height: 60px;
-}
-
 .submit-button {
   width: 100%;
   padding: 10px;
@@ -70,6 +53,7 @@
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
+  margin-top: 20px; /* Add margin to create space above the button */
 }
 
 .submit-button:hover {
