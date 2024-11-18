@@ -7,8 +7,6 @@ const recentActivitiesRoutes = require('../routes/activities');
 const itemTrackingRoutes = require('../routes/itemTracking');
 const inventoryRoutes = require('../routes/inventory');
 
-
-
 const app = express();
 app.use(cors({
   origin: ["https://resource-link.vercel.app", "http://localhost:3000"],
