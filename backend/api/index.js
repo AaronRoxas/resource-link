@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('../routes/auth'); 
-const itemRoutes = require('../routes/items');
 const connectDB = require('../config/db'); 
 const recentActivitiesRoutes = require('../routes/activities');
 const itemTrackingRoutes = require('../routes/itemTracking');
@@ -29,13 +28,13 @@ app.get('/', (req, res) => {
 
 // Mount auth routes
 app.use('/api/auth', authRoutes); 
-app.use('/api/items', itemRoutes);
+
 
 // Mount recent activities and item tracking routes
 app.use('/api/activities', recentActivitiesRoutes);
 app.use('/api/item-tracking', itemTrackingRoutes);
 app.use('/api/inventory', inventoryRoutes);
-
+app.use('/', inventoryRoutes);
 
 
 // Improved error handling for undefined routes
