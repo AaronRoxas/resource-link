@@ -34,7 +34,7 @@ app.use('/api/items', itemRoutes);
 // Mount recent activities and item tracking routes
 app.use('/api/activities', recentActivitiesRoutes);
 app.use('/api/item-tracking', itemTrackingRoutes);
-app.use('/', inventoryRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
 
 

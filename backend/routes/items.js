@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Item = require('../models/Item');
+const mongoose = require('mongoose');
 
 // Get the last used ID
 router.get('/last-id', async (req, res) => {
@@ -40,10 +41,26 @@ router.get('/', async (req, res) => {
 // Update an item
 router.put('/:id', async (req, res) => {
   try {
-    const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { id } = req.params;
+
+    // Validate the ID format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send('Invalid ID format');
+    }
+
+    // Convert the id to ObjectId
+    const objectId = mongoose.Types.ObjectId(id);
+
+    const updatedItem = await Item.findByIdAndUpdate(objectId, req.body, { new: true });
+
+    if (!updatedItem) {
+      return res.status(404).send('Item not found');
+    }
+
     res.status(200).json(updatedItem);
-  } catch (err) {
-    res.status(500).json(err);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
   }
 });
 
