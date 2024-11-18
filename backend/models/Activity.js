@@ -6,7 +6,5 @@ const activitySchema = new mongoose.Schema({
   action: { type: String, required: true },
   item: { type: String, required: true }
 });
-
 const Activity = mongoose.model('Activity', activitySchema);
-
 module.exports = Activity;
