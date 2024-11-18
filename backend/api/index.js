@@ -6,7 +6,7 @@ const connectDB = require('../config/db');
 const recentActivitiesRoutes = require('../routes/activities');
 const itemTrackingRoutes = require('../routes/itemTracking');
 const inventoryRoutes = require('../routes/inventory');
-
+const itemRoutes = require('../routes/items');
 const app = express();
 app.use(cors({
   origin: ["https://resource-link.vercel.app", "http://localhost:3000"],
@@ -32,6 +32,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/activities', recentActivitiesRoutes);
 app.use('/api/item-tracking', itemTrackingRoutes);
 app.use('/api/inventory', inventoryRoutes);
+app.use('/api/items', itemRoutes);
 app.use('/', inventoryRoutes);
 
 

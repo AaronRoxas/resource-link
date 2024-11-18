@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import BottomNav from '../../components/BottomNav'; 
 import '../../styles/AdminCategories.css'; // Import your CSS file for styling
-
+import { useNavigate } from 'react-router-dom';
 
 
 const AdminCategories = () => {
   const [inventory, setInventory] = useState([]);
   const [editItem, setEditItem] = useState(null); // State to hold the item being edited
   const [formData, setFormData] = useState({ name: '', status: '', serialNo: '', category: '' }); // Form data state
-
+  const navigate = useNavigate();
   const navItems = [
     { path: '/admin', icon: 'home', label: 'Home' },
     { path: '/adminChart', icon: 'chart', label: 'Chart' },
@@ -66,11 +66,19 @@ const AdminCategories = () => {
       console.error('Error deleting item:', error);
     }
   };
+  const handleBack = () => {
+    navigate('/admin'); // Navigate to the admin dashboard
+  };
 
   return (
     <div className="admin-categories">
-      <h1>Inventory Items</h1>
+      
+      <h1>
+        <img src="back-arrow.svg" alt="Back" className="back-arrow" onClick={handleBack} /> 
+          &nbsp;Inventory Items
+      </h1>
       <div className="table-container">
+        <hr />
         <table>
           <thead>
             <tr>

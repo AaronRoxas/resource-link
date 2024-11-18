@@ -36,6 +36,13 @@
   align-items: center; /* Center icons vertically */
 }
 
+.back-arrow{
+  cursor: pointer;
+  width: 24px;
+  height: 24px; 
+  margin-right: 10px;
+}
+
 @media (max-width: 768px) {
   .table-container th, td {
     font-size: 14px; 
@@ -71,7 +78,7 @@
   }
 
   .action-icons span {
-    cursor: pointer; /* Change cursor to pointer for text */
+    cursor: pointer; 
     margin: 0;
    
   }
@@ -129,8 +136,6 @@
   border-radius: 4px;
 }
 
-
-
 .cancel-button {
   width: 100%;
   padding: 10px;
@@ -142,7 +147,6 @@
   font-size: 16px;
   margin-top: 5px;
 }
-
 
 .cancel-button:hover {
   background-color: #e20000;
