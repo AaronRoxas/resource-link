@@ -1,6 +1,6 @@
 import React from 'react';
-import '../styles/InventoryModal.css'; // Optional: Add your styles here
-import '../styles/AdminDash.css'; // Import AdminDash styles for table
+import '../styles/InventoryModal.css'; // Import InventoryAlertModal styles
+
 
 const InventoryModal = ({ isOpen, onClose, inventory }) => {
   if (!isOpen) return null;
@@ -21,14 +21,9 @@ const InventoryModal = ({ isOpen, onClose, inventory }) => {
 
   return (
     <div className="inventory-modal-overlay">
-    <button onClick={onClose} className="close-button">X</button> {/* Close button as X */}
       <div className="inventory-modal-content">
-        
+      <span className="close" onClick={onClose}>&times;</span>{/* Close button as X */}
         <section className="inventory-alerts">
-          <div className="card-header">
-            <img src='table-imgs/alert.svg' alt='Alert Icon' className="icon" />
-            <h2>Inventory Alerts</h2>
-          </div>
           <div className="table-container">
             <table>
               <thead>

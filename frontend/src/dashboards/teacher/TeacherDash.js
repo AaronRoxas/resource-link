@@ -2,9 +2,11 @@ import React from 'react'
 import '../../styles/TeacherDash.css'
 import { getFormattedDate } from '../../utils/dateUtils'
 import LogoutButton from '../../components/LogoutButton'
+import { useNavigate } from 'react-router-dom'
 
 const TeacherDash = () => {
   const formattedDate = getFormattedDate()
+  const navigate = useNavigate()
 
   return (
     <div className="dashboard">
@@ -23,16 +25,16 @@ const TeacherDash = () => {
       </div>
       <div className="grid">
         <div className="card devices">
-          <img src="dashboard-imgs/devices.svg" alt="Devices" />
+          <img src="dashboard-imgs/devices.svg" alt="Devices" onClick={() => navigate('/viewDevices')} />
         </div>
         <div className="card books">
-          <img src="dashboard-imgs/books.svg" alt="Books" />
+          <img src="dashboard-imgs/books.svg" alt="Books" onClick={() => navigate('/viewBooks')} />
         </div>
         <div className="card lab-equipments">
-          <img src="dashboard-imgs/lab.svg" alt="Lab Equipments" />
+          <img src="dashboard-imgs/lab.svg" alt="Lab Equipments" onClick={() => navigate('/ViewLabEquipments')} />
         </div>
         <div className="card miscellaneous">
-          <img src="dashboard-imgs/misc.svg" alt="Miscellaneous" />
+          <img src="dashboard-imgs/misc.svg" alt="Miscellaneous" onClick={() => navigate('/viewMisc')} />
         </div>
       </div>
 

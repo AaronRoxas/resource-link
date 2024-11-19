@@ -15,6 +15,10 @@ import PublicRoute from './PublicRoute';
 import ChangePassword from './components/ChangePassword.js';
 import AdminChart from './dashboards/admin/AdminChart.js';
 import AddItem from './dashboards/admin/AddItem.js';
+import ViewDevices from './dashboards/teacher/ViewDevices.js';
+import ViewLabEquipments from './dashboards/teacher/ViewLabEquipments.js';
+import ViewBooks from './dashboards/teacher/ViewBooks.js';
+import ViewMisc from './dashboards/teacher/ViewMisc.js';
 
 function App() {
   return (
@@ -51,6 +55,38 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <TeacherDash />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/viewDevices"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <ViewDevices/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/viewBooks"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <ViewBooks/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/viewLabEquipments"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <ViewLabEquipments/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/viewMisc"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <ViewMisc/>
             </ProtectedRoute>
           }
         />
