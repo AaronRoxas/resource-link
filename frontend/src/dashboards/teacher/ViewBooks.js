@@ -6,8 +6,6 @@ import { useNavigate } from 'react-router-dom';
 
 const ViewBooks = () => {
     const [books, setBooks] = useState([]);
-    const [editItem, setEditItem] = useState(null);
-    const [formData, setFormData] = useState({ name: '', status: '', serialNo: '', category: '' });
     const [borrowItem, setBorrowItem] = useState(null);
     const [borrowFormData, setBorrowFormData] = useState({ borrower: '', borrowDate: '', returnDate: '' });
     const navigate = useNavigate();

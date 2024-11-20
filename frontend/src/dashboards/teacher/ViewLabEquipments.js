@@ -8,7 +8,6 @@ const ViewLabEquipments = () => {
     const [equipments, setEquipments] = useState([]);
     const [borrowItem, setBorrowItem] = useState(null);
     const [borrowFormData, setBorrowFormData] = useState({ borrower: '', borrowDate: '', returnDate: '' });
-    const [user, setUser] = useState(null);
     const navigate = useNavigate();
     const navItems = [
         { path: '/teacher', icon: 'active-home', label: 'Home' },
@@ -50,10 +49,6 @@ const ViewLabEquipments = () => {
 
     const handleSetBorrowItem = (item) => {
         setBorrowItem(item);
-        setBorrowFormData({
-            ...borrowFormData,
-            borrower: user?.username || '' // Use the authenticated user's username
-        });
     };
 
     const handleBack = () => {

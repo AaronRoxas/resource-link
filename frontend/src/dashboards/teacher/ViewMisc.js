@@ -6,8 +6,6 @@ import { useNavigate } from 'react-router-dom';
 
 const ViewMisc = () => {
     const [misc, setMisc] = useState([]);
-    const [editItem, setEditItem] = useState(null);
-    const [formData, setFormData] = useState({ name: '', status: '', serialNo: '', category: '' });
     const [borrowItem, setBorrowItem] = useState(null);
     const [borrowFormData, setBorrowFormData] = useState({ borrower: '', borrowDate: '', returnDate: '' });
     const navigate = useNavigate();
@@ -33,23 +31,8 @@ const ViewMisc = () => {
         fetchMisc();
     }, []);
 
-    const handleEdit = (item) => {
-        setEditItem(item);
-        setFormData({ name: item.name, status: item.status, serialNo: item.serialNo, category: item.category });
-    };
 
-    const handleSave = async () => {
-        try {
-            const response = await axios.put(`https://resource-link-main-14c755858b60.herokuapp.com/api/inventory/${editItem._id}`, formData, {
-                withCredentials: true
-            });
-            console.log('Item updated successfully:', response.data);
-            setMisc(misc.map(item => (item._id === editItem._id ? { ...item, ...formData } : item)));
-            setEditItem(null);
-        } catch (error) {
-            console.error('Error updating item:', error);
-        }
-    };
+
 
     const handleBorrow = async () => {
         try {
@@ -101,7 +84,7 @@ const ViewMisc = () => {
                                         onClick={() => setBorrowItem(item)} 
                                         className="icon" 
                                     />
-                                   <span className="action-text edit-text" onClick={() => handleEdit(item)}>Borrow Item</span>
+                                   <span className="action-text edit-text" onClick={() => handleBorrow(item)}>Borrow Item</span>
                                 </td>
                             </tr>
                         ))}
