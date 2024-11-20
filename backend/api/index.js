@@ -34,6 +34,7 @@ app.use('/api/item-tracking', itemTrackingRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/borrowings', borrowingsRoutes);
+app.use('/', inventoryRoutes);
 
 // Improved error handling for undefined routes
 app.use((req, res) => {
