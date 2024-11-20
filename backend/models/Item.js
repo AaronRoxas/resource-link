@@ -8,7 +8,11 @@ const itemSchema = new mongoose.Schema({
   purchaseCost: { type: Number, required: true },
   notes: { type: String },
   category: { type: String, required: true },
-  id: { type: Number, required: true }
+  id: { type: Number, required: true },
+  stocks: { type: Number, required: true, default: 0 },
+  borrower: String, // New field
+  borrowDate: Date, // New field
+  returnDate: Date  // New field
 });
 
 // Create the Item model

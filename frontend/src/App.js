@@ -19,7 +19,7 @@ import ViewDevices from './dashboards/teacher/ViewDevices.js';
 import ViewLabEquipments from './dashboards/teacher/ViewLabEquipments.js';
 import ViewBooks from './dashboards/teacher/ViewBooks.js';
 import ViewMisc from './dashboards/teacher/ViewMisc.js';
-
+import TeacherCategories from './dashboards/teacher/TeacherCategories.js';
 function App() {
   return (
     <Router>
@@ -55,6 +55,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <TeacherDash />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacherCategories"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <TeacherCategories />
             </ProtectedRoute>
           }
         />

@@ -11,6 +11,7 @@ const AddItem = () => {
     purchaseDate: '',
     purchaseCost: '',
     notes: '',
+    stocks: '',
     category: ''
   });
 
@@ -43,6 +44,7 @@ const AddItem = () => {
         purchaseDate: '',
         purchaseCost: '',
         notes: '',
+        stocks: '',
         category: ''
       });
       setCurrentId(currentId + 1);

@@ -3,11 +3,14 @@ import '../../styles/TeacherDash.css'
 import { getFormattedDate } from '../../utils/dateUtils'
 import LogoutButton from '../../components/LogoutButton'
 import { useNavigate } from 'react-router-dom'
-
+import BottomNav from '../../components/BottomNav'
 const TeacherDash = () => {
   const formattedDate = getFormattedDate()
   const navigate = useNavigate()
-
+  const navItems = [
+    { path: '/teacher', icon: 'active-home', label: 'Home' },
+    { path: '/teacherCategories', icon: 'cube', label: 'Inventory' },
+];
   return (
     <div className="dashboard">
       <header>
@@ -38,12 +41,7 @@ const TeacherDash = () => {
         </div>
       </div>
 
-      <nav className="bottom-nav">
-        <div className="home-icon">
-          <img src="footer-imgs/active-home.svg" alt="Home" />
-          <span>Home</span>
-        </div>
-      </nav>
+      <BottomNav navItems={navItems} />
     </div>
   )
 }

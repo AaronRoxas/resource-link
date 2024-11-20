@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const Item = require('../models/Item'); // Use the Item model
-const mongoose = require('mongoose'); // Import mongoose
+const Item = require('../models/Item'); 
+const mongoose = require('mongoose'); 
 
-// Define the route to get inventory items
+
 router.get('/api/inventory', async (req, res) => {
   try {
     const items = await Item.find(); // Fetch items from the database
@@ -37,5 +37,57 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// POST route to borrow an inventory item
+router.post('/borrow/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { borrower, borrowDate, returnDate } = req.body;
+
+    // Validate the ID format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send('Invalid ID format');
+    }
+
+    // Find the item by ID
+    const item = await Item.findById(id);
+
+    if (!item) {
+      return res.status(404).send('Item not found');
+    }
+
+    // Update the item with borrowing details
+    item.borrower = borrower;
+    item.borrowDate = new Date(borrowDate);
+    item.returnDate = new Date(returnDate);
+
+    // Save the updated item
+    await item.save();
+
+    res.status(200).json(item);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+// POST route to create a new inventory item
+router.post('/items', async (req, res) => {
+  try {
+    const { name, description, stocks, /* other fields */ } = req.body;
+    
+    const newItem = new Item({
+      name,
+      description,
+      stocks: stocks || 0,  // Provide a default value if none is provided
+      // ... other fields ...
+    });
+
+    await newItem.save();
+    res.status(201).json(newItem);
+  } catch (error) {
+    console.error('Error creating item:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 module.exports = router;
