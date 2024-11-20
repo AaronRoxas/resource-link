@@ -109,65 +109,8 @@ const ViewMisc = () => {
                 </table>
             </div>
 
-            {/* Edit Modal */}
-            {editItem && (
-                <div className="edit-item-modal">
-                    <div className="edit-item-modal-content">
-                        <span className="close" onClick={() => setEditItem(null)}>&times;</span>
-                        <h2>Edit Item</h2>
-                        <div className="field">
-                            <label>Name</label>
-                            <input 
-                                type="text" 
-                                value={formData.name} 
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
-                                placeholder="Item Name" 
-                            />
-                        </div>
-                        <div className="field">
-                            <label>Status</label>
-                            <select
-                                name="status"
-                                value={formData.status}
-                                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                            >
-                                <option value="" disabled>Select status</option>
-                                <option value="Good">Good</option>
-                                <option value="For repair">For repair</option>
-                                <option value="For maintenance">For maintenance</option>
-                                <option value="Low stock">Low stock</option>
-                            </select>
-                        </div>
-                        <div className="field">
-                            <label>Serial No.</label>
-                            <input 
-                                type="text" 
-                                value={formData.serialNo} 
-                                onChange={(e) => setFormData({ ...formData, serialNo: e.target.value })} 
-                                placeholder="Serial No." 
-                            />
-                        </div>
-                        <div className="field">
-                            <label>Category</label>
-                            <select
-                                name="category"
-                                value={formData.category}
-                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                            >
-                                <option value="" disabled>Select a category</option>
-                                <option value="Devices">Devices</option>
-                                <option value="Books">Books</option>
-                                <option value="Lab Equipments">Lab Equipments</option>
-                                <option value="Misc">Misc</option>
-                            </select>
-                        </div>
-                        <button className="submit-button" onClick={handleSave}>Save</button>
-                        <button className="cancel-button" onClick={() => setEditItem(null)}>Cancel</button>
-                    </div>
-                </div>
-            )}
-                        {/* Borrow Modal */}
-                        {borrowItem && (
+            {/* Borrow Modal */}
+            {borrowItem && (
                 <div className="edit-item-modal">
                     <div className="edit-item-modal-content">
                         <span className="close" onClick={() => setBorrowItem(null)}>&times;</span>
@@ -176,9 +119,11 @@ const ViewMisc = () => {
                             <label>Borrower Name</label>
                             <input 
                                 type="text" 
-                                value={borrowFormData.borrower} 
+                                value= {localStorage.getItem('username')}
                                 onChange={(e) => setBorrowFormData({ ...borrowFormData, borrower: e.target.value })} 
                                 placeholder="Borrower Name" 
+                                disabled // Make the field read-only
+                                className="disabled-input"
                             />
                         </div>
                         <div className="field">

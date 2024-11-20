@@ -52,6 +52,7 @@ const LoginComponent = () => {
       // Store token in localStorage
       localStorage.setItem('authToken', response.data.token);
       localStorage.setItem('userRole', response.data.role); // Store user role
+      localStorage.setItem('username', username); // Store username
 
       console.log(response.data); // Handle successful login
 

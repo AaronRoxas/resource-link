@@ -116,7 +116,7 @@ const ViewLabEquipments = () => {
                             <label>Borrower Name</label>
                             <input 
                                 type="text" 
-                                value={borrowFormData.borrower}
+                                value= {localStorage.getItem('username')}
                                 disabled // Make the field read-only
                                 className="disabled-input"
                             />

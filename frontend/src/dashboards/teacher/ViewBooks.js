@@ -105,9 +105,11 @@ const ViewBooks = () => {
                             <label>Borrower Name</label>
                             <input 
                                 type="text" 
-                                value={borrowFormData.borrower} 
+                                value= {localStorage.getItem('username')}
                                 onChange={(e) => setBorrowFormData({ ...borrowFormData, borrower: e.target.value })} 
                                 placeholder="Borrower Name" 
+                                disabled // Make the field read-only
+                                className="disabled-input"
                             />
                         </div>
                         <div className="field">
