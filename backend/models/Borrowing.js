@@ -7,8 +7,7 @@ const borrowingSchema = new mongoose.Schema({
         required: true
     },
     borrower: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,
         required: true
     },
     borrowDate: {

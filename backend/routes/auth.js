@@ -51,7 +51,7 @@ router.post('/login', async (req, res) => {
         dashboardUrl = '/';
     }
 
-    res.status(200).json({ message: 'Login successful', dashboardUrl, token, role: user.role });
+    res.status(200).json({ message: 'Login successful', dashboardUrl, token, role: user.role, user: { _id: user._id, username: user.username, role: user.role } });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });

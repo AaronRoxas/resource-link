@@ -7,6 +7,8 @@ const recentActivitiesRoutes = require('../routes/activities');
 const itemTrackingRoutes = require('../routes/itemTracking');
 const inventoryRoutes = require('../routes/inventory');
 const itemRoutes = require('../routes/items');
+const borrowingsRoutes = require('../routes/borrowings');
+
 const app = express();
 app.use(cors({
   origin: ["https://resource-link.vercel.app", "http://localhost:3000"],
@@ -14,7 +16,6 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json()); // Parse JSON request bodies
-
 
 connectDB()
   .catch(err => console.error('Database connection error:', err));
@@ -27,14 +28,12 @@ app.get('/', (req, res) => {
 // Mount auth routes
 app.use('/api/auth', authRoutes); 
 
-
 // Mount recent activities and item tracking routes
 app.use('/api/activities', recentActivitiesRoutes);
 app.use('/api/item-tracking', itemTrackingRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/items', itemRoutes);
-app.use('/', inventoryRoutes);
-
+app.use('/api/borrowings', borrowingsRoutes);
 
 // Improved error handling for undefined routes
 app.use((req, res) => {

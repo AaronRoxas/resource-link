@@ -95,13 +95,13 @@ router.post('/borrow/:id', async (req, res) => {
 // POST route to create a new inventory item
 router.post('/items', async (req, res) => {
   try {
-    const { name, description, stocks, /* other fields */ } = req.body;
+    const { name, description, stocks, } = req.body;
     
     const newItem = new Item({
       name,
       description,
-      stocks: stocks || 0,  // Provide a default value if none is provided
-      // ... other fields ...
+      stocks: stocks || 0,  
+
     });
 
     await newItem.save();
