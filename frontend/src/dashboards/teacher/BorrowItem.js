@@ -13,7 +13,7 @@ const BorrowItem = ({ item, onClose }) => {
         try {
             const borrowingData = {
                 itemId: item._id,
-                borrower: borrowFormData.borrower, // This should be the ObjectId
+                borrower: borrowFormData.borrower, 
                 borrowDate: new Date(borrowFormData.borrowDate),
                 returnDate: new Date(borrowFormData.returnDate),
                 quantity: borrowFormData.quantity,

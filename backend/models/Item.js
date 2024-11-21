@@ -10,9 +10,10 @@ const itemSchema = new mongoose.Schema({
   category: { type: String, required: true },
   id: { type: Number, required: true },
   stocks: { type: Number, required: true, default: 0 },
-  borrower: String, // New field
-  borrowDate: Date, // New field
-  returnDate: Date  // New field
+  borrower: String, 
+  availability: String, 
+  borrowDate: Date, 
+  returnDate: Date  
 });
 
 // Create the Item model

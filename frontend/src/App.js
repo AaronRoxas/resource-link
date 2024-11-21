@@ -19,7 +19,7 @@ import ViewDevices from './dashboards/teacher/ViewDevices.js';
 import ViewLabEquipments from './dashboards/teacher/ViewLabEquipments.js';
 import ViewBooks from './dashboards/teacher/ViewBooks.js';
 import ViewMisc from './dashboards/teacher/ViewMisc.js';
-import TeacherCategories from './dashboards/teacher/TeacherCategories.js';
+import TeacherInventory from './dashboards/teacher/TeacherInventory.js';
 function App() {
   return (
     <Router>
@@ -59,10 +59,10 @@ function App() {
           }
         />
         <Route
-          path="/teacherCategories"
+          path="/teacherInventory"
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
-              <TeacherCategories />
+              <TeacherInventory />
             </ProtectedRoute>
           }
         />

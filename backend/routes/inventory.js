@@ -64,11 +64,11 @@ router.post('/borrow/:id', async (req, res) => {
             borrower,
             borrowDate,
             returnDate,
-            status: 'borrowed'
+            availability: 'available'
         });
 
         // Update item status
-        item.status = 'borrowed';
+        item.availability = 'borrowed';
         
         // Save both documents
         await newBorrowing.save({ session });

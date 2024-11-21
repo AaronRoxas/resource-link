@@ -10,7 +10,7 @@ const ViewDevices = () => {
     const navigate = useNavigate();
     const navItems = [
         { path: '/teacher', icon: 'active-home', label: 'Home' },
-        { path: '/teacherCategories', icon: 'cube', label: 'Inventory' },
+        { path: '/teacherInventory', icon: 'cube', label: 'Inventory' },
     ];
 
     // Fetch devices data
@@ -35,7 +35,7 @@ const ViewDevices = () => {
     };
 
     return (
-        <div className="view-books">
+        <div className="view-devices">
             <h1>
                 <img src="back-arrow.svg" alt="Back" className="back-arrow" onClick={handleBack} /> 
                 &nbsp;Devices

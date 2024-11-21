@@ -11,7 +11,7 @@ const ViewMisc = () => {
     const navigate = useNavigate();
     const navItems = [
         { path: '/teacher', icon: 'active-home', label: 'Home' },
-        { path: '/teacherCategories', icon: 'cube', label: 'Inventory' },
+        { path: '/teacherInventory', icon: 'cube', label: 'Inventory' },
     ];
 
     // Fetch devices data

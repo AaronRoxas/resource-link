@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 const LoginComponent = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [username, setUsername] = useState(''); // State for username
+  const [name, setName] = useState(''); // State for name
   const [password, setPassword] = useState(''); // State for password
   const [error, setError] = useState(''); // State for error messages
   const [loading, setLoading] = useState(false); // New loading state
