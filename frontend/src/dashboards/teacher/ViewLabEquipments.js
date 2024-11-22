@@ -91,7 +91,6 @@ const ViewLabEquipments = () => {
             {borrowItem && (
                 <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)} fetchLabEquipments={fetchLabEquipments} />
             )}
-
             <BottomNav navItems={navItems} />
         </div>
     );
