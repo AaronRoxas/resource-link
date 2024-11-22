@@ -93,7 +93,7 @@ const AdminDash = () => {
           <table>
             <thead>
               <tr>
-                <th>ID</th>
+                
                 <th>Item</th>
                 <th>Status</th>
               </tr>
@@ -103,8 +103,7 @@ const AdminDash = () => {
                 .filter(item => item.status !== 'Good')
                 .slice(0, 3)
                 .map((item) => (
-                  <tr key={item.tag}>
-                    <td data-label="ID">{item.id}</td>
+                  <tr key={item.id}>
                     <td data-label="Item">{item.name}</td>
                     <td data-label="Status" > 
                       <img 

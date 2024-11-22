@@ -36,7 +36,7 @@ const AdminCategories = () => {
 
   const handleEdit = (item) => {
     setEditItem(item); // Set the item to be edited
-    setFormData({ name: item.name, status: item.status, serialNo: item.serialNo, category: item.category }); // Populate form data
+    setFormData({ name: item.name, status: item.status, serialNo: item.serialNo, category: item.category, availability: item.availability }); // Populate form data
   };
 
   const handleSave = async () => {
@@ -86,6 +86,7 @@ const AdminCategories = () => {
               <th>Status</th>
               <th>Serial No.</th>
               <th>Category</th>
+              <th>Availability</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -93,9 +94,10 @@ const AdminCategories = () => {
             {inventory.map((item) => (
               <tr key={item.id}>
                 <td data-label="Item">{item.name}</td>
-                <td data-label="Status">{item.status}</td>
+                <td data-label="Status"> {item.stocks < 10 ? 'Low Stocks' : item.status}</td>
                 <td data-label="Serial No.">{item.serialNo}</td>
                 <td data-label="Category">{item.category}</td>
+                <td data-label="Availability"> {item.stocks > 0 ? 'Available' : 'Not Available'}</td>
                 <td data-label="Action" className="action-icons">
                   <img 
                     src="/table-imgs/edit.svg" 
@@ -172,6 +174,20 @@ const AdminCategories = () => {
                 <option value="Books">Books</option>
                 <option value="Lab Equipments">Lab Equipments</option>
                 <option value="Misc">Misc</option>
+              </select>
+          </div>
+
+            <div className="field">
+              <label>Availability</label>
+              <select
+                name="availability"
+                value={formData.availability}
+                onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
+              >
+                <option value="" disabled selected></option>
+                <option value="Available">Available</option>
+                <option value="Borrowed">Borrowed</option>
+                <option value="Under Maintenance">Under Maintenance</option>
               </select>
           </div>
             <button className="submit-button" onClick={handleSave}>Save</button>

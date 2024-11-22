@@ -9,11 +9,7 @@ const itemSchema = new mongoose.Schema({
   notes: { type: String },
   category: { type: String, required: true },
   id: { type: Number, required: true },
-  stocks: { type: Number, required: true, default: 0 },
-  borrower: String, 
-  availability: String, 
-  borrowDate: Date, 
-  returnDate: Date  
+  stocks: { type: Number, required: true, default: 0 }
 });
 
 // Create the Item model

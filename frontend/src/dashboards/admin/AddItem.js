@@ -88,8 +88,8 @@ const AddItem = () => {
               value={formData.status}
               onChange={handleChange}
             >
-              <option value="" disabled></option>
-              <option value="">Good</option>
+              <option value="" disabled readOnly></option>
+              <option value="Good">Good</option>
               <option value="For repair">For repair</option>
               <option value="For maintenance">For maintenance</option>
               <option value="Low stock">Low stock</option>
@@ -120,6 +120,10 @@ const AddItem = () => {
           <div className="field">
             <label>Purchase Cost</label>
             <input type="text" name="purchaseCost" value={formData.purchaseCost} onChange={handleChange} required />
+          </div>
+          <div className="field">
+            <label>Stocks</label>
+            <input type="number" name="stocks" value={formData.stocks} onChange={handleChange} required />
           </div>
           <div className="field">
             <label>Notes</label>

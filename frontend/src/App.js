@@ -9,7 +9,6 @@ import TeacherDash from './dashboards/teacher/TeacherDash.js';
 import AdminDash from './dashboards/admin/AdminDash.js';
 import StaffDash from './dashboards/staff/StaffDash.js';
 import AdminCategories from './dashboards/admin/AdminCategories.js';
-import CreateNewCategories from './dashboards/admin/CreateNewCategories.js';
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
 import ChangePassword from './components/ChangePassword.js';
@@ -130,14 +129,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/createCategories"
-          element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <CreateNewCategories />
-            </ProtectedRoute>
-          }
-        />
+
         <Route
           path="/changePass"
           element={
