@@ -12,7 +12,7 @@ const borrowingsRoutes = require('../routes/borrowings');
 const app = express();
 app.use(cors({
   origin: ["https://resource-link.vercel.app", "http://localhost:3000"],
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   credentials: true
 }));
 app.use(express.json()); // Parse JSON request bodies
