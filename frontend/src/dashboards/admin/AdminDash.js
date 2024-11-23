@@ -93,7 +93,6 @@ const AdminDash = () => {
           <table>
             <thead>
               <tr>
-                
                 <th>Item</th>
                 <th>Status</th>
               </tr>
@@ -101,11 +100,10 @@ const AdminDash = () => {
             <tbody>
               {inventory
                 .filter(item => item.status !== 'Good')
-                .slice(0, 3)
                 .map((item) => (
                   <tr key={item.id}>
                     <td data-label="Item">{item.name}</td>
-                    <td data-label="Status" > 
+                    <td data-label="Status"> 
                       <img 
                         src={getStatusIcon(item.status)} 
                         alt={item.status} 
@@ -115,6 +113,11 @@ const AdminDash = () => {
                     </td>
                   </tr>
               ))}
+              {inventory.filter(item => item.status !== 'Good').length === 0 && (
+                <tr>
+                  <td colSpan="2" style={{ textAlign: 'center' }}>No inventory alerts</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

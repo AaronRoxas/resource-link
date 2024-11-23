@@ -83,9 +83,10 @@ const AdminCategories = () => {
           <thead>
             <tr>
               <th>Item</th>
-              <th>Status</th>
               <th>Serial No.</th>
               <th>Category</th>
+              <th>Status</th>
+              <th>Stocks</th>
               <th>Availability</th>
               <th>Action</th>
             </tr>
@@ -94,9 +95,10 @@ const AdminCategories = () => {
             {inventory.map((item) => (
               <tr key={item.id}>
                 <td data-label="Item">{item.name}</td>
-                <td data-label="Status"> {item.stocks < 10 ? 'Low Stocks' : item.status}</td>
                 <td data-label="Serial No.">{item.serialNo}</td>
                 <td data-label="Category">{item.category}</td>
+                <td data-label="Status"> {item.stocks < 10 ? 'Low Stocks' : item.status}</td>
+                <td data-label="Stocks">{item.stocks}</td>
                 <td data-label="Availability"> {item.stocks > 0 ? 'Available' : 'Not Available'}</td>
                 <td data-label="Action" className="action-icons">
                   <img 

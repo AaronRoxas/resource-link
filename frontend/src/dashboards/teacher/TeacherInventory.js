@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../../components/BottomNav';
+import '../../styles/TeacherDash.css';
 
 const TeacherInventory = () => {
   const navItems = [
@@ -51,22 +52,32 @@ const handleReturn = async (borrowingId, itemId, quantity) => {
   }
 };
 
+
   return (
-    <div>
-          <h1>
+<div className="teacher-inventory">
+            <h1>
                 <img src="back-arrow.svg" alt="Back" className="back-arrow" onClick={handleBack} /> 
                 &nbsp;Item Inventory
             </h1>
-      <ul>
-        {borrowedItems.map(item => (
-          <li key={item._id}>
-            {item.itemId ? item.itemId.name : 'Item not found'} - {item.borrowDate} 
-            <button onClick={() => handleReturn(item._id, item.itemId._id, item.quantity)}>Return</button>
-          </li>
-        ))}
-      </ul>
-      <BottomNav navItems={navItems} />
-    </div>
+            <div className="inventory-list">
+                {borrowedItems.length > 0 ? (
+                    borrowedItems.map(item => (
+                        <div className="inventory-card" key={item._id}>
+                            <div className="item-details">
+                                <h3>{item.itemId ? item.itemId.name : 'Item not found'}</h3>
+                                <p>Borrowed on: {new Date(item.borrowDate).toLocaleDateString()}</p>
+                                <p>Return on: {new Date(item.returnDate).toLocaleDateString()}</p>
+                                <p>Quantity: {item.quantity}</p>
+                            </div>
+                            <button className="return-button" onClick={() => handleReturn(item._id, item.itemId._id, item.quantity)}>Return</button>
+                        </div>
+                    ))
+                ) : (
+                    <p>No items borrowed.</p>
+                )}
+            </div>
+            <BottomNav navItems={navItems} />
+        </div>
   );
 };
 

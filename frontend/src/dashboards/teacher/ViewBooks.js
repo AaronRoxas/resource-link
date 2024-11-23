@@ -89,7 +89,7 @@ const ViewBooks = () => {
 
             {/* Borrow Item Modal */}
             {borrowItem && (
-                <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)} fetchBooks={fetchBooks} />
+                <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)} fetchItems={fetchBooks} />
             )}
 
             <BottomNav navItems={navItems} />

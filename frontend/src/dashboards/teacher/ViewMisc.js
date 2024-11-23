@@ -89,7 +89,7 @@ const ViewMisc = () => {
 
             {/* Borrow Item Modal */}
             {borrowItem && (
-                <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)} fetchMisc={fetchMisc} />
+                <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)} fetchItems={fetchMisc} />
             )}
 
             <BottomNav navItems={navItems} />

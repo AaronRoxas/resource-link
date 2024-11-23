@@ -89,7 +89,7 @@ const ViewLabEquipments = () => {
 
             {/* Borrow Item Modal */}
             {borrowItem && (
-                <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)} fetchLabEquipments={fetchLabEquipments} />
+                <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)} fetchItems={fetchLabEquipments} />
             )}
             <BottomNav navItems={navItems} />
         </div>

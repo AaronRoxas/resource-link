@@ -1,26 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const BorrowItem = ({ item, onClose, fetchDevices }) => {
+const BorrowItem = ({ item, onClose, fetchItems }) => {
     const [borrowFormData, setBorrowFormData] = useState({
         borrower: localStorage.getItem('username'),
         borrowDate: '',
         returnDate: '',
         quantity: 1
     });
+    const [currentStock, setCurrentStock] = useState(0);
+
+    useEffect(() => {
+        const fetchStock = async () => {
+            try {
+                // Fetch the current stock of the item
+                const itemResponse = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${item._id}`);
+                const stock = itemResponse.data.stocks;
+                setCurrentStock(stock);
+            } catch (error) {
+                console.error('Error fetching item stock:', error);
+            }
+        };
+
+        fetchStock();
+    }, [item]);
 
     const handleBorrow = async () => {
         try {
-            // Fetch the current stock of the item
-            const itemResponse = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${item._id}`);
-            const currentStock = itemResponse.data.stocks;
-
-            // Check if the requested quantity is available
-            if (borrowFormData.quantity > currentStock) {
-                alert('Not enough stock available to borrow this quantity.');
-                return;
-            }
-
             // Create borrowing data
             const borrowingData = {
                 itemId: item._id,
@@ -41,7 +47,7 @@ const BorrowItem = ({ item, onClose, fetchDevices }) => {
                 stocks: newStock // Update stock
             });
 
-            fetchDevices(); // Refresh devices after borrowing
+            fetchItems(); // Refresh devices after borrowing
             onClose(); // Close the modal
         } catch (error) {
             console.error('Error borrowing item:', error);
@@ -58,15 +64,28 @@ const BorrowItem = ({ item, onClose, fetchDevices }) => {
                 </div>
                 <div className="field">
                     <label>Borrow Date:</label>
-                    <input type="date" onChange={(e) => setBorrowFormData({ ...borrowFormData, borrowDate: e.target.value })} />
+                    <input 
+                    type="date" 
+                    onChange={(e) => setBorrowFormData({ ...borrowFormData, borrowDate: e.target.value })}
+                    min={new Date().toISOString().split("T")[0]}
+                     />
                 </div>
                 <div className="field">
                     <label>Return Date:</label>
-                    <input type="date" onChange={(e) => setBorrowFormData({ ...borrowFormData, returnDate: e.target.value })} />
+                    <input type="date" 
+                    onChange={(e) => setBorrowFormData({ ...borrowFormData, returnDate: e.target.value })}
+                    min={new Date().toISOString().split("T")[0]}
+                    />
                 </div>
                 <div className="field">
                     <label>Quantity:</label>
-                    <input type="number" value={borrowFormData.quantity} onChange={(e) => setBorrowFormData({ ...borrowFormData, quantity: e.target.value })} />
+                    <input 
+                        type="number" 
+                        value={borrowFormData.quantity} 
+                        onChange={(e) => setBorrowFormData({ ...borrowFormData, quantity: Math.min(e.target.value, currentStock) })} 
+                        max={currentStock}
+                        min={1}
+                    />
                 </div>
                 <button className="submit-button" onClick={handleBorrow}>Borrow</button>
                 <button className="cancel-button" onClick={onClose}>Cancel</button>

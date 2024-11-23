@@ -89,7 +89,7 @@ const ViewDevices = () => {
 
             {/* Borrow Item Modal */}
             {borrowItem && (
-                <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)} fetchDevices={fetchDevices} />
+                <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)}  fetchItems={fetchDevices} />
             )}
 
             <BottomNav navItems={navItems} />
