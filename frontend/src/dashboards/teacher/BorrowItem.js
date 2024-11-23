@@ -82,7 +82,13 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                     <input 
                         type="number" 
                         value={borrowFormData.quantity} 
-                        onChange={(e) => setBorrowFormData({ ...borrowFormData, quantity: Math.min(e.target.value, currentStock) })} 
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            // Check if the value is empty (backspace) or a valid number
+                            if (value === '' || (value > 0 && value <= currentStock)) {
+                                setBorrowFormData({ ...borrowFormData, quantity: value });
+                            }
+                        }} 
                         max={currentStock}
                         min={1}
                     />
