@@ -43,7 +43,7 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
             const newStock = currentStock - borrowFormData.quantity;
 
             // Update the item's stock and status if necessary
-            await axios.patch(`http://localhost:5000/api/items/${item._id}`, {
+            await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${item._id}`, {
                 stocks: newStock, // Update stock
                 status: newStock < 10 ? 'Low Stock' : 'In Stock' // Update status based on new stock
             });
