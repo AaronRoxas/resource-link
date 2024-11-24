@@ -62,8 +62,7 @@ const AdminDash = () => {
         return 'table-imgs/lowstock.svg';
       case 'For maintenance':
         return 'table-imgs/maintenance.svg';
-      default:
-        return 'table-imgs/good.svg';
+    
     }
   };
 
@@ -93,20 +92,17 @@ const AdminDash = () => {
           <table>
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Item</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
               {inventory
-                .filter(item => item.status !== 'Good')
-                .slice(0, 3)
+                .filter(item => item.status !== 'In Stock')
                 .map((item) => (
-                  <tr key={item.tag}>
-                    <td data-label="ID">{item.id}</td>
+                  <tr key={item.id}>
                     <td data-label="Item">{item.name}</td>
-                    <td data-label="Status" > 
+                    <td data-label="Status"> 
                       <img 
                         src={getStatusIcon(item.status)} 
                         alt={item.status} 
@@ -116,6 +112,11 @@ const AdminDash = () => {
                     </td>
                   </tr>
               ))}
+              {inventory.filter(item => item.status !== 'In Stock').length === 0 && (
+                <tr>
+                  <td colSpan="2" style={{ textAlign: 'center' }}>No inventory alerts</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

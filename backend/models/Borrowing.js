@@ -18,10 +18,10 @@ const borrowingSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    status: {
+    availability: {
         type: String,
-        enum: ['pending', 'borrowed', 'returned'],
-        default: 'borrowed'
+        enum: ['Available', 'Borrowed', 'Under Maintenance'],
+        default: 'Borrowed'
     },
     quantity: {
         type: Number,

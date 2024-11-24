@@ -2,72 +2,45 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import BottomNav from '../../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
-
+import BorrowItem from './BorrowItem';
 
 const ViewLabEquipments = () => {
-    const [equipments, setEquipments] = useState([]);
+    const [labEquipments, setLabEquipments] = useState([]);
     const [borrowItem, setBorrowItem] = useState(null);
-    const [borrowFormData, setBorrowFormData] = useState({ borrower: '', borrowDate: '', returnDate: '' });
-    const [user, setUser] = useState(null);
     const navigate = useNavigate();
     const navItems = [
         { path: '/teacher', icon: 'active-home', label: 'Home' },
-        { path: '/teacherCategories', icon: 'cube', label: 'Inventory' },
+        { path: '/teacherInventory', icon: 'cube', label: 'Inventory' },
     ];
 
-    // Fetch devices data
-    useEffect(() => {
-        const fetchDevices = async () => {
-            try {
-                const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', {
-                    withCredentials: true
-                });
-                const filteredEquipments = response.data.filter(item => item.category === 'Lab Equipments');
-                setEquipments(filteredEquipments);
-            } catch (error) {
-                console.error('Error fetching devices:', error);
-            }
-        };
-
-        fetchDevices();
-    }, []);
-
- 
-
-
-    const handleBorrow = async () => {
+    // Fetch books data
+    const fetchLabEquipments = async () => {
         try {
-            const response = await axios.post(`https://resource-link-main-14c755858b60.herokuapp.com/api/inventory/borrow/${borrowItem._id}`, borrowFormData, {
+            const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', {
                 withCredentials: true
             });
-            console.log('Item borrowed successfully:', response.data);
-            setEquipments(equipments.map(item => (item._id === borrowItem._id ? { ...item, ...response.data } : item)));
-            setBorrowItem(null);
+            const filteredLabEquipments = response.data.filter(item => item.category === 'Lab Equipments');
+            setLabEquipments(filteredLabEquipments);
         } catch (error) {
-            console.error('Error borrowing item:', error);
+            console.error('Error fetching lab equipments:', error);
         }
     };
 
-    const handleSetBorrowItem = (item) => {
-        setBorrowItem(item);
-        setBorrowFormData({
-            ...borrowFormData,
-            borrower: user?.username || '' // Use the authenticated user's username
-        });
-    };
+    useEffect(() => {
+        fetchLabEquipments();
+    }, []);
 
     const handleBack = () => {
         navigate('/teacher'); // Navigate to the teacher dashboard
     };
 
     return (
-        <div className="view-books">
+        <div className="view-devices">
             <h1>
                 <img src="back-arrow.svg" alt="Back" className="back-arrow" onClick={handleBack} /> 
                 &nbsp;Lab Equipments
             </h1>
             <div className="table-container">
-                <hr />
                 <table>
                     <thead>
                         <tr>
@@ -75,30 +48,38 @@ const ViewLabEquipments = () => {
                             <th>Status</th>
                             <th>Serial No.</th>
                             <th>Category</th>
+                            <th>Stocks</th>
+                            <th>Availability</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {equipments.map((item) => (
+                        {labEquipments.map((item) => (
                             <tr key={item._id}>
                                 <td data-label="Item">{item.name}</td>
-                                <td data-label="Status">{item.status}</td>
+                                <td data-label="Status">
+                                    {item.stocks < 10 ? 'Low Stocks' : item.status}
+                                </td>
                                 <td data-label="Serial No.">{item.serialNo}</td>
                                 <td data-label="Category">{item.category}</td>
+                                <td data-label="Stocks">{item.stocks}</td>
+                                <td data-label="Availability">
+                                    {item.stocks > 0 ? 'Available' : 'Not Available'}
+                                </td>
                                 <td data-label="Action" className="action-icons">
-                                    <img 
-                                        src="/table-imgs/edit.svg" 
-                                        alt="Edit" 
-                                        onClick={() => handleSetBorrowItem(item)} 
-                                        className="icon" 
-                                    />
-                                    <span 
-                                        className="action-text edit-text" 
-                                        onClick={() => handleSetBorrowItem(item)}
-                                    >
-                                        Borrow Item
-                                    </span>
-                                     
+                                    {item.stocks > 0 && (
+                                        <img 
+                                            src="/table-imgs/edit.svg" 
+                                            alt="Edit" 
+                                            onClick={() => setBorrowItem(item)} 
+                                            className="icon" 
+                                        />
+                                    )}
+                                    {item.stocks > 0 ? (
+                                        <span className="action-text edit-text" onClick={() => setBorrowItem(item)}>Borrow Item</span>
+                                    ) : (
+                                        <span className="action-text edit-text" style={{ color: 'gray', cursor: 'not-allowed', display: 'inline' }}>Not Available</span>
+                                    )}
                                 </td>
                             </tr>
                         ))}
@@ -106,43 +87,10 @@ const ViewLabEquipments = () => {
                 </table>
             </div>
 
-            {/* Borrow Modal */}
+            {/* Borrow Item Modal */}
             {borrowItem && (
-                <div className="edit-item-modal">
-                    <div className="edit-item-modal-content">
-                        <span className="close" onClick={() => setBorrowItem(null)}>&times;</span>
-                        <h2>Borrow Item</h2>
-                        <div className="field">
-                            <label>Borrower Name</label>
-                            <input 
-                                type="text" 
-                                value= {localStorage.getItem('username')}
-                                disabled // Make the field read-only
-                                className="disabled-input"
-                            />
-                        </div>
-                        <div className="field">
-                            <label>Borrow Date</label>
-                            <input 
-                                type="date" 
-                                value={borrowFormData.borrowDate} 
-                                onChange={(e) => setBorrowFormData({ ...borrowFormData, borrowDate: e.target.value })} 
-                            />
-                        </div>
-                        <div className="field">
-                            <label>Return Date</label>
-                            <input 
-                                type="date" 
-                                value={borrowFormData.returnDate} 
-                                onChange={(e) => setBorrowFormData({ ...borrowFormData, returnDate: e.target.value })} 
-                            />
-                        </div>
-                        <button className="submit-button" onClick={handleBorrow}>Borrow</button>
-                        <button className="cancel-button" onClick={() => setBorrowItem(null)}>Cancel</button>
-                    </div>
-                </div>
+                <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)} fetchItems={fetchLabEquipments} />
             )}
-
             <BottomNav navItems={navItems} />
         </div>
     );
