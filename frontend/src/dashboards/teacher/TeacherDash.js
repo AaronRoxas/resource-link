@@ -9,15 +9,14 @@ const TeacherDash = () => {
   const navigate = useNavigate()
   const navItems = [
     { path: '/teacher', icon: 'active-home', label: 'Home' },
-    { path: '/teacherCategories', icon: 'cube', label: 'Inventory' },
+    { path: '/teacherInventory', icon: 'cube', label: 'Inventory' },
 ];
   return (
     <div className="dashboard">
       <header>
         <LogoutButton />
-        <h1>User</h1>
-        <h2>Hi, Welcome Back!</h2>
-        <h3>{formattedDate}</h3>
+        <h1>Hi, {localStorage.getItem('username')} Welcome Back!</h1>
+        <h2>{formattedDate}</h2>
       </header>
       <label>Request Item</label>
       <div className="search-container">

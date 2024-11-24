@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 const LoginComponent = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [username, setUsername] = useState(''); // State for username
+  const [name, setName] = useState(''); // State for name
   const [password, setPassword] = useState(''); // State for password
   const [error, setError] = useState(''); // State for error messages
   const [loading, setLoading] = useState(false); // New loading state
@@ -103,7 +104,7 @@ const LoginComponent = () => {
             <input type="checkbox" />
             <span>Remember me</span>
           </label>
-          <a href="#" className="forgot-password">Forgot password?</a>
+          {/* <a href="#" className="forgot-password">Forgot password?</a> */}
         </div>
         <button type="submit" className="login-button">Log in</button>
       </form>

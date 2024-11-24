@@ -10,23 +10,23 @@ const ViewDevices = () => {
     const navigate = useNavigate();
     const navItems = [
         { path: '/teacher', icon: 'active-home', label: 'Home' },
-        { path: '/teacherCategories', icon: 'cube', label: 'Inventory' },
+        { path: '/teacherInventory', icon: 'cube', label: 'Inventory' },
     ];
 
     // Fetch devices data
-    useEffect(() => {
-        const fetchDevices = async () => {
-            try {
-                const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', {
-                    withCredentials: true
-                });
-                const filteredDevice = response.data.filter(item => item.category === 'Devices');
-                setDevices(filteredDevice);
-            } catch (error) {
-                console.error('Error fetching devices:', error);
-            }
-        };
+    const fetchDevices = async () => {
+        try {
+            const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', {
+                withCredentials: true
+            });
+            const filteredDevice = response.data.filter(item => item.category === 'Devices');
+            setDevices(filteredDevice);
+        } catch (error) {
+            console.error('Error fetching devices:', error);
+        }
+    };
 
+    useEffect(() => {
         fetchDevices();
     }, []);
 
@@ -35,7 +35,7 @@ const ViewDevices = () => {
     };
 
     return (
-        <div className="view-books">
+        <div className="view-devices">
             <h1>
                 <img src="back-arrow.svg" alt="Back" className="back-arrow" onClick={handleBack} /> 
                 &nbsp;Devices
@@ -48,6 +48,8 @@ const ViewDevices = () => {
                             <th>Status</th>
                             <th>Serial No.</th>
                             <th>Category</th>
+                            <th>Stocks</th>
+                            <th>Availability</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -55,17 +57,29 @@ const ViewDevices = () => {
                         {devices.map((item) => (
                             <tr key={item._id}>
                                 <td data-label="Item">{item.name}</td>
-                                <td data-label="Status">{item.status}</td>
+                                <td data-label="Status">
+                                    {item.stocks < 10 ? 'Low Stocks' : item.status}
+                                </td>
                                 <td data-label="Serial No.">{item.serialNo}</td>
                                 <td data-label="Category">{item.category}</td>
+                                <td data-label="Stocks">{item.stocks}</td>
+                                <td data-label="Availability">
+                                    {item.stocks > 0 ? 'Available' : 'Not Available'}
+                                </td>
                                 <td data-label="Action" className="action-icons">
-                                    <img 
-                                        src="/table-imgs/edit.svg" 
-                                        alt="Edit" 
-                                        onClick={() => setBorrowItem(item)} 
-                                        className="icon" 
-                                    />
-                                    <span className="action-text edit-text" onClick={() => setBorrowItem(item)}>Borrow Item</span>
+                                    {item.stocks > 0 && (
+                                        <img 
+                                            src="/table-imgs/edit.svg" 
+                                            alt="Edit" 
+                                            onClick={() => setBorrowItem(item)} 
+                                            className="icon" 
+                                        />
+                                    )}
+                                    {item.stocks > 0 ? (
+                                        <span className="action-text edit-text" onClick={() => setBorrowItem(item)}>Borrow Item</span>
+                                    ) : (
+                                        <span className="action-text edit-text" style={{ color: 'gray', cursor: 'not-allowed', display: 'inline' }}>Not Available</span>
+                                    )}
                                 </td>
                             </tr>
                         ))}
@@ -75,7 +89,7 @@ const ViewDevices = () => {
 
             {/* Borrow Item Modal */}
             {borrowItem && (
-                <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)} />
+                <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)}  fetchItems={fetchDevices} />
             )}
 
             <BottomNav navItems={navItems} />

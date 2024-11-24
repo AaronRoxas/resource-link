@@ -64,11 +64,11 @@ router.post('/borrow/:id', async (req, res) => {
             borrower,
             borrowDate,
             returnDate,
-            status: 'borrowed'
+            availability: 'available'
         });
 
         // Update item status
-        item.status = 'borrowed';
+        item.availability = 'borrowed';
         
         // Save both documents
         await newBorrowing.save({ session });
@@ -95,13 +95,13 @@ router.post('/borrow/:id', async (req, res) => {
 // POST route to create a new inventory item
 router.post('/items', async (req, res) => {
   try {
-    const { name, description, stocks, } = req.body;
+    const { name, description, stocks, /* other fields */ } = req.body;
     
     const newItem = new Item({
       name,
       description,
-      stocks: stocks || 0,  
-
+      stocks: stocks || 0,  // Provide a default value if none is provided
+      // ... other fields ...
     });
 
     await newItem.save();
@@ -123,6 +123,30 @@ router.get('/borrowings', async (req, res) => {
         console.error('Error fetching borrowings:', error);
         res.status(500).json({ message: 'Error fetching borrowings' });
     }
+});
+
+// DELETE route to delete an inventory item by _id
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate the ID format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send('Invalid ID format');
+    }
+
+    // Use the Item model to find and delete the item
+    const deletedItem = await Item.findByIdAndDelete(id);
+
+    if (!deletedItem) {
+      return res.status(404).send('Item not found');
+    }
+
+    res.status(200).json({ message: 'Item deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
 });
 
 module.exports = router;

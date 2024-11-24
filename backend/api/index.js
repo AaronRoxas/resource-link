@@ -12,7 +12,7 @@ const borrowingsRoutes = require('../routes/borrowings');
 const app = express();
 app.use(cors({
   origin: ["https://resource-link.vercel.app", "http://localhost:3000"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   credentials: true
 }));
 app.use(express.json()); // Parse JSON request bodies
@@ -22,7 +22,7 @@ connectDB()
 
 // Define a root route
 app.get('/', (req, res) => {
-  res.send('API is working');
+  res.send(`API is working Server is running on port ${PORT}`);
 });
 
 // Mount auth routes
@@ -34,6 +34,8 @@ app.use('/api/item-tracking', itemTrackingRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/borrowings', borrowingsRoutes);
+app.use('/', inventoryRoutes);
+
 
 // Improved error handling for undefined routes
 app.use((req, res) => {
