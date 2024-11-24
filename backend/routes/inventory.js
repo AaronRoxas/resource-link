@@ -125,4 +125,28 @@ router.get('/borrowings', async (req, res) => {
     }
 });
 
+// DELETE route to delete an inventory item by _id
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate the ID format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send('Invalid ID format');
+    }
+
+    // Use the Item model to find and delete the item
+    const deletedItem = await Item.findByIdAndDelete(id);
+
+    if (!deletedItem) {
+      return res.status(404).send('Item not found');
+    }
+
+    res.status(200).json({ message: 'Item deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
 module.exports = router;

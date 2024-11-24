@@ -52,6 +52,7 @@ const handleReturn = async (borrowingId, itemId, quantity) => {
   }
 };
 
+const currentUser = localStorage.getItem('username'); // Get the current user's name from localStorage
 
   return (
 <div className="teacher-inventory">
@@ -60,20 +61,22 @@ const handleReturn = async (borrowingId, itemId, quantity) => {
                 &nbsp;Item Inventory
             </h1>
             <div className="inventory-list">
-                {borrowedItems.length > 0 ? (
-                    borrowedItems.map(item => (
-                        <div className="inventory-card" key={item._id}>
-                            <div className="item-details">
-                                <h3>{item.itemId ? item.itemId.name : 'Item not found'}</h3>
-                                <p>Borrowed on: {new Date(item.borrowDate).toLocaleDateString()}</p>
-                                <p>Return on: {new Date(item.returnDate).toLocaleDateString()}</p>
-                                <p>Quantity: {item.quantity}</p>
+                {borrowedItems.length > 0 && borrowedItems.filter(item => item.borrower === currentUser).length > 0 ? (
+                    borrowedItems
+                        .filter(item => item.borrower === currentUser) // Display only items borrowed by the current user
+                        .map(item => (
+                            <div className="inventory-card" key={item._id}>
+                                <div className="item-details">
+                                    <h3>{item.itemId ? item.itemId.name : 'Item not found'}</h3>
+                                    <p>Borrowed on: {new Date(item.borrowDate).toLocaleDateString()}</p>
+                                    <p>Return on: {new Date(item.returnDate).toLocaleDateString()}</p>
+                                    <p>Quantity: {item.quantity}</p>
+                                </div>
+                                <button className="return-button" onClick={() => handleReturn(item._id, item.itemId._id, item.quantity)}>Return</button>
                             </div>
-                            <button className="return-button" onClick={() => handleReturn(item._id, item.itemId._id, item.quantity)}>Return</button>
-                        </div>
-                    ))
+                        ))
                 ) : (
-                    <p>No items borrowed.</p>
+                    <p>No items borrowed.</p> // Message displayed when no items are borrowed
                 )}
             </div>
             <BottomNav navItems={navItems} />

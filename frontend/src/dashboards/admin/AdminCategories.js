@@ -36,36 +36,53 @@ const AdminCategories = () => {
 
   const handleEdit = (item) => {
     setEditItem(item); // Set the item to be edited
-    setFormData({ name: item.name, status: item.status, serialNo: item.serialNo, category: item.category, availability: item.availability }); // Populate form data
+    setFormData({ name: item.name, status: item.status, serialNo: item.serialNo, category: item.category, availability: item.availability, stocks: item.stocks }); // Populate form data
   };
 
   const handleSave = async () => {
     try {
-      const response = await axios.put(`https://resource-link-main-14c755858b60.herokuapp.com/api/inventory/${editItem._id}`, formData, {
-        withCredentials: true
-      });
-      console.log('Item updated successfully:', response.data);
-      
-      // Update the inventory state with the edited item
-      setInventory(inventory.map(item => (item._id === editItem._id ? { ...item, ...formData } : item)));
-      setEditItem(null); // Close the edit modal
+        // Set stocks to 0 if it's blank
+        const updatedFormData = {
+            ...formData,
+            stocks: formData.stocks === '' ? 0 : Number(formData.stocks)
+        };
+
+        const response = await axios.put(`https://resource-link-main-14c755858b60.herokuapp.com/api/inventory/${editItem._id}`, updatedFormData, {
+            withCredentials: true
+        });
+        console.log('Item updated successfully:', response.data);
+        
+        // Update the inventory state with the edited item
+        setInventory(inventory.map(item => (item._id === editItem._id ? { ...item, ...updatedFormData } : item)));
+        setEditItem(null); // Close the edit modal
     } catch (error) {
-      console.error('Error updating item:', error);
+        console.error('Error updating item:', error);
     }
   };
 
   const handleDelete = async (itemId) => {
+    // Confirm deletion
+    const confirmDelete = window.confirm("Are you sure you want to delete this item?");
+    if (!confirmDelete) return; // Exit if the user cancels
+
+    console.log("Attempting to delete item with ID:", itemId); // Log the item ID
+
     // Logic for deleting the item
     try {
-      await axios.delete(`https://resource-link-main-14c755858b60.herokuapp.com/api/inventory/${itemId}`, {
-        withCredentials: true
-      });
-      // Update the inventory state to remove the deleted item
-      setInventory(inventory.filter(item => item.id !== itemId));
+        const response = await axios.delete(`https://resource-link-main-14c755858b60.herokuapp.com/api/inventory/${itemId}`, {
+            withCredentials: true
+        });
+        if (response.status === 200) { // Check if the deletion was successful
+            // Update the inventory state to remove the deleted item
+            setInventory(inventory.filter(item => item._id !== itemId));
+        } else {
+            console.error('Error deleting item:', response.data);
+        }
     } catch (error) {
-      console.error('Error deleting item:', error);
+        console.error('Error deleting item:', error.response ? error.response.data : error.message);
     }
   };
+  
   const handleBack = () => {
     navigate('/admin'); // Navigate to the admin dashboard
   };
@@ -93,7 +110,7 @@ const AdminCategories = () => {
           </thead>
           <tbody>
             {inventory.map((item) => (
-              <tr key={item.id}>
+              <tr key={item._id}>
                 <td data-label="Item">{item.name}</td>
                 <td data-label="Serial No.">{item.serialNo}</td>
                 <td data-label="Category">{item.category}</td>
@@ -110,11 +127,11 @@ const AdminCategories = () => {
                   <img 
                     src="table-imgs/delete.svg" 
                     alt="Delete" 
-                    onClick={() => handleDelete(item.id)} 
+                    onClick={() => handleDelete(item._id)} 
                     className="icon" 
                   />
                   <span className="action-text edit-text" onClick={() => handleEdit(item)}>Edit</span>
-                  <span className="action-text delete-text" onClick={() => handleDelete(item.id)}>Delete</span>
+                  <span className="action-text delete-text" onClick={() => handleDelete(item._id)}>Delete</span>
                 </td>
               </tr>
             ))}
@@ -179,19 +196,17 @@ const AdminCategories = () => {
               </select>
           </div>
 
-            <div className="field">
-              <label>Availability</label>
-              <select
-                name="availability"
-                value={formData.availability}
-                onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
-              >
-                <option value="" disabled selected></option>
-                <option value="Available">Available</option>
-                <option value="Borrowed">Borrowed</option>
-                <option value="Under Maintenance">Under Maintenance</option>
-              </select>
-          </div>
+          <div className="field">
+              <label htmlFor="">Stocks</label>
+              <input 
+              type="number" 
+              value={formData.stocks} 
+              onChange={(e) => setFormData({ ...formData, stocks: e.target.value })}
+              placeholder={formData.stocks}
+              min={0}
+            />
+            </div>
+
             <button className="submit-button" onClick={handleSave}>Save</button>
             <button className="cancel-button" onClick={() => setEditItem(null)}>Cancel</button>
           </div>
