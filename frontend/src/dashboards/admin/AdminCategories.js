@@ -131,7 +131,7 @@ const AdminCategories = () => {
                     className="icon" 
                   />
                   <span className="action-text edit-text" onClick={() => handleEdit(item)}>Edit</span>
-                  <span className="action-text delete-text" onClick={() => handleDelete(item.id)}>Delete</span>
+                  <span className="action-text delete-text" onClick={() => handleDelete(item._id)}>Delete</span>
                 </td>
               </tr>
             ))}
