@@ -127,7 +127,7 @@ const AdminCategories = () => {
                   <img 
                     src="table-imgs/delete.svg" 
                     alt="Delete" 
-                    onClick={() => handleDelete(item.id)} 
+                    onClick={() => handleDelete(item._id)} 
                     className="icon" 
                   />
                   <span className="action-text edit-text" onClick={() => handleEdit(item)}>Edit</span>
