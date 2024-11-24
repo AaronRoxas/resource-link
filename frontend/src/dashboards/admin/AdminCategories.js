@@ -110,11 +110,11 @@ const AdminCategories = () => {
           </thead>
           <tbody>
             {inventory.map((item) => (
-              <tr key={item._id}>
+              <tr key={item.id}>
                 <td data-label="Item">{item.name}</td>
                 <td data-label="Serial No.">{item.serialNo}</td>
                 <td data-label="Category">{item.category}</td>
-                <td data-label="Status"> {item.stocks < 10 ? 'Low Stocks' : item.status}</td>
+                <td data-label="Status"> {item.stocks < 10 ? 'Low Stock' : item.status}</td>
                 <td data-label="Stocks">{item.stocks}</td>
                 <td data-label="Availability"> {item.stocks > 0 ? 'Available' : 'Not Available'}</td>
                 <td data-label="Action" className="action-icons">
@@ -127,11 +127,11 @@ const AdminCategories = () => {
                   <img 
                     src="table-imgs/delete.svg" 
                     alt="Delete" 
-                    onClick={() => handleDelete(item._id)} 
+                    onClick={() => handleDelete(item.id)} 
                     className="icon" 
                   />
                   <span className="action-text edit-text" onClick={() => handleEdit(item)}>Edit</span>
-                  <span className="action-text delete-text" onClick={() => handleDelete(item._id)}>Delete</span>
+                  <span className="action-text delete-text" onClick={() => handleDelete(item.id)}>Delete</span>
                 </td>
               </tr>
             ))}
@@ -165,7 +165,7 @@ const AdminCategories = () => {
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
               >
                 <option value="" disabled>Select status</option>
-                <option value="Good">Good</option>
+                <option value="In Stock">In Stock</option>
                 <option value="For repair">For repair</option>
                 <option value="For maintenance">For maintenance</option>
                 <option value="Low stock">Low stock</option>

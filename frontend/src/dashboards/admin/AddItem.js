@@ -6,7 +6,7 @@ import axios from 'axios';
 const AddItem = () => {
   const [formData, setFormData] = useState({
     name: '',
-    status: '',
+    status: 'In Stock',
     serialNo: '',
     purchaseDate: '',
     purchaseCost: '',
@@ -81,20 +81,6 @@ const AddItem = () => {
             <input type="text" name="name" value={formData.name} onChange={handleChange} required />
           </div>
 
-          <div className="field">
-            <label>Status</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-            >
-              <option value="" disabled readOnly></option>
-              <option value="Good">Good</option>
-              <option value="For repair">For repair</option>
-              <option value="For maintenance">For maintenance</option>
-              <option value="Low stock">Low stock</option>
-            </select>
-          </div>
           <div className="field">
             <label>Category</label>
             <select

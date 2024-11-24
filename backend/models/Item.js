@@ -12,6 +12,13 @@ const itemSchema = new mongoose.Schema({
   stocks: { type: Number, required: true, default: 0 }
 });
 
+itemSchema.pre('save', function(next) {
+  if (this.stocks < 10) {
+    this.status = 'Low Stocks';
+  }
+  next();
+});
+
 // Create the Item model
 const Item = mongoose.model('Item', itemSchema);
 
