@@ -45,7 +45,75 @@
   display: flex;
   width: 100%;
 }
+/* TeacherDash.css */
+.alert.success {
+  display: flex; /* Use flexbox for alignment */
+  justify-content: space-between; /* Space between text and close button */
+  align-items: center; /* Center vertically */
+  background-color: #4CAF50; /* Green background */
+  color: white; /* White text */
+  padding: 10px 20px; /* Padding for spacing */
+  border-radius: 5px; /* Rounded corners */
+  margin: 10px 0; /* Margin for spacing */
+  position: relative; /* Position for close button */
+  transition: opacity 0.3s ease; /* Smooth transition */
+}
 
+.closebtn {
+  cursor: pointer; /* Pointer cursor for close button */
+  font-weight: bold; /* Bold text */
+  margin-left: 15px; /* Space between text and close button */
+  color: white; /* White color for close button */
+}
+
+.closebtn:hover {
+  opacity: 0.8; /* Slightly transparent on hover */
+}
+/* TeacherDash.css */
+.teacher-inventory {
+  padding: 20px;
+  background-color: #f9f9f9; /* Light background for contrast */
+}
+
+.inventory-list {
+  display: flex;
+  flex-wrap: wrap; /* Allow items to wrap */
+  gap: 20px; /* Space between cards */
+}
+
+.inventory-card {
+  background-color: white; /* Card background */
+  border: 1px solid #ddd; /* Light border */
+  border-radius: 8px; /* Rounded corners */
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  flex: 1 1 calc(33% - 20px); /* Responsive card width */
+  min-width: 250px; /* Minimum width for cards */
+}
+
+.item-details h3 {
+  margin: 0 0 10px; /* Margin for heading */
+  font-size: 1.2em; /* Heading size */
+}
+
+.item-details p {
+  margin: 0; /* No margin for paragraph */
+  color: #666; /* Gray text for date */
+}
+
+.return-button {
+  background-color: #4CAF50; /* Green background */
+  color: white; /* White text */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  padding: 10px 15px; /* Padding for button */
+  cursor: pointer; /* Pointer cursor */
+  transition: background-color 0.3s; /* Smooth transition */
+}
+
+.return-button:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
 .search-input-container {
   position: relative; 
   width: 100%; 

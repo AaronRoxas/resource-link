@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "main": "api/index.js",
   "scripts": {
-      "start": "node server.js",
-      "dev": "nodemon server.js",
-      "prod": "NODE_ENV=production nodemon server.js",
-     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install npm && run build"
-    },
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "prod": "NODE_ENV=production nodemon server.js",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install npm && run build"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -16,6 +16,7 @@
     "bcryptjs": "^2.4.3",
     "body-parse": "^0.1.0",
     "cors": "^2.8.5",
+    "curl": "^0.1.4",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",

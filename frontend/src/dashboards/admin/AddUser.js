@@ -106,7 +106,7 @@ const AddUser = () => {
             value={role}
             onChange={(e) => setRole(e.target.value)} 
           >
-            <option value="" disabled selected></option>
+            <option value="" disabled readOnly>Select Role</option>
             <option value="Teacher">Teacher</option>
             <option value="Staff">Staff</option>
             <option value="Admin">Admin</option>
