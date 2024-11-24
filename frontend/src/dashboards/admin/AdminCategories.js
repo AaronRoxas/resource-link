@@ -110,7 +110,7 @@ const AdminCategories = () => {
           </thead>
           <tbody>
             {inventory.map((item) => (
-              <tr key={item.id}>
+              <tr key={item._id}>
                 <td data-label="Item">{item.name}</td>
                 <td data-label="Serial No.">{item.serialNo}</td>
                 <td data-label="Category">{item.category}</td>
