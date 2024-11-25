@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import BottomNav from '../../components/BottomNav'; 
-import '../../styles/AdminCategories.css'; // Import your CSS file for styling
+import ItemInformation from '../../components/ItemInformation';
+import '../../styles/AdminCategories.css';
 import { useNavigate } from 'react-router-dom';
-
 
 const AdminCategories = () => {
   const [inventory, setInventory] = useState([]);
@@ -17,6 +17,7 @@ const AdminCategories = () => {
     { path: '/addUser', icon: 'profile', label: 'Add User' },
     { path: '/adminCategories', icon: 'active-cube', label: 'Inventory' },
   ];
+  const [selectedItem, setSelectedItem] = useState(null);
 
   // Fetch inventory data
   useEffect(() => {
@@ -87,6 +88,14 @@ const AdminCategories = () => {
     navigate('/admin'); // Navigate to the admin dashboard
   };
 
+  const handleItemClick = (item) => {
+    setSelectedItem(item);
+  };
+
+  const handleCloseItemInfo = () => {
+    setSelectedItem(null);
+  };
+
   return (
     <div className="admin-categories">
       
@@ -111,11 +120,17 @@ const AdminCategories = () => {
           <tbody>
             {inventory.map((item) => (
               <tr key={item._id}>
-                <td data-label="Item">{item.name}</td>
+                <td 
+                  data-label="Item" 
+                  style={{cursor: 'pointer'}} 
+                  onClick={() => handleItemClick(item)}
+                >
+                  {item.name}
+                </td>
                 <td data-label="Serial No.">{item.serialNo}</td>
                 <td data-label="Category">{item.category}</td>
                 <td data-label="Status"> {item.stocks < 10 ? 'Low Stock' : item.status}</td>
-                <td data-label="Stocks">{item.stocks}</td>
+                <td data-label="Stocks" style={{color: item.stocks < 10 ? 'red' : 'black'}}>{item.stocks}</td>
                 <td data-label="Availability"> {item.stocks > 0 ? 'Available' : 'Not Available'}</td>
                 <td data-label="Action" className="action-icons">
                   <img 
@@ -211,6 +226,14 @@ const AdminCategories = () => {
             <button className="cancel-button" onClick={() => setEditItem(null)}>Cancel</button>
           </div>
         </div>
+      )}
+
+      {/* Item Information Modal */}
+      {selectedItem && (
+        <ItemInformation 
+          selectedItem={selectedItem} 
+          handleCloseItemInfo={handleCloseItemInfo}
+        />
       )}
 
       <BottomNav navItems={navItems} />

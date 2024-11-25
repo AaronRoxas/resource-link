@@ -3,11 +3,12 @@ import axios from 'axios';
 import BottomNav from '../../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
 import BorrowItem from './BorrowItem';
-
+import ItemInformation from '../../components/ItemInformation';
 const ViewDevices = () => {
     const [devices, setDevices] = useState([]);
     const [borrowItem, setBorrowItem] = useState(null);
     const navigate = useNavigate();
+    const [selectedItem, setSelectedItem] = useState(null);
     const navItems = [
         { path: '/teacher', icon: 'active-home', label: 'Home' },
         { path: '/teacherInventory', icon: 'cube', label: 'Inventory' },
@@ -30,9 +31,18 @@ const ViewDevices = () => {
         fetchDevices();
     }, []);
 
+
     const handleBack = () => {
         navigate('/teacher'); // Navigate to the teacher dashboard
     };
+    const handleItemClick = (item) => {
+        setSelectedItem(item);
+      };
+    
+      const handleCloseItemInfo = () => {
+        setSelectedItem(null);
+      };
+    
 
     return (
         <div className="view-devices">
@@ -56,7 +66,13 @@ const ViewDevices = () => {
                     <tbody>
                         {devices.map((item) => (
                             <tr key={item._id}>
-                                <td data-label="Item">{item.name}</td>
+                                <td 
+                                    data-label="Item" 
+                                    style={{cursor: 'pointer'}} 
+                                    onClick={() => handleItemClick(item)}
+                                >
+                                {item.name}
+                                </td>
                                 <td data-label="Status">
                                     {item.stocks < 10 ? 'Low Stocks' : item.status}
                                 </td>
@@ -90,6 +106,14 @@ const ViewDevices = () => {
             {/* Borrow Item Modal */}
             {borrowItem && (
                 <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)}  fetchItems={fetchDevices} />
+            )}
+
+                  {/* Item Information Modal */}
+            {selectedItem && (
+                <ItemInformation 
+                selectedItem={selectedItem} 
+                handleCloseItemInfo={handleCloseItemInfo}
+                />
             )}
 
             <BottomNav navItems={navItems} />

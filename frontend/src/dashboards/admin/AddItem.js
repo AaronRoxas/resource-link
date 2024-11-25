@@ -105,7 +105,7 @@ const AddItem = () => {
           </div>
           <div className="field">
             <label>Purchase Cost</label>
-            <input type="text" name="purchaseCost" value={formData.purchaseCost} onChange={handleChange} required />
+            <input type="number" name="purchaseCost" value={formData.purchaseCost} onChange={handleChange} min={1}required />
           </div>
           <div className="field">
             <label>Stocks</label>

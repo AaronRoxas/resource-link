@@ -35,7 +35,7 @@ const InventoryModal = ({ isOpen, onClose, inventory }) => {
               </thead>
               <tbody>
                 {inventory
-                  .filter(item => item.status !== 'Good')
+                  .filter(item => item.status !== 'In Stock')
                   .map((item) => (
                     <tr key={item.tag}>
                       <td data-label="ID">{item.id}</td>

@@ -79,6 +79,7 @@ const currentUser = localStorage.getItem('username'); // Get the current user's 
                     <p>No items borrowed.</p> // Message displayed when no items are borrowed
                 )}
             </div>
+            
             <BottomNav navItems={navItems} />
         </div>
   );

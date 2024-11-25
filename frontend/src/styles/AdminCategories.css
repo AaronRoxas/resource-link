@@ -116,12 +116,7 @@
 }
 
 .close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 24px;
-  cursor: pointer;
-  color: #ff0000; /* Red color for close button */
+  display: none;
 }
 
 .edit-item-modal-content h2 {
@@ -150,4 +145,109 @@
 
 .cancel-button:hover {
   background-color: #e20000;
+}
+
+.item-info-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.item-info-content {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.back-link {
+  cursor: pointer;
+  color: #333;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-link:hover {
+  color: #006B3C;
+}
+
+#back-button {
+  display: none;
+}
+
+.item-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.checkout-button {
+  padding: 15px;
+}
+
+.checkout {
+  width: 100%;
+  padding: 12px;
+  background: #006B3C;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.item-info-tabs {
+  padding: 20px;
+}
+
+.tabs {
+  display: flex;
+  gap: 20px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 20px;
+}
+
+.tabs span {
+  padding: 10px 0;
+  cursor: pointer;
+}
+
+.tabs span.active {
+  border-bottom: 2px solid #006B3C;
+  color: #006B3C;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.label {
+  color: #666;
+}
+
+.value {
+  font-weight: 500;
 }
