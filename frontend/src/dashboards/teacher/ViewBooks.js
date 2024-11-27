@@ -36,10 +36,7 @@ const ViewBooks = () => {
         navigate('/teacher');
     };
 
-    const handleItemClick = (item) => {
-        setSelectedItem(item);
-      };
-    
+
       const handleCloseItemInfo = () => {
         setSelectedItem(null);
       };
@@ -61,7 +58,7 @@ const ViewBooks = () => {
             <div className="books-grid">
                 {books.map((book) => (
                     <div key={book._id} className="book-card" >
-                        <div className="book-image" onClick={() => handleItemClick(book)}>
+                        <div className="book-image">
                             <img src="dashboard-imgs/placeholder.svg" alt={book.name} />
                         </div>
                         <div className="book-info">

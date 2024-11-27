@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const itemSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  status: { type: String, required: true },
+  status: { type: String},
   serialNo: { type: String, required: true },
   purchaseDate: { type: Date, required: true },
   purchaseCost: { type: Number, required: true },
@@ -15,6 +15,9 @@ const itemSchema = new mongoose.Schema({
 itemSchema.pre('save', function(next) {
   if (this.stocks < 10) {
     this.status = 'Low Stocks';
+  }
+  else{
+    this.status = 'In Stock';
   }
   next();
 });

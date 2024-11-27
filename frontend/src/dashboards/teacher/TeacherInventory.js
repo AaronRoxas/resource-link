@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import BottomNav from '../../components/BottomNav';
 import '../../styles/TeacherInventory.css';
 
@@ -44,7 +44,7 @@ const BorrowReceipt = ({ item, onClose }) => {
                 </div>
 
                 <div className="receipt-footer">
-                    <p>Borrow request ID: {item._id}</p>
+                    <p><b>Borrow request ID: {item._id.slice(0, 10)}</b></p>
                     <p>Date: {new Date(item.borrowDate).toLocaleDateString()}</p>
                     <p>Time: {new Date(item.receiptData?.borrowTime).toLocaleTimeString('en-US', {
                         hour: '2-digit',
@@ -68,7 +68,7 @@ const TeacherInventory = () => {
     ];
     const [borrowedItems, setBorrowedItems] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     useEffect(() => {
         const fetchBorrowedItems = async () => {
@@ -83,27 +83,27 @@ const TeacherInventory = () => {
         fetchBorrowedItems();
     }, []);
 
-    const handleBack = () => {
-        navigate('/teacher');
-    };
+    // const handleBack = () => {
+    //     navigate('/teacher');
+    // };
 
-    const handleReturn = async (borrowingId, itemId, quantity) => {
-        try {
-            await axios.delete(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowingId}`);
-            const itemResponse = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${itemId}`);
-            const currentStock = itemResponse.data.stocks;
-            const newStock = currentStock + quantity;
+    // const handleReturn = async (borrowingId, itemId, quantity) => {
+    //     try {
+    //         await axios.delete(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowingId}`);
+    //         const itemResponse = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${itemId}`);
+    //         const currentStock = itemResponse.data.stocks;
+    //         const newStock = currentStock + quantity;
             
-            await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${itemId}`, {
-                stocks: newStock
-            });
+    //         await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${itemId}`, {
+    //             stocks: newStock
+    //         });
 
-            const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
-            setBorrowedItems(response.data);
-        } catch (error) {
-            console.error('Error returning item:', error);
-        }
-    };
+    //         const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
+    //         setBorrowedItems(response.data);
+    //     } catch (error) {
+    //         console.error('Error returning item:', error);
+    //     }
+    // };
 
     const currentUser = localStorage.getItem('username');
 
@@ -136,7 +136,7 @@ const TeacherInventory = () => {
                                         {item.itemId ? item.itemId.category : 'Category not found'}
                                     </p>
                                     <div className="borrow-details">
-                                        <p><b>Borrow request ID: {item._id}</b></p>
+                                        <p><b>Borrow request ID: {item._id.slice(0, 10)}</b></p>
                                         <p>Borrowed On: {new Date(item.borrowDate).toLocaleDateString()}</p>
                                         <p>Return On: {new Date(item.returnDate).toLocaleDateString()}</p>
                                     </div>

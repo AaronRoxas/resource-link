@@ -44,7 +44,7 @@ const ViewMisc = () => {
                     className="back-arrow" 
                     onClick={handleBack}
                 />
-                <h1>Electronics & IT Equipment</h1>
+                <h1>Miscellaneous</h1>
             </div>
         </header>
         <div className="misc-grid">

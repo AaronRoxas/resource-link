@@ -1,0 +1,130 @@
+.item-info-modal {
+    background: white;
+    height: 100vh;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+  }
+  
+  .item-header {
+    padding: 20px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  
+  .item-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .item-title h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .item-title p {
+    margin: 4px 0 0;
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .tabs-container {
+    border-bottom: 1px solid #eee;
+  }
+  
+  .tabs {
+    display: flex;
+    padding: 0 20px;
+    gap: 24px;
+  }
+  
+  .tab {
+    padding: 12px 0;
+    color: #666;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .tab.active {
+    color: #000;
+    font-weight: 500;
+  }
+  
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #006B3E;
+  }
+  
+  .info-content {
+    padding: 20px;
+  }
+  
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .label {
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .value {
+    font-size: 14px;
+  }
+  
+  .status-pill {
+    background: #E8F5E9;
+    color: #2E7D32;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+  
+  .action-buttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: white;
+  }
+  
+  .action-buttons button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    background: #F5F5F5;
+    color: #000;
+  }
+  
+  .check-in-button {
+    background: #F5F5F5 !important;
+  }
+  
+  .check-out-button {
+    background: #F5F5F5 !important;
+  }
+  
+  .reserved-checkout-button {
+    background: #F5F5F5 !important;
+  }

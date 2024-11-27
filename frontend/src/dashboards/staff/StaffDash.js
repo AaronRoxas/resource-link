@@ -4,12 +4,14 @@ import '../../styles/StaffDash.css'
 import { getFormattedDate } from '../../utils/dateUtils'; // Import the function
 import BottomNav from '../../components/BottomNav'; // Import the BottomNav component
 import LogoutButton from '../../components/LogoutButton';
+import QrScanner from 'react-qr-scanner';
 
 const StaffDash = () => {
   const [borrowings, setBorrowings] = useState([]);
   const [selectedBorrow, setSelectedBorrow] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
 
   const fetchBorrowings = async () => {
     try {
@@ -40,7 +42,7 @@ const StaffDash = () => {
 
   const handleAccept = async (borrowId) => {
     try {
-      await axios.patch(`http://localhost:5000/api/borrowings/${borrowId}/status`, {
+      await axios.patch(`hhttps://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
         status: 'reserved'
       });
       
@@ -54,7 +56,7 @@ const StaffDash = () => {
 
   const handleDecline = async (borrowId) => {
     try {
-      await axios.patch(`http://localhost:5000/api/borrowings/${borrowId}/status`, {
+      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
         status: 'declined'
       });
       
@@ -69,14 +71,14 @@ const StaffDash = () => {
   const handleCheckout = async (borrowId) => {
     try {
       // Update the status to 'borrowed'
-      await axios.patch(`http://localhost:5000/api/borrowings/${borrowId}/status`, {
+      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
         status: 'borrowed'
       });
 
       // Update the item's availability
       const borrowing = borrowings.find(b => b._id === borrowId);
       if (borrowing?.itemId) {
-        await axios.patch(`http://localhost:5000/api/items/${borrowing.itemId._id}`, {
+        await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${borrowing.itemId._id}`, {
           availability: 'Borrowed'
         });
       }
@@ -92,6 +94,18 @@ const StaffDash = () => {
   const handleCheckoutClick = () => {
     setShowModal(false); // Close the reservation receipt modal
     setShowCheckoutModal(true); // Show the checkout modal
+  };
+
+  const handleScan = (data) => {
+    if (data) {
+      console.log('QR Code scanned:', data.text);
+      // Handle the scanned data here
+      setShowQRScanner(false);
+    }
+  };
+
+  const handleError = (err) => {
+    console.error(err);
   };
 
   return (
@@ -249,7 +263,7 @@ const StaffDash = () => {
               </div>
 
               <div className="receipt-footer">
-                <p>Borrow request ID: {selectedBorrow.receiptData?.requestId}</p>
+                <p>Borrow request ID: {selectedBorrow.receiptData?.requestId?.slice(0, 10)}</p>
                 <p>Date: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleDateString()}</p>
                 <p>Time: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleTimeString()}</p>
               </div>
@@ -301,9 +315,23 @@ const StaffDash = () => {
               <span>Or</span>
             </div>
 
-            <span className="scan-text">
-              SCAN QR CODE
-            </span>
+            {showQRScanner ? (
+              <div className="qr-scanner-modal">
+                <QrScanner
+                  onError={handleError}
+                  onScan={handleScan}
+                  constraints={{
+                    video: { facingMode: "environment" }
+                  }}
+                  style={{ width: '100%', maxWidth: '400px' }}
+                />
+                <button onClick={() => setShowQRScanner(false)}>Close Scanner</button>
+              </div>
+            ) : (
+              <span className="scan-text" onClick={() => setShowQRScanner(true)}>
+                SCAN QR CODE
+              </span>
+            )}
           </div>
         </div>
       )}

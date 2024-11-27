@@ -78,9 +78,9 @@ const TeacherDash = () => {
                 <img src="dashboard-imgs/placeholder.svg" alt="Art & Music" />
               </div>
               <div className="category-info">
-                <h4>Art & Music Materials</h4>
-                <p>Musical Instruments, Canvas, Paint</p>
-                <p>Brushes, easels, etc.</p>
+                <h4>Miscellaneous</h4>
+                <p>Routers, Tools</p>
+                <p>Furnitures, etc.</p>
               </div>
             </div>
           </div>

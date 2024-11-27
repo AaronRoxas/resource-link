@@ -35,7 +35,11 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                 borrowDate: new Date(borrowFormData.borrowDate),
                 returnDate: new Date(borrowFormData.returnDate),
                 receiptData: {
-                    requestId: Math.random().toString(36).substr(2, 6),
+                    requestId: Array(10)
+                      .fill(0)
+                      .map(() => Math.random().toString(36).charAt(2))
+                      .join('')
+                      .toUpperCase(),
                     borrowerType: 'Teacher',
                     borrowTime: new Date(),
                     status: 'pending'
@@ -53,7 +57,7 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
 
             // Set receipt data
             setReceiptData({
-                requestId: response.data.receiptData?.requestId || borrowingData.receiptData.requestId,
+                requestId: (response.data.receiptData?.requestId || borrowingData.receiptData.requestId).padEnd(10, '0').slice(0, 10),
                 date: new Date().toLocaleDateString(),
                 time: new Date().toLocaleTimeString(),
                 borrowDate: borrowFormData.borrowDate,
