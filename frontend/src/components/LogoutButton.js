@@ -32,12 +32,7 @@ const LogoutButton = () => {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
-      <span
-        style={{ marginRight: '10px', cursor: 'pointer', color: 'blue' }}
-        onClick={handleChangePassword}
-      >
-        Change Password
-      </span>
+
       <button className="logout-button" onClick={handleLogout}>
         {isMobile ? (
           <img src="/dashboard-imgs/logout.svg" alt="Logout" style={{ width: '40px', height: '40px' }} />

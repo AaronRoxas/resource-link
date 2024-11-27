@@ -146,7 +146,6 @@
 .cancel-button:hover {
   background-color: #e20000;
 }
-
 .item-info-modal {
   position: fixed;
   top: 0;
@@ -164,13 +163,19 @@
   background: white;
   width: 90%;
   max-width: 500px;
+  max-height: 90vh;
   border-radius: 8px;
-  overflow: hidden;
+  overflow-y: auto;
+  position: relative;
 }
 
 .modal-header {
-  padding: 20px;
+  padding: 15px 20px;
   border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 2;
 }
 
 .back-link {
@@ -180,14 +185,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.back-link:hover {
-  color: #006B3C;
-}
-
-#back-button {
-  display: none;
 }
 
 .item-image {
@@ -203,7 +200,7 @@
 }
 
 .checkout-button {
-  padding: 15px;
+  padding: 15px 20px;
 }
 
 .checkout {
@@ -214,10 +211,11 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 16px;
 }
 
 .item-info-tabs {
-  padding: 20px;
+  padding: 0 20px 20px;
 }
 
 .tabs {
@@ -225,29 +223,106 @@
   gap: 20px;
   border-bottom: 1px solid #eee;
   margin-bottom: 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px 0;
 }
 
 .tabs span {
-  padding: 10px 0;
+  padding: 8px 0;
   cursor: pointer;
+  white-space: nowrap;
+  color: #666;
 }
 
 .tabs span.active {
-  border-bottom: 2px solid #006B3C;
   color: #006B3C;
+  border-bottom: 2px solid #006B3C;
+}
+
+.info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .info-row {
   display: flex;
   justify-content: space-between;
-  padding: 10px 0;
+  padding: 12px 0;
   border-bottom: 1px solid #eee;
 }
 
 .label {
   color: #666;
+  font-size: 14px;
 }
 
 .value {
   font-weight: 500;
+  font-size: 14px;
+  text-align: right;
+  word-break: break-word;
+  max-width: 60%;
+}
+
+/* Mobile Responsive Styles */
+@media screen and (max-width: 768px) {
+  .item-info-content {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
+
+  .item-image {
+    height: 180px;
+  }
+
+  .modal-header {
+    padding: 15px;
+  }
+
+  .checkout-button {
+    padding: 12px 15px;
+  }
+
+  .item-info-tabs {
+    padding: 0 15px 15px;
+  }
+
+  .tabs {
+    gap: 15px;
+  }
+
+  .info-row {
+    padding: 10px 0;
+  }
+
+  .label, .value {
+    font-size: 13px;
+  }
+}
+
+/* Small Mobile Devices */
+@media screen and (max-width: 320px) {
+  .modal-header {
+    padding: 12px;
+  }
+
+  .back-link {
+    font-size: 14px;
+  }
+
+  .item-image {
+    height: 150px;
+  }
+
+  .tabs span {
+    font-size: 13px;
+  }
+
+  .label, .value {
+    font-size: 12px;
+  }
 }

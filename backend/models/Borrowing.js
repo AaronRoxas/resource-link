@@ -18,18 +18,20 @@ const borrowingSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    availability: {
-        type: String,
-        enum: ['Available', 'Borrowed', 'Under Maintenance'],
-        default: 'Borrowed'
-    },
-    quantity: {
-        type: Number,
-        required: true,
-        default: 1
+    receiptData: {
+        requestId: String,
+        borrowerType: {
+            type: String,
+            default: 'Teacher'
+        },
+        borrowTime: {
+            type: Date,
+            default: Date.now
+        },
+        status: {
+            type: String
+        }
     }
-}, {
-    timestamps: true // This will add createdAt and updatedAt fields
 });
 
 module.exports = mongoose.model('Borrowing', borrowingSchema);

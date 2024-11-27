@@ -3,12 +3,11 @@ import axios from 'axios';
 import BottomNav from '../../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
 import BorrowItem from './BorrowItem';
-import ItemInformation from '../../components/ItemInformation';
+ 
 const ViewDevices = () => {
     const [devices, setDevices] = useState([]);
     const [borrowItem, setBorrowItem] = useState(null);
     const navigate = useNavigate();
-    const [selectedItem, setSelectedItem] = useState(null);
     const navItems = [
         { path: '/teacher', icon: 'active-home', label: 'Home' },
         { path: '/teacherInventory', icon: 'cube', label: 'Inventory' },
@@ -35,85 +34,45 @@ const ViewDevices = () => {
     const handleBack = () => {
         navigate('/teacher'); // Navigate to the teacher dashboard
     };
-    const handleItemClick = (item) => {
-        setSelectedItem(item);
-      };
-    
-      const handleCloseItemInfo = () => {
-        setSelectedItem(null);
-      };
-    
+
 
     return (
         <div className="view-devices">
-            <h1>
-                <img src="back-arrow.svg" alt="Back" className="back-arrow" onClick={handleBack} /> 
-                &nbsp;Devices
-            </h1>
-            <div className="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Status</th>
-                            <th>Serial No.</th>
-                            <th>Category</th>
-                            <th>Stocks</th>
-                            <th>Availability</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {devices.map((item) => (
-                            <tr key={item._id}>
-                                <td 
-                                    data-label="Item" 
-                                    style={{cursor: 'pointer'}} 
-                                    onClick={() => handleItemClick(item)}
-                                >
-                                {item.name}
-                                </td>
-                                <td data-label="Status">
-                                    {item.stocks < 10 ? 'Low Stocks' : item.status}
-                                </td>
-                                <td data-label="Serial No.">{item.serialNo}</td>
-                                <td data-label="Category">{item.category}</td>
-                                <td data-label="Stocks">{item.stocks}</td>
-                                <td data-label="Availability">
-                                    {item.stocks > 0 ? 'Available' : 'Not Available'}
-                                </td>
-                                <td data-label="Action" className="action-icons">
-                                    {item.stocks > 0 && (
-                                        <img 
-                                            src="/table-imgs/edit.svg" 
-                                            alt="Edit" 
-                                            onClick={() => setBorrowItem(item)} 
-                                            className="icon" 
-                                        />
-                                    )}
-                                    {item.stocks > 0 ? (
-                                        <span className="action-text edit-text" onClick={() => setBorrowItem(item)}>Borrow Item</span>
-                                    ) : (
-                                        <span className="action-text edit-text" style={{ color: 'gray', cursor: 'not-allowed', display: 'inline' }}>Not Available</span>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            <header>
+                <div className="back-header">
+                    <img 
+                        src="back-arrow.svg" 
+                        alt="Back" 
+                        className="back-arrow" 
+                        onClick={handleBack}
+                    />
+                    <h1>Electronics & IT Equipment</h1>
+                </div>
+            </header>
+            <div className="devices-grid">
+            {devices.map((devices) => (
+                    <div key={devices._id} className="devices-card">
+                        <div className="devices-image">
+                            <img src="dashboard-imgs/placeholder.svg" alt={devices.name} />
+                        </div>
+                        <div className="devices-info">
+                            <h3>{devices.name}</h3>
+                            <p className="category">{devices.category}</p>
+                            <button 
+                                className="item-borrow-btn"
+                                onClick={() => setBorrowItem(devices)}
+                                disabled={devices.stocks <= 0}
+                            >
+                                Borrow
+                            </button>
+                        </div>
+                    </div>
+                ))}
             </div>
 
             {/* Borrow Item Modal */}
             {borrowItem && (
                 <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)}  fetchItems={fetchDevices} />
-            )}
-
-                  {/* Item Information Modal */}
-            {selectedItem && (
-                <ItemInformation 
-                selectedItem={selectedItem} 
-                handleCloseItemInfo={handleCloseItemInfo}
-                />
             )}
 
             <BottomNav navItems={navItems} />

@@ -2,87 +2,164 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../../components/BottomNav';
-import '../../styles/TeacherDash.css';
+import '../../styles/TeacherInventory.css';
+
+const BorrowReceipt = ({ item, onClose }) => {
+    return (
+        <div className="receipt-modal-overlay">
+            <div className="receipt-modal">
+                <h2>Borrow Request Receipt</h2>
+                
+                <div className="user-info">
+                    <img src="dashboard-imgs/placeholder.svg" alt="User" className="user-avatar" />
+                    <div className="user-details">
+                        <h3>{item.borrower}</h3>
+                        <p>Teacher</p>
+                    </div>
+                </div>
+
+                <div className="to-borrow-section">
+                    <p className="section-label">To Borrow</p>
+                    <div className="borrowed-item-preview">
+                        <img src="dashboard-imgs/placeholder.svg" alt={item.itemId?.name} />
+                        <div>
+                            <h4>{item.itemId?.name}</h4>
+                            <p>{item.itemId?.category}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="date-section">
+                    <p className="section-label">Date</p>
+                    <div className="date-info">
+                        <div className="date-row">
+                            <p>Borrow Date:</p>
+                            <p>{new Date(item.borrowDate).toLocaleDateString()}</p>
+                        </div>
+                        <div className="date-row">
+                            <p>Return Date:</p>
+                            <p>{new Date(item.returnDate).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="receipt-footer">
+                    <p>Borrow request ID: {item._id}</p>
+                    <p>Date: {new Date(item.borrowDate).toLocaleDateString()}</p>
+                    <p>Time: {new Date(item.receiptData?.borrowTime).toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    })}</p>
+                </div>
+
+                <button className="close-btn" onClick={onClose}>
+                    Close
+                </button>
+            </div>
+        </div>
+    );
+};
 
 const TeacherInventory = () => {
-  const navItems = [
-    { path: '/teacher', icon: 'home', label: 'Home' },
-    { path: '/teacherInventory', icon: 'active-cube', label: 'Inventory' },
-];
-  const [borrowedItems, setBorrowedItems] = useState([]);
-  const navigate = useNavigate();
-  useEffect(() => {
-    const fetchBorrowedItems = async () => {
-      try {
-        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
-        setBorrowedItems(response.data);
-      } catch (error) {
-        console.error('Error fetching borrowed items:', error);
-      }
+    const navItems = [
+        { path: '/teacher', icon: 'home'},
+        { path: '/teacherInventory', icon: 'active-cube'},
+    ];
+    const [borrowedItems, setBorrowedItems] = useState([]);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchBorrowedItems = async () => {
+            try {
+                const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
+                setBorrowedItems(response.data);
+            } catch (error) {
+                console.error('Error fetching borrowed items:', error);
+            }
+        };
+
+        fetchBorrowedItems();
+    }, []);
+
+    const handleBack = () => {
+        navigate('/teacher');
     };
 
-    fetchBorrowedItems();
-  }, []);
-  const handleBack = () => {
-    navigate('/teacher'); // Navigate to the teacher dashboard
-};
+    const handleReturn = async (borrowingId, itemId, quantity) => {
+        try {
+            await axios.delete(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowingId}`);
+            const itemResponse = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${itemId}`);
+            const currentStock = itemResponse.data.stocks;
+            const newStock = currentStock + quantity;
+            
+            await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${itemId}`, {
+                stocks: newStock
+            });
 
-const handleReturn = async (borrowingId, itemId, quantity) => {
-  try {
-    // Send a request to return the item
-    await axios.delete(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowingId}`); // Use borrowingId to delete the borrowing record
+            const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
+            setBorrowedItems(response.data);
+        } catch (error) {
+            console.error('Error returning item:', error);
+        }
+    };
 
-    // Fetch the current stock of the item
-    const itemResponse = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${itemId}`);
-    const currentStock = itemResponse.data.stocks;
+    const currentUser = localStorage.getItem('username');
 
-    // Calculate the new stock
-    const newStock = currentStock + quantity;
+    const handleItemClick = (item) => {
+        setSelectedItem(item);
+    };
 
-    // Update the item's stock
-    await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${itemId}`, {
-      stocks: newStock // Increment stock by the quantity returned
-    });
+    return (
+        <div className="teacher-inventory">
+            <header>
+                <h1>Borrowed Items</h1>
+            </header>
 
-    // Refresh the borrowed items
-    const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
-    setBorrowedItems(response.data);
-  } catch (error) {
-    console.error('Error returning item:', error);
-  }
-};
-
-const currentUser = localStorage.getItem('username'); // Get the current user's name from localStorage
-
-  return (
-<div className="teacher-inventory">
-            <h1>
-                <img src="back-arrow.svg" alt="Back" className="back-arrow" onClick={handleBack} /> 
-                &nbsp;Item Inventory
-            </h1>
-            <div className="inventory-list">
+            <div className="borrowed-items-grid">
                 {borrowedItems.length > 0 && borrowedItems.filter(item => item.borrower === currentUser).length > 0 ? (
                     borrowedItems
-                        .filter(item => item.borrower === currentUser) // Display only items borrowed by the current user
+                        .filter(item => item.borrower === currentUser)
                         .map(item => (
-                            <div className="inventory-card" key={item._id}>
-                                <div className="item-details">
-                                    <h3>{item.itemId ? item.itemId.name : 'Item not found'}</h3>
-                                    <p>Borrowed on: {new Date(item.borrowDate).toLocaleDateString()}</p>
-                                    <p>Return on: {new Date(item.returnDate).toLocaleDateString()}</p>
-                                    <p>Quantity: {item.quantity}</p>
+                            <div 
+                                className="borrowed-item-card" 
+                                key={item._id}
+                                onClick={() => handleItemClick(item)}
+                            >
+                                <div className="item-image">
+                                    <img src="dashboard-imgs/placeholder.svg" alt={item.itemId?.name} />
                                 </div>
-                                <button className="return-button" onClick={() => handleReturn(item._id, item.itemId._id, item.quantity)}>Return</button>
+                                <div className="item-info">
+                                    <h3>{item.itemId ? item.itemId.name : 'Item not found'}</h3>
+                                    <p className="category">
+                                        {item.itemId ? item.itemId.category : 'Category not found'}
+                                    </p>
+                                    <div className="borrow-details">
+                                        <p><b>Borrow request ID: {item._id}</b></p>
+                                        <p>Borrowed On: {new Date(item.borrowDate).toLocaleDateString()}</p>
+                                        <p>Return On: {new Date(item.returnDate).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
                             </div>
                         ))
                 ) : (
-                    <p>No items borrowed.</p> // Message displayed when no items are borrowed
+                    <div className="no-items-message">
+                        <p>No items borrowed.</p>
+                    </div>
                 )}
             </div>
             
+            {selectedItem && (
+                <BorrowReceipt 
+                    item={selectedItem} 
+                    onClose={() => setSelectedItem(null)} 
+                />
+            )}
+            
             <BottomNav navItems={navItems} />
         </div>
-  );
+    );
 };
 
 export default TeacherInventory;

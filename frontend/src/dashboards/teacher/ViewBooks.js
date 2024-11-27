@@ -3,10 +3,12 @@ import axios from 'axios';
 import BottomNav from '../../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
 import BorrowItem from './BorrowItem';
-
+import '../../styles/ViewItems.css';
+import ItemInformation from '../../components/ItemInformation';
 const ViewBooks = () => {
     const [books, setBooks] = useState([]);
     const [borrowItem, setBorrowItem] = useState(null);
+    const [selectedItem, setSelectedItem] = useState(null);
     const navigate = useNavigate();
     const navItems = [
         { path: '/teacher', icon: 'active-home', label: 'Home' },
@@ -31,65 +33,65 @@ const ViewBooks = () => {
     }, []);
 
     const handleBack = () => {
-        navigate('/teacher'); // Navigate to the teacher dashboard
+        navigate('/teacher');
     };
 
+    const handleItemClick = (item) => {
+        setSelectedItem(item);
+      };
+    
+      const handleCloseItemInfo = () => {
+        setSelectedItem(null);
+      };
+
     return (
-        <div className="view-devices">
-            <h1>
-                <img src="back-arrow.svg" alt="Back" className="back-arrow" onClick={handleBack} /> 
-                &nbsp;Books
-            </h1>
-            <div className="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Status</th>
-                            <th>Serial No.</th>
-                            <th>Category</th>
-                            <th>Stocks</th>
-                            <th>Availability</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {books.map((item) => (
-                            <tr key={item._id}>
-                                <td data-label="Item">{item.name}</td>
-                                <td data-label="Status">
-                                    {item.stocks < 10 ? 'Low Stocks' : item.status}
-                                </td>
-                                <td data-label="Serial No.">{item.serialNo}</td>
-                                <td data-label="Category">{item.category}</td>
-                                <td data-label="Stocks">{item.stocks}</td>
-                                <td data-label="Availability">
-                                    {item.stocks > 0 ? 'Available' : 'Not Available'}
-                                </td>
-                                <td data-label="Action" className="action-icons">
-                                    {item.stocks > 0 && (
-                                        <img 
-                                            src="/table-imgs/edit.svg" 
-                                            alt="Edit" 
-                                            onClick={() => setBorrowItem(item)} 
-                                            className="icon" 
-                                        />
-                                    )}
-                                    {item.stocks > 0 ? (
-                                        <span className="action-text edit-text" onClick={() => setBorrowItem(item)}>Borrow Item</span>
-                                    ) : (
-                                        <span className="action-text edit-text" style={{ color: 'gray', cursor: 'not-allowed', display: 'inline' }}>Not Available</span>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+        <div className="view-books">
+            <header>
+                <div className="back-header">
+                    <img 
+                        src="back-arrow.svg" 
+                        alt="Back" 
+                        className="back-arrow" 
+                        onClick={handleBack}
+                    />
+                    <h1>Books, Modules</h1>
+                </div>
+            </header>
+
+            <div className="books-grid">
+                {books.map((book) => (
+                    <div key={book._id} className="book-card" >
+                        <div className="book-image" onClick={() => handleItemClick(book)}>
+                            <img src="dashboard-imgs/placeholder.svg" alt={book.name} />
+                        </div>
+                        <div className="book-info">
+                            <h3>{book.name}</h3>
+                            <p className="category">{book.category}</p>
+                            <button 
+                                className="item-borrow-btn"
+                                onClick={() => setBorrowItem(book)}
+                                disabled={book.stocks <= 0}
+                            >
+                                Borrow
+                            </button>
+                        </div>
+                    </div>
+                ))}
             </div>
 
-            {/* Borrow Item Modal */}
             {borrowItem && (
-                <BorrowItem item={borrowItem} onClose={() => setBorrowItem(null)} fetchItems={fetchBooks} />
+                <BorrowItem 
+                    item={borrowItem} 
+                    onClose={() => setBorrowItem(null)} 
+                    fetchItems={fetchBooks} 
+                />
+            )}
+
+            {selectedItem && (
+                <ItemInformation 
+                    selectedItem={selectedItem} 
+                    handleCloseItemInfo={handleCloseItemInfo} 
+                />
             )}
 
             <BottomNav navItems={navItems} />

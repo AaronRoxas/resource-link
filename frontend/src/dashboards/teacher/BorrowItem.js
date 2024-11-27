@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import '../../styles/BorrowItem.css';
 
 const BorrowItem = ({ item, onClose, fetchItems }) => {
     const [borrowFormData, setBorrowFormData] = useState({
@@ -9,11 +10,12 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
         quantity: 1
     });
     const [currentStock, setCurrentStock] = useState(0);
+    const [showReceipt, setShowReceipt] = useState(false);
+    const [receiptData, setReceiptData] = useState(null);
 
     useEffect(() => {
         const fetchStock = async () => {
             try {
-                // Fetch the current stock of the item
                 const itemResponse = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${item._id}`);
                 const stock = itemResponse.data.stocks;
                 setCurrentStock(stock);
@@ -27,33 +29,89 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
 
     const handleBorrow = async () => {
         try {
-            // Create borrowing data
             const borrowingData = {
                 itemId: item._id,
                 borrower: borrowFormData.borrower,
                 borrowDate: new Date(borrowFormData.borrowDate),
                 returnDate: new Date(borrowFormData.returnDate),
-                quantity: borrowFormData.quantity
             };
 
-            // Send borrowing request
-            await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings', borrowingData);
+            const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings', borrowingData);
 
-            // Calculate new stock
             const newStock = currentStock - borrowFormData.quantity;
 
-            // Update the item's stock and status if necessary
             await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${item._id}`, {
-                stocks: newStock, // Update stock
-                status: newStock < 10 ? 'Low Stock' : 'In Stock' // Update status based on new stock
+                stocks: newStock,
+                status: newStock < 10 ? 'Low Stock' : 'In Stock'
             });
 
-            fetchItems(); // Refresh devices after borrowing
-            onClose(); // Close the modal
+            // Set receipt data
+            setReceiptData({
+                requestId: response.data._id || Math.random().toString(36).substr(2, 2),
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString(),
+                borrowDate: borrowFormData.borrowDate,
+                returnDate: borrowFormData.returnDate,
+                item: item
+            });
+
+            setShowReceipt(true);
+            fetchItems();
         } catch (error) {
             console.error('Error borrowing item:', error);
         }
     };
+
+    if (showReceipt) {
+        return (
+            <div className="edit-item-modal">
+                <div className="edit-item-modal-content receipt">
+                    <h2>Borrow Request Receipt</h2>
+                    
+                    <div className="user-info">
+                        <img src="dashboard-imgs/placeholder.svg" alt="User" className="user-avatar" />
+                        <div className="user-details">
+                            <h3>{borrowFormData.borrower}</h3>
+                            <p>Teacher</p>
+                        </div>
+                    </div>
+
+                    <div className="borrow-details">
+                        <h4>To Borrow</h4>
+                        <div className="item-preview">
+                            <img src={item.image || "dashboard-imgs/placeholder.svg"} alt={item.name} />
+                            <div>
+                                <h4>{item.name}</h4>
+                                <p>{item.category}</p>
+                            </div>
+                        </div>
+
+                        <h4>Date</h4>
+                        <div className="date-details">
+                            <div>
+                                <p>Borrow Date:</p>
+                                <strong>{new Date(borrowFormData.borrowDate).toLocaleDateString()}</strong>
+                            </div>
+                            <div>
+                                <p>Return Date:</p>
+                                <strong>{new Date(borrowFormData.returnDate).toLocaleDateString()}</strong>
+                            </div>
+                        </div>
+
+                        <div className="receipt-footer">
+                            <p>Borrow request ID: {receiptData.requestId}</p>
+                            <p>Date: {receiptData.date}</p>
+                            <p>Time: {receiptData.time}</p>
+                        </div>
+
+                        <button className="submit-button" onClick={onClose}>
+                            Continue
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="edit-item-modal">
@@ -66,32 +124,17 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                 <div className="field">
                     <label>Borrow Date:</label>
                     <input 
-                    type="date" 
-                    onChange={(e) => setBorrowFormData({ ...borrowFormData, borrowDate: e.target.value })}
-                    min={new Date().toISOString().split("T")[0]}
-                     />
-                </div>
-                <div className="field">
-                    <label>Return Date:</label>
-                    <input type="date" 
-                    onChange={(e) => setBorrowFormData({ ...borrowFormData, returnDate: e.target.value })}
-                    min={new Date().toISOString().split("T")[0]}
+                        type="date" 
+                        onChange={(e) => setBorrowFormData({ ...borrowFormData, borrowDate: e.target.value })}
+                        min={new Date().toISOString().split("T")[0]}
                     />
                 </div>
                 <div className="field">
-                    <label>Quantity:</label>
+                    <label>Return Date:</label>
                     <input 
-                        type="number" 
-                        value={borrowFormData.quantity} 
-                        onChange={(e) => {
-                            const value = e.target.value;
-                            // Check if the value is empty (backspace) or a valid number
-                            if (value === '' || (value > 0 && value <= currentStock)) {
-                                setBorrowFormData({ ...borrowFormData, quantity: value });
-                            }
-                        }} 
-                        max={currentStock}
-                        min={1}
+                        type="date" 
+                        onChange={(e) => setBorrowFormData({ ...borrowFormData, returnDate: e.target.value })}
+                        min={new Date().toISOString().split("T")[0]}
                     />
                 </div>
                 <button className="submit-button" onClick={handleBorrow}>Borrow</button>

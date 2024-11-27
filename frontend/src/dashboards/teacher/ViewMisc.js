@@ -35,57 +35,38 @@ const ViewMisc = () => {
     };
 
     return (
-        <div className="view-devices">
-            <h1>
-                <img src="back-arrow.svg" alt="Back" className="back-arrow" onClick={handleBack} /> 
-                &nbsp;Miscellaneous
-            </h1>
-            <div className="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Status</th>
-                            <th>Serial No.</th>
-                            <th>Category</th>
-                            <th>Stocks</th>
-                            <th>Availability</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {misc.map((item) => (
-                            <tr key={item._id}>
-                                <td data-label="Item">{item.name}</td>
-                                <td data-label="Status">
-                                    {item.stocks < 10 ? 'Low Stocks' : item.status}
-                                </td>
-                                <td data-label="Serial No.">{item.serialNo}</td>
-                                <td data-label="Category">{item.category}</td>
-                                <td data-label="Stocks">{item.stocks}</td>
-                                <td data-label="Availability">
-                                    {item.stocks > 0 ? 'Available' : 'Not Available'}
-                                </td>
-                                <td data-label="Action" className="action-icons">
-                                    {item.stocks > 0 && (
-                                        <img 
-                                            src="/table-imgs/edit.svg" 
-                                            alt="Edit" 
-                                            onClick={() => setBorrowItem(item)} 
-                                            className="icon" 
-                                        />
-                                    )}
-                                    {item.stocks > 0 ? (
-                                        <span className="action-text edit-text" onClick={() => setBorrowItem(item)}>Borrow Item</span>
-                                    ) : (
-                                        <span className="action-text edit-text" style={{ color: 'gray', cursor: 'not-allowed', display: 'inline' }}>Not Available</span>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+        <div className="view-misc">
+        <header>
+            <div className="back-header">
+                <img 
+                    src="back-arrow.svg" 
+                    alt="Back" 
+                    className="back-arrow" 
+                    onClick={handleBack}
+                />
+                <h1>Electronics & IT Equipment</h1>
             </div>
+        </header>
+        <div className="misc-grid">
+        {misc.map((misc) => (
+                <div key={misc._id} className="misc-card">
+                    <div className="misc-image">
+                        <img src="dashboard-imgs/placeholder.svg" alt={misc.name} />
+                    </div>
+                    <div className="devices-info">
+                        <h3>{misc.name}</h3>
+                        <p className="category">{misc.category}</p>
+                        <button 
+                            className="item-borrow-btn"
+                            onClick={() => setBorrowItem(misc)}
+                            disabled={misc.stocks <= 0}
+                        >
+                            Borrow
+                        </button>
+                    </div>
+                </div>
+            ))}
+        </div>
 
             {/* Borrow Item Modal */}
             {borrowItem && (
