@@ -1,0 +1,583 @@
+/* Main container */
+.staff-dashboard {
+    padding: 20px;
+    padding-bottom: 80px;
+    background-color: #f5f5f5;
+  }
+  
+  /* Header styles */
+  .staff-header {
+    margin-bottom: 24px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+  
+  .staff-header h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .staff-header h3 {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  /* Section styles */
+  .staff-section {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  /* Table styles */
+  .staff-table-container {
+    overflow-x: auto;
+    margin: 12px 0;
+    border-radius: 8px;
+  }
+  
+  .staff-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  
+  .staff-table th {
+    padding: 12px;
+    text-align: left;
+    color: #666;
+    font-weight: 500;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .staff-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  /* Status pills */
+  .status-pill {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+  }
+  
+  .status-declined {
+    background-color: #FFEBEE;
+    color: #D32F2F;
+    cursor: pointer;
+  }
+  
+  .status-pending {
+    background: #FFF4E5;
+    color: #FF9800;
+    cursor: pointer;
+  }
+  
+  .status-reserved {
+    background: #E8F5E9;
+    color: #43A047;
+  }
+  
+  /* Section headers */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .section-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .section-icon {
+    width: 24px;
+    height: 24px;
+  }
+  
+  /* View all button */
+  .view-all-button {
+    width: 100%;
+    padding: 8px;
+    background: #f5f5f5;
+    border: none;
+    border-radius: 8px;
+    color: #666;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .view-all-button:hover {
+    background: #eeeeee;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .staff-dashboard {
+      padding: 16px;
+    }
+    
+    .staff-header h1 {
+      font-size: 20px;
+    }
+    
+    .staff-header h2 {
+      font-size: 18px;
+    }
+    
+    .section-header h2 {
+      font-size: 16px;
+    }
+  }
+  
+  /* Table cell styles */
+  .staff-table td {
+    padding: 12px;
+    vertical-align: middle;
+  }
+  
+  /* Request ID style */
+  .staff-table td:first-child {
+    font-family: monospace;
+    font-weight: 600;
+    color: #666;
+  }
+  
+  /* Empty state */
+  .staff-table tbody:empty::after {
+    content: "No items to display";
+    display: block;
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-style: italic;
+  }
+  
+  /* Modal Styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .receipt-modal {
+    background: white;
+    padding: 24px;
+  }
+  
+  .receipt-modal h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+  }
+  
+  .user-details h3 {
+    margin: 0;
+    font-size: 16px;
+  }
+  
+  .user-details p {
+    margin: 4px 0 0;
+    color: #666;
+  }
+  
+  .item-preview {
+    display: flex;
+    gap: 12px;
+    margin: 12px 0;
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 8px;
+  }
+  
+  .item-preview img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  
+  .date-details {
+    display: flex;
+    justify-content: space-between;
+    margin: 16px 0;
+  }
+  
+  .receipt-footer {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+  }
+  
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  
+  .accept-button {
+    width: 100%;
+    padding: 14px;
+    background: #006B3E;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .decline-text {
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .decline-text:hover {
+    text-decoration: underline;
+  }
+  
+  .modal-content .receipt-modal .close-button {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: white;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  /* Add status-reserved style */
+  .status-reserved {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+  }
+  
+  /* Add checkout button style */
+  .checkout-button {
+    width: 100%;
+    padding: 12px;
+    background: #006B3E;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+  
+  .checkout-button:hover {
+    background: #005432;
+  }
+  
+  /* Update modal styles */
+  .modal-content.receipt-modal {
+    max-width: 400px;
+    width: 90%;
+  }
+  
+  .receipt-modal h2 {
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 20px;
+  }
+  
+  /* Reservation Receipt Styles */
+  .reservation-receipt {
+    background: white;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 12px;
+  }
+  
+  .reservation-receipt h2 {
+    text-align: center;
+    margin: 24px 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 24px;
+  }
+  
+  .user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+  }
+  
+  .user-details h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .user-details p {
+    margin: 4px 0 0;
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .section-label {
+    color: #666;
+    font-size: 14px;
+    margin: 16px 0 8px;
+  }
+  
+  .item-preview {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .item-preview img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  
+  .item-info h4 {
+    margin: 0;
+    font-size: 16px;
+  }
+  
+  .item-info p {
+    margin: 4px 0 0;
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .date-container {
+    background: #f5f5f5;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+  }
+  
+  .date-field {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  
+  .date-field:last-child {
+    margin-bottom: 0;
+  }
+  
+  .date-field p {
+    margin: 0;
+    font-size: 14px;
+  }
+  
+  .receipt-footer {
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+  
+  .receipt-footer p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .checkout-button {
+    width: 100%;
+    padding: 14px;
+    background: #006B3E;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .checkout-button:hover {
+    background: #005432;
+  }
+  
+  .reservation-receipt .close-button {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 0 16px;
+  }
+  
+  .modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    flex: 1;
+    text-align: center;
+  }
+  
+  .close-button {
+    font-size: 16px;
+    color: #000;
+    cursor: pointer;
+    text-transform: lowercase;
+    user-select: none;  /* Prevents text selection */
+  }
+  
+  .close-button:hover {
+    color: #333;
+  }
+  
+  .modal-top {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+  }
+  
+  .checkout-modal {
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+  }
+  
+  .checkout-modal h2 {
+    text-align: center;
+    margin: 24px 0;
+    font-size: 18px;
+  }
+  
+  .search-section {
+    margin: 24px 0;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: center;
+  }
+  
+  .continue-button {
+    width: 100%;
+    padding: 14px;
+    background: #006B3E;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    margin: 16px 0;
+  }
+  
+  .divider {
+    text-align: center;
+    margin: 24px 0;
+    position: relative;
+  }
+  
+  .divider::before,
+  .divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 45%;
+    height: 1px;
+    background: #ddd;
+  }
+  
+  .divider::before {
+    left: 0;
+  }
+  
+  .divider::after {
+    right: 0;
+  }
+  
+  .divider span {
+    background: white;
+    padding: 0 10px;
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .scan-text {
+    display: block;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  
+  .scan-text:hover {
+    text-decoration: underline;
+  }

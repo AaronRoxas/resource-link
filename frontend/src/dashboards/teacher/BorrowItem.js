@@ -34,6 +34,12 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                 borrower: borrowFormData.borrower,
                 borrowDate: new Date(borrowFormData.borrowDate),
                 returnDate: new Date(borrowFormData.returnDate),
+                receiptData: {
+                    requestId: Math.random().toString(36).substr(2, 6),
+                    borrowerType: 'Teacher',
+                    borrowTime: new Date(),
+                    status: 'pending'
+                }
             };
 
             const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings', borrowingData);
@@ -47,12 +53,13 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
 
             // Set receipt data
             setReceiptData({
-                requestId: response.data._id || Math.random().toString(36).substr(2, 2),
+                requestId: response.data.receiptData?.requestId || borrowingData.receiptData.requestId,
                 date: new Date().toLocaleDateString(),
                 time: new Date().toLocaleTimeString(),
                 borrowDate: borrowFormData.borrowDate,
                 returnDate: borrowFormData.returnDate,
-                item: item
+                item: item,
+                status: 'pending'
             });
 
             setShowReceipt(true);
@@ -89,12 +96,12 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                         <h4>Date</h4>
                         <div className="date-details">
                             <div>
-                                <p>Borrow Date:</p>
-                                <strong>{new Date(borrowFormData.borrowDate).toLocaleDateString()}</strong>
+                                <p>Borrow Date: <strong>{new Date(borrowFormData.borrowDate).toLocaleDateString()}</strong></p>
+                             
                             </div>
                             <div>
-                                <p>Return Date:</p>
-                                <strong>{new Date(borrowFormData.returnDate).toLocaleDateString()}</strong>
+                                <p>Return Date: <strong>{new Date(borrowFormData.returnDate).toLocaleDateString()}</strong></p>
+                             
                             </div>
                         </div>
 
@@ -102,6 +109,7 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                             <p>Borrow request ID: {receiptData.requestId}</p>
                             <p>Date: {receiptData.date}</p>
                             <p>Time: {receiptData.time}</p>
+                            <p>Status: {receiptData.status}</p>
                         </div>
 
                         <button className="submit-button" onClick={onClose}>

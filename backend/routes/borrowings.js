@@ -20,7 +20,7 @@ router.post('/', async (req, res) => {
                 requestId: new mongoose.Types.ObjectId().toString(),
                 borrowerType: 'Teacher',
                 borrowTime: new Date(),
-                status: 'approved'
+                status: 'pending'
             }
         });
 

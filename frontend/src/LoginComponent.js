@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 const LoginComponent = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [username, setUsername] = useState(''); // State for username
-  const [name, setName] = useState(''); // State for name
+  // const [name, setName] = useState(''); // State for name
   const [password, setPassword] = useState(''); // State for password
   const [error, setError] = useState(''); // State for error messages
   const [loading, setLoading] = useState(false); // New loading state
@@ -31,9 +31,10 @@ const LoginComponent = () => {
     }
   }, [isDarkMode]);
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+  // const toggleTheme = () => {
+  //   setIsDarkMode(!isDarkMode);
+  // };
+
   axios.defaults.withCredentials = true; // Enable sending cookies with requests
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent default form submission
@@ -108,9 +109,9 @@ const LoginComponent = () => {
         </div>
         <button type="submit" className="login-button">Log in</button>
       </form>
-      <button className="theme-toggle" onClick={toggleTheme}>
+      {/* <button className="theme-toggle" onClick={toggleTheme}>
         {isDarkMode ? '☀️' : '🌑'}
-      </button>
+      </button> */}
     </div>
   )
 }
