@@ -10,12 +10,16 @@ const itemRoutes = require('../routes/items');
 const borrowingsRoutes = require('../routes/borrowings');
 
 const app = express();
+
+// Increase the payload size limit for bulk uploads
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
 app.use(cors({
   origin: ["https://resource-link.vercel.app", "http://localhost:3000"],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   credentials: true
 }));
-app.use(express.json()); // Parse JSON request bodies
 
 connectDB()
   .catch(err => console.error('Database connection error:', err));

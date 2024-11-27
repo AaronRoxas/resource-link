@@ -19,6 +19,8 @@ import ViewLabEquipments from './dashboards/teacher/ViewLabEquipments.js';
 import ViewBooks from './dashboards/teacher/ViewBooks.js';
 import ViewMisc from './dashboards/teacher/ViewMisc.js';
 import TeacherInventory from './dashboards/teacher/TeacherInventory.js';
+import ItemPage from './components/ItemPage';
+
 function App() {
   return (
     <Router>
@@ -138,6 +140,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/staff/:itemId" element={<ItemPage />} />
+        <Route path="/staff/*" element={<StaffDash />} />
         {/* Other routes */}
       </Routes>
     </Router>

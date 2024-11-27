@@ -5,13 +5,21 @@ import { getFormattedDate } from '../../utils/dateUtils'; // Import the function
 import BottomNav from '../../components/BottomNav'; // Import the BottomNav component
 import LogoutButton from '../../components/LogoutButton';
 import QrScanner from 'react-qr-scanner';
+import ItemInformation from '../../components/ItemInformation';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const StaffDash = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [borrowings, setBorrowings] = useState([]);
   const [selectedBorrow, setSelectedBorrow] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
+  const [searchId, setSearchId] = useState('');
+  const [foundItem, setFoundItem] = useState(null);
+  const [showItemInfo, setShowItemInfo] = useState(false);
 
   const fetchBorrowings = async () => {
     try {
@@ -42,7 +50,7 @@ const StaffDash = () => {
 
   const handleAccept = async (borrowId) => {
     try {
-      await axios.patch(`hhttps://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
+      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
         status: 'reserved'
       });
       
@@ -99,14 +107,65 @@ const StaffDash = () => {
   const handleScan = (data) => {
     if (data) {
       console.log('QR Code scanned:', data.text);
-      // Handle the scanned data here
-      setShowQRScanner(false);
+      try {
+        const url = new URL(data.text);
+        // Check if it's the correct URL format and extract the item ID
+        if (url.pathname.startsWith('/staff/item/')) {
+          const itemId = url.pathname.split('/').pop(); // This will get 'books-1'
+          setShowQRScanner(false);
+          setSearchId(itemId);
+          handleSearch(itemId);
+        } else {
+          alert('Invalid QR code format');
+        }
+      } catch (error) {
+        console.error('Invalid URL format:', error);
+        alert('Invalid QR code format');
+      }
     }
   };
 
   const handleError = (err) => {
-    console.error(err);
+    console.error('QR Scanner Error:', err);
+    alert('Error scanning QR code. Please try again.');
   };
+
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${searchId}`);
+      if (response.data) {
+        setFoundItem(response.data);
+        setShowItemInfo(true);
+        setShowCheckoutModal(false);
+        navigate(`/staff/item/${searchId}`, { replace: true });
+      } else {
+        alert('Item not found');
+      }
+    } catch (error) {
+      console.error('Error finding item:', error);
+      alert('Error searching for item');
+    }
+  };
+
+  useEffect(() => {
+    const fetchItemFromUrl = async () => {
+      const match = location.pathname.match(/\/staff\/item\/(.+)/);
+      if (match) {
+        const itemId = match[1];
+        try {
+          const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`);
+          if (response.data) {
+            setFoundItem(response.data);
+            setShowItemInfo(true);
+          }
+        } catch (error) {
+          console.error('Error fetching item from URL:', error);
+        }
+      }
+    };
+
+    fetchItemFromUrl();
+  }, [location]);
 
   return (
     <div className="staff-dashboard">
@@ -302,12 +361,22 @@ const StaffDash = () => {
             <div className="search-section">
               <input 
                 type="text" 
-                placeholder="ID0001" 
+                placeholder="category-1" 
                 className="search-input"
+                value={searchId}
+                onChange={(e) => setSearchId(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSearch();
+                  }
+                }}
               />
             </div>
 
-            <button className="continue-button" onClick={() => handleCheckout(selectedBorrow._id)}>
+            <button 
+              className="continue-button" 
+              onClick={handleSearch}
+            >
               Continue
             </button>
 
@@ -335,6 +404,26 @@ const StaffDash = () => {
           </div>
         </div>
       )}
+
+      {/* Item Information Modal */}
+      {showItemInfo && foundItem && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <ItemInformation 
+              selectedItem={foundItem}
+              handleCloseItemInfo={() => {
+                setShowItemInfo(false);
+                setFoundItem(null);
+                setSearchId('');
+                navigate('/staff', { replace: true });
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Add QR Scanner Modal */}
+    
     </div>
   )
 }

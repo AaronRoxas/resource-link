@@ -85,4 +85,93 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
+// Add the bulk route
+router.post('/bulk', async (req, res) => {
+  try {
+    const items = req.body;
+    
+    if (!Array.isArray(items)) {
+      return res.status(400).json({ error: 'Invalid data format. Expected an array of items.' });
+    }
+
+    // First, get all existing items to check highest IDs for each category
+    const existingItems = await Item.find({});
+    const categoryMaxIds = {};
+
+    // Initialize max IDs for each category
+    existingItems.forEach(item => {
+      if (item.id) {
+        const [category, numStr] = item.id.split('-');
+        const num = parseInt(numStr);
+        if (!categoryMaxIds[category] || num > categoryMaxIds[category]) {
+          categoryMaxIds[category] = num;
+        }
+      }
+    });
+
+    const createdItems = [];
+    
+    // Process items sequentially to avoid ID conflicts
+    for (const item of items) {
+      try {
+        const category = item.category.toLowerCase().replace(/\s+/g, '');
+        
+        // Initialize category counter if it doesn't exist
+        if (!categoryMaxIds[category]) {
+          categoryMaxIds[category] = 0;
+        }
+        
+        // Increment the counter for this category
+        categoryMaxIds[category]++;
+        
+        // Generate new unique ID
+        const newId = `${category}-${categoryMaxIds[category]}`;
+
+        const newItem = new Item({
+          ...item,
+          id: newId
+        });
+
+        const savedItem = await newItem.save();
+        createdItems.push(savedItem);
+      } catch (error) {
+        console.error('Error saving item:', error);
+        createdItems.push({ error: error.message, item: item });
+      }
+    }
+
+    const successfulItems = createdItems.filter(item => !item.error);
+    const failedItems = createdItems.filter(item => item.error);
+
+    res.status(200).json({
+      message: `Successfully added ${successfulItems.length} items. ${failedItems.length} items failed.`,
+      successfulItems,
+      failedItems
+    });
+  } catch (error) {
+    console.error('Bulk import error:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Add this new route to find item by ID
+router.get('/find/:itemId', async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    console.log('Searching for item with ID:', itemId);
+    const item = await Item.findOne({ id: new RegExp(`^${itemId}$`, 'i') });
+    
+    if (!item) {
+      console.log('Item not found in database');
+      return res.status(404).json({ message: 'Item not found' });
+    }
+    
+    console.log('Item found:', item);
+    res.json(item);
+  } catch (error) {
+    console.error('Error finding item:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

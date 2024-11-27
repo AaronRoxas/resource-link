@@ -103,11 +103,6 @@ const AdminDash = () => {
                   <tr key={item.id}>
                     <td data-label="Item">{item.name}</td>
                     <td data-label="Status"> 
-                      <img 
-                        src={getStatusIcon(item.status)} 
-                        alt={item.status} 
-                        className="status-icon" 
-                      />
                       {item.status}
                     </td>
                   </tr>

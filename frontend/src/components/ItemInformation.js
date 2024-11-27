@@ -1,11 +1,16 @@
 import React, { useState } from 'react'
+import '../styles/ItemInformation.css'
 
 const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
   const [activeTab, setActiveTab] = useState('Info');
 
   return (
     <div className="item-info-modal">
+
       <div className="item-info-content">
+      <span className="close-button" onClick={handleCloseItemInfo}>
+        ×
+      </span>
         <div className="item-header">
           <img src={selectedItem.imageUrl || '/table-imgs/default-item-image.jpg'} 
                alt={selectedItem.name} 
@@ -13,7 +18,6 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
           />
           <div className="item-title">
             <h3>{selectedItem.name}</h3>
-            <p>{selectedItem.category}</p>
           </div>
         </div>
 
@@ -26,12 +30,6 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
               Info
             </span>
             <span 
-              className={`tab ${activeTab === 'Components' ? 'active' : ''}`}
-              onClick={() => setActiveTab('Components')}
-            >
-              Components
-            </span>
-            <span 
               className={`tab ${activeTab === 'History' ? 'active' : ''}`}
               onClick={() => setActiveTab('History')}
             >
@@ -42,7 +40,7 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
 
         <div className="info-content">
           <div className="info-row">
-            <span className="label">Tag</span>
+            <span className="label">ID</span>
             <span className="value">{selectedItem.id}</span>
           </div>
           <div className="info-row">
@@ -73,12 +71,13 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
             <span className="label">Notes</span>
             <span className="value">{selectedItem.notes || '-'}</span>
           </div>
-        </div>
-
-        <div className="action-buttons">
           <button className="check-in-button">Check-in</button>
           <button className="check-out-button">Check-out</button>
           <button className="reserved-checkout-button">Reserved Check-out</button>
+        </div>
+
+        <div className="action-buttons">
+
         </div>
       </div>
     </div>
