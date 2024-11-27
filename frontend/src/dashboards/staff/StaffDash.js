@@ -15,7 +15,7 @@ const StaffDash = () => {
 
   const fetchBorrowings = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/borrowings');
+      const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
       setBorrowings(response.data);
     } catch (error) {
       console.error('Error fetching borrowings:', error);
