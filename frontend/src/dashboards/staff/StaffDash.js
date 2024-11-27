@@ -104,17 +104,30 @@ const StaffDash = () => {
     setShowCheckoutModal(true); // Show the checkout modal
   };
 
-  const handleScan = (data) => {
+  const handleScan = async (data) => {
     if (data) {
       console.log('QR Code scanned:', data.text);
       try {
         const url = new URL(data.text);
         // Check if it's the correct URL format and extract the item ID
-        if (url.pathname.startsWith('/staff/item/')) {
+        if (url.hostname === 'resource-link.vercel.app' && url.pathname.startsWith('/staff/item/')) {
           const itemId = url.pathname.split('/').pop(); // This will get 'books-1'
           setShowQRScanner(false);
-          setSearchId(itemId);
-          handleSearch(itemId);
+          
+          try {
+            const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`);
+            if (response.data) {
+              setFoundItem(response.data);
+              setShowItemInfo(true);
+              setShowCheckoutModal(false);
+              navigate(`/staff/item/${itemId}`, { replace: true });
+            } else {
+              alert('Item not found');
+            }
+          } catch (error) {
+            console.error('Error finding item:', error);
+            alert('Error searching for item');
+          }
         } else {
           alert('Invalid QR code format');
         }
