@@ -8,6 +8,7 @@ const itemTrackingRoutes = require('../routes/itemTracking');
 const inventoryRoutes = require('../routes/inventory');
 const itemRoutes = require('../routes/items');
 const borrowingsRoutes = require('../routes/borrowings');
+const userRoutes = require('../routes/user');
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/item-tracking', itemTrackingRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/borrowings', borrowingsRoutes);
+app.use('/api/users', userRoutes);
 app.use('/', inventoryRoutes);
 
 // Global error handler

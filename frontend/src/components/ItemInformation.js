@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import '../styles/ItemInformation.css'
+import debounce from 'lodash/debounce'
 
 const getCurrentDate = () => {
   const today = new Date();
@@ -9,6 +10,9 @@ const getCurrentDate = () => {
 const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
   const [activeTab, setActiveTab] = useState('Info');
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [employeeSearch, setEmployeeSearch] = useState('');
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const handleCheckoutClick = () => {
     setIsCheckoutModalOpen(true);
@@ -19,6 +23,34 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
   const handleCloseModal = () => {
     setIsCheckoutModalOpen(false);
     document.getElementById('main-modal').style.display = 'block';
+  };
+
+  const debouncedSearch = useCallback(
+    debounce(async (searchValue) => {
+      if (searchValue.length < 1) {
+        setFilteredEmployees([]);
+        return;
+      }
+
+      try {
+        const response = await fetch(`https://resource-link-main-14c755858b60.herokuapp.com/api/users/search?query=${encodeURIComponent(searchValue)}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch employees');
+        }
+        const employees = await response.json();
+        setFilteredEmployees(employees);
+      } catch (error) {
+        console.error('Error searching employees:', error);
+        setFilteredEmployees([]);
+      }
+    }, 300),
+    []
+  );
+
+  const handleEmployeeSearch = (e) => {
+    const searchValue = e.target.value;
+    setEmployeeSearch(searchValue);
+    debouncedSearch(searchValue);
   };
 
   return (
@@ -77,7 +109,7 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
           </div>
           <div className="info-row">
             <span className="label">Purchase Date</span>
-            <span className="value">{selectedItem.purchaseDate}</span>
+            <span className="value">{new Date(selectedItem.purchaseDate).toLocaleDateString()}</span>
           </div>
           <div className="info-row">
             <span className="label">Purchase Cost</span>
@@ -114,10 +146,37 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
               <h3>{selectedItem.name} <p>{selectedItem.category}</p></h3>
              
             </div>
-            <input 
-              type="text" 
-              placeholder="Enter employee number"
-            />
+            <div className="employee-search-container">
+              <input 
+                type="text" 
+                placeholder="Enter employee number"
+                value={employeeSearch}
+                onChange={handleEmployeeSearch}
+              />
+              {employeeSearch && filteredEmployees.length > 0 && (
+                <div className="employee-dropdown">
+                  {filteredEmployees.map(employee => (
+                    <div 
+                      key={employee._id} 
+                      className="employee-item"
+                      onClick={() => {
+                        setSelectedEmployee(employee);
+                        setEmployeeSearch(employee.employee_id);
+                        setFilteredEmployees([]);
+                      }}
+                    >
+                      <div className="employee-info">
+                        <span className="employee-id">{employee.employee_id}</span>
+                        <span className="employee-name">
+                          {`${employee.first_name} ${employee.last_name}`}
+                        </span>
+                        <span className="employee-role">{employee.role}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="date-inputs">
               <div>
                 <label>Borrow Date:</label>
@@ -129,7 +188,11 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
               </div>
               <div>
                 <label>Return Date:</label>
-                <input type="date" />
+                <input 
+                  type="date"
+                  min={new Date().toISOString().split("T")[0]}
+                  required
+                />
               </div>
             </div>
             <button className="continue-button">Continue</button>
