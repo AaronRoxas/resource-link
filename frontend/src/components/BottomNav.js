@@ -1,13 +1,17 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/BottomNav.css';
-const BottomNav = ({ navItems }) => {
+const BottomNav = ({ navItems, setShowQRScanner }) => {
   const navigate = useNavigate(); 
   const location = useLocation(); 
 
 
   const handleNavigation = (path) => {
-    navigate(path); 
+    if (path === '/qr-scan') {
+      setShowQRScanner(true);
+    } else {
+      navigate(path); 
+    }
   };
 
   return (

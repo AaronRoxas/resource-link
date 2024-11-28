@@ -38,7 +38,7 @@ const StaffDash = () => {
   // Define the navigation items
   const navItems = [
     { path: '/staff', icon: 'active-home', label: 'Home' },
-    { path: '/qr-code', icon: 'qr' },
+    { path: '/qr', icon: 'qr' },
     { path: '/categories', icon: 'cube', label: 'Categories' },
   ];
 
@@ -287,7 +287,7 @@ const StaffDash = () => {
         <button className="view-all-button">View all</button>
       </section>
 
-      <BottomNav navItems={navItems} /> {/* Use the BottomNav component */}
+      <BottomNav navItems={navItems} setShowQRScanner={setShowQRScanner} /> {/* Use the BottomNav component */}
 
       {/* Receipt Modal */}
       {showModal && selectedBorrow && (

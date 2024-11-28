@@ -20,6 +20,7 @@ import ViewBooks from './dashboards/teacher/ViewBooks.js';
 import ViewMisc from './dashboards/teacher/ViewMisc.js';
 import TeacherInventory from './dashboards/teacher/TeacherInventory.js';
 import ItemPage from './components/ItemPage';
+import QRScan from './components/QRScan.js';
 
 function App() {
   return (
@@ -38,8 +39,9 @@ function App() {
         <Route
           path="/addUser"
           element={
-          
+            <ProtectedRoute allowedRoles={['admin']}>
               <AddUser />
+            </ProtectedRoute>
           }
         />
         <Route
@@ -111,6 +113,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['staff']}>
               <StaffDash />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/qr"
+          element={
+            <ProtectedRoute allowedRoles={['staff']}>
+              <QRScan />
             </ProtectedRoute>
           }
         />
