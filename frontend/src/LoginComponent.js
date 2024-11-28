@@ -5,13 +5,11 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const LoginComponent = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [username, setUsername] = useState(''); // State for username
-  // const [name, setName] = useState(''); // State for name
-  const [password, setPassword] = useState(''); // State for password
-  const [error, setError] = useState(''); // State for error messages
-  const [loading, setLoading] = useState(false); // New loading state
-  const navigate = useNavigate(); // Initialize useNavigate
-
+  const [email, setEmail] = useState(''); // Changed from username to email
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -31,18 +29,16 @@ const LoginComponent = () => {
     }
   }, [isDarkMode]);
 
-  // const toggleTheme = () => {
-  //   setIsDarkMode(!isDarkMode);
-  // };
-
   axios.defaults.withCredentials = true; // Enable sending cookies with requests
   const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent default form submission
-    setLoading(true); // Set loading to true when login starts
+    e.preventDefault();
+    setLoading(true);
+    setError(''); // Clear any previous errors
+
     try {
       const response = await axios.post(
-        'https://resource-link-main-14c755858b60.herokuapp.com/api/auth/login' || 'http://localhost:5000/api/auth/login', // Login endpoint
-        { username, password },
+        'https://resource-link-main-14c755858b60.herokuapp.com/api/auth/login',
+        { email, password },
         {
           withCredentials: true,
           headers: {
@@ -53,24 +49,20 @@ const LoginComponent = () => {
 
       // Store token in localStorage
       localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem('userRole', response.data.role); // Store user role
-      localStorage.setItem('username', username); // Store username
+      localStorage.setItem('userRole', response.data.role);
+      localStorage.setItem('first_name', response.data.first_name);  // Add this
+      localStorage.setItem('last_name', response.data.last_name);
+      localStorage.setItem('email', email);
 
-      console.log(response.data); // Handle successful login
-
-      // Redirect to the dashboard URL returned from the server
+      // Navigate to dashboard
       if (response.data.dashboardUrl) {
-        navigate(response.data.dashboardUrl); // Navigate to the dashboard URL
+        navigate(response.data.dashboardUrl);
       }
     } catch (err) {
-      console.error('Login error:', err.response ? err.response.data : err.message);
-    
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message); 
-        setError('Invalid username or password'); 
-      }
+      console.error('Login error:', err.response?.data?.message || err.message);
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {
-      setLoading(false); // Reset loading state
+      setLoading(false);
     }
   };
 
@@ -85,11 +77,12 @@ const LoginComponent = () => {
       <h1 className="app-name">ResourceLink</h1>
       <form className="login-form" onSubmit={handleLogin}>
         <input 
-          type="text" 
-          placeholder="Username" 
+          type="email" // Changed to email type for better validation
+          placeholder="Email" 
           className="login-input" 
-          value={username} 
-          onChange={(e) => setUsername(e.target.value)}
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)}
+          required // Added required attribute
         />
         <input 
           type="password" 
@@ -97,21 +90,18 @@ const LoginComponent = () => {
           className="login-input" 
           value={password} 
           onChange={(e) => setPassword(e.target.value)}
+          required // Added required attribute
         />
-        {loading && <p className="loading-message">Logging in...</p>} {/* Loading message */}
+        {loading && <p className="loading-message">Logging in...</p>}
         {error && <p className="error-message">{error}</p>}
         <div className="login-options">
           <label className="remember-me">
             <input type="checkbox" />
             <span>Remember me</span>
           </label>
-          {/* <a href="#" className="forgot-password">Forgot password?</a> */}
         </div>
         <button type="submit" className="login-button">Log in</button>
       </form>
-      {/* <button className="theme-toggle" onClick={toggleTheme}>
-        {isDarkMode ? '☀️' : '🌑'}
-      </button> */}
     </div>
   )
 }

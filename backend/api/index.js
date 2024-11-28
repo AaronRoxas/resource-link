@@ -40,10 +40,15 @@ app.use('/api/items', itemRoutes);
 app.use('/api/borrowings', borrowingsRoutes);
 app.use('/', inventoryRoutes);
 
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Internal Server Error', error: err.message });
+});
 
-// Improved error handling for undefined routes
+// Handle 404 routes
 app.use((req, res) => {
-  res.status(404).send('Route not found');
+  res.status(404).json({ message: 'Route not found' });
 });
 
 const PORT = process.env.PORT || 5000;

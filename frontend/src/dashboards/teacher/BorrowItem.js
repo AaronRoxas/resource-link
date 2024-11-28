@@ -4,7 +4,7 @@ import '../../styles/BorrowItem.css';
 
 const BorrowItem = ({ item, onClose, fetchItems }) => {
     const [borrowFormData, setBorrowFormData] = useState({
-        borrower: localStorage.getItem('username'),
+        borrower: localStorage.getItem('first_name') + ' ' + localStorage.getItem('last_name'),
         borrowDate: '',
         returnDate: '',
         quantity: 1

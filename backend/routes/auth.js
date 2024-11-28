@@ -1,43 +1,50 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
-// Secret key for JWT
-const JWT_SECRET = process.env.JWT_SECRET;
-
-// Middleware to verify JWT
-const authenticateToken = (req, res, next) => {
-  const token = req.headers['authorization'];
-  if (!token) return res.status(401).json({ message: 'Access denied' });
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ message: 'Invalid token' });
-    req.user = user;
-    next();
-  });
-};
-
+// Login Route
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
   try {
-    const user = await User.findOne({ username });
+    const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Please provide email and password' });
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Check if user is active
+    if (!user.is_active) {
+      return res.status(401).json({ message: 'Account is inactive. Please contact administrator.' });
+    }
+
+    // Verify password
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid username or password' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // Generate a JWT token
-    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        userId: user._id,
+        email: user.email,
+        role: user.role 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
 
+    // Determine dashboard URL based on role
     let dashboardUrl;
-    switch (user.role) {
+    switch (user.role.toLowerCase()) {
       case 'admin':
         dashboardUrl = '/admin';
         break;
@@ -51,80 +58,188 @@ router.post('/login', async (req, res) => {
         dashboardUrl = '/';
     }
 
-    res.status(200).json({ message: 'Login successful', dashboardUrl, token, role: user.role, user: { _id: user._id, username: user.username, role: user.role } });
+    // Send response
+    res.status(200).json({
+      token,
+      role: user.role,
+      first_name: user.first_name,  // Added this
+      last_name: user.last_name, 
+      dashboardUrl,
+      message: 'Login successful'
+    });
+
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
+// Registration route
 router.post('/register', async (req, res) => {
-  const { username, password, name, department, role } = req.body;
-
   try {
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+    // Log the incoming request data
+    console.log('Registration request received:', req.body);
+
+    const { employee_id, first_name, last_name, email, password, role, is_active } = req.body;
+
+    // Validate required fields
+    if (!employee_id || !first_name || !last_name || !email || !password || !role) {
+      console.log('Missing required fields');
+      return res.status(400).json({
+        message: 'All fields are required',
+        received: { employee_id, first_name, last_name, email, role }
+      });
     }
 
-    const newUser = new User({ username, password, name, department, role });
+    // Check if user exists
+    const existingUser = await User.findOne({
+      $or: [{ email: email.toLowerCase() }, { employee_id }]
+    });
+
+    if (existingUser) {
+      console.log('User already exists:', existingUser.email);
+      return res.status(400).json({
+        message: existingUser.email === email.toLowerCase() 
+          ? 'Email already registered' 
+          : 'Employee ID already in use'
+      });
+    }
+
+    // Create new user
+    const newUser = new User({
+      employee_id,
+      first_name,
+      last_name,
+      email: email.toLowerCase(),
+      password, // Will be hashed by the pre-save middleware
+      role: role.toLowerCase(),
+      is_active: is_active ?? true
+    });
+
+    console.log('Attempting to save user:', {
+      employee_id: newUser.employee_id,
+      email: newUser.email,
+      role: newUser.role
+    });
+
     await newUser.save();
 
-    res.status(201).json({ message: 'User created successfully' });
+    console.log('User saved successfully');
+
+    res.status(201).json({
+      message: 'User created successfully',
+      user: {
+        employee_id: newUser.employee_id,
+        email: newUser.email,
+        role: newUser.role
+      }
+    });
+
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-router.get('/data', authenticateToken, async (req, res) => {
-  try {
-    const data = await User.find(); // Fetch all user documents
-    res.json(data);
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-router.post('/change-password', authenticateToken, async (req, res) => {
-  const { currentPassword, newPassword } = req.body;
-  const userId = req.user.id;
-
-  try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    // Log the full error
+    console.error('Registration error details:', error);
+    
+    // Check for validation errors
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        message: 'Validation error',
+        errors: Object.values(error.errors).map(err => err.message)
+      });
     }
 
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Current password is incorrect' });
+    // Check for duplicate key errors
+    if (error.code === 11000) {
+      return res.status(400).json({
+        message: 'Duplicate entry error',
+        field: Object.keys(error.keyPattern)[0]
+      });
     }
 
-    // Hash the new password
-    user.password = await bcrypt.hash(newPassword, 10);
-    await user.save();
-
-    res.status(200).json({ message: 'Password changed successfully' });
-  } catch (error) {
-    console.error('Change password error:', error);
-    res.status(500).json({ message: 'Server error' });
+    // For all other errors
+    res.status(500).json({ 
+      message: 'Error creating user',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
-// Add this new route to get current user data
-router.get('/me', authenticateToken, async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id).select('-password');
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+// Bulk registration route
+router.post('/register/bulk', async (req, res) => {
+  try {
+    const users = req.body;
+    const results = {
+      successful: [],
+      failed: []
+    };
+
+    for (const userData of users) {
+      try {
+        // Check if user exists
+        const existingUser = await User.findOne({
+          $or: [{ email: userData.email.toLowerCase() }, { employee_id: userData.employee_id }]
+        });
+
+        if (existingUser) {
+          results.failed.push({
+            ...userData,
+            error: 'Email or Employee ID already exists'
+          });
+          continue;
         }
-        res.json(user);
-    } catch (error) {
-        console.error('Error fetching user data:', error);
-        res.status(500).json({ message: 'Server error' });
+
+        // Create new user
+        const newUser = new User({
+          employee_id: userData.employee_id,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          email: userData.email.toLowerCase(),
+          password: userData.password || '1234',
+          role: userData.role.toLowerCase(),
+          is_active: userData.is_active ?? true
+        });
+
+        await newUser.save();
+        results.successful.push(userData);
+
+      } catch (error) {
+        results.failed.push({
+          ...userData,
+          error: error.message
+        });
+      }
     }
+
+    res.status(200).json({
+      message: `Successfully imported ${results.successful.length} users. Failed: ${results.failed.length}`,
+      successful: results.successful,
+      failed: results.failed
+    });
+
+  } catch (error) {
+    console.error('Bulk registration error:', error);
+    res.status(500).json({ message: 'Error processing bulk registration' });
+  }
+});
+
+// Add these routes for email and employee ID checking
+router.get('/check-email/:email', async (req, res) => {
+  try {
+    const email = req.params.email.toLowerCase();
+    const user = await User.findOne({ email });
+    res.json({ available: !user });
+  } catch (error) {
+    res.status(500).json({ message: 'Error checking email availability' });
+  }
+});
+
+router.get('/check-employee-id/:id', async (req, res) => {
+  try {
+    const employee_id = req.params.id;
+    const user = await User.findOne({ employee_id });
+    res.json({ available: !user });
+  } catch (error) {
+    res.status(500).json({ message: 'Error checking employee ID availability' });
+  }
 });
 
 module.exports = router;

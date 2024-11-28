@@ -40,7 +40,7 @@ const NavBar = () => {
       </NavContainer>
       <MainContent>
         <WelcomeText>
-        <h1>Hi, { localStorage.getItem('username')}! <br/>Welcome Back!</h1>
+        <h1>Hi, {localStorage.getItem('first_name')}! <br/>Welcome Back!</h1>
         <h3>{formattedDate}</h3>
         </WelcomeText>
       </MainContent>

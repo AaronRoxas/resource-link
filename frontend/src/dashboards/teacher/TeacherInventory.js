@@ -105,7 +105,7 @@ const TeacherInventory = () => {
     //     }
     // };
 
-    const currentUser = localStorage.getItem('username');
+    const currentUser = localStorage.getItem('first_name') + ' ' + localStorage.getItem('last_name');
 
     const handleItemClick = (item) => {
         setSelectedItem(item);
