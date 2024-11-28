@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../../styles/AdminDash.css';
-import { getFormattedDate } from '../../utils/dateUtils'; 
 import BottomNav from '../../components/BottomNav'; 
 import InventoryModal from '../../components/InventoryAlertModal'; // Import the modal component
 import NavBar from '../../components/NavBar';
@@ -10,7 +9,7 @@ const AdminDash = () => {
   const [recentActivities, setRecentActivities] = useState([]);
   const [itemTracking, setItemTracking] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
-  const formattedDate = getFormattedDate(); 
+
 
   // Fetch inventory data
   useEffect(() => {

@@ -1,13 +1,29 @@
 import React, { useState } from 'react'
 import '../styles/ItemInformation.css'
 
+const getCurrentDate = () => {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+};
+
 const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
   const [activeTab, setActiveTab] = useState('Info');
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+
+  const handleCheckoutClick = () => {
+    setIsCheckoutModalOpen(true);
+    document.getElementById('main-modal').style.display = 'none';
+
+  };
+
+  const handleCloseModal = () => {
+    setIsCheckoutModalOpen(false);
+    document.getElementById('main-modal').style.display = 'block';
+  };
 
   return (
     <div className="item-info-modal">
-
-      <div className="item-info-content">
+      <div className="item-info-content" id='main-modal'>
       <span className="close-button" onClick={handleCloseItemInfo}>
         ×
       </span>
@@ -72,7 +88,12 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
             <span className="value">{selectedItem.notes || '-'}</span>
           </div>
           <button className="check-in-button">Check-in</button>
-          <button className="check-out-button">Check-out</button>
+          <button 
+            className="check-out-button" 
+            onClick={handleCheckoutClick}
+          >
+            Check-out
+          </button>
           <button className="reserved-checkout-button">Reserved Check-out</button>
         </div>
 
@@ -80,6 +101,41 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
 
         </div>
       </div>
+
+      {isCheckoutModalOpen && (
+        <div className="checkout-modal" onClick={handleCloseModal}>
+          <div className="checkout-modal-content" onClick={e => e.stopPropagation()}>
+            <span className="modal-close-button" onClick={handleCloseModal}>
+              ×
+            </span>
+            <h2>Check-out</h2>
+            <div className="item-preview">
+              <img src={selectedItem.imageUrl || '/dashboard-imgs/placeholder.svg'} alt={selectedItem.name} />
+              <h3>{selectedItem.name} <p>{selectedItem.category}</p></h3>
+             
+            </div>
+            <input 
+              type="text" 
+              placeholder="Enter employee number"
+            />
+            <div className="date-inputs">
+              <div>
+                <label>Borrow Date:</label>
+                <input 
+                  type="date" 
+                  defaultValue={getCurrentDate()}
+                  readOnly
+                />
+              </div>
+              <div>
+                <label>Return Date:</label>
+                <input type="date" />
+              </div>
+            </div>
+            <button className="continue-button">Continue</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

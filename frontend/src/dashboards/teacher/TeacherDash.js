@@ -1,11 +1,10 @@
 import React from 'react'
 import '../../styles/TeacherDash.css'
-import { getFormattedDate } from '../../utils/dateUtils'
 import NavBar from '../../components/NavBar';
 import { useNavigate } from 'react-router-dom'
 import BottomNav from '../../components/BottomNav'
 const TeacherDash = () => {
-  const formattedDate = getFormattedDate()
+
   const navigate = useNavigate()
   const navItems = [
     { path: '/teacher', icon: 'active-home', label: 'Home' },
