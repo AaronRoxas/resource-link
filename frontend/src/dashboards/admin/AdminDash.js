@@ -3,9 +3,8 @@ import axios from 'axios';
 import '../../styles/AdminDash.css';
 import { getFormattedDate } from '../../utils/dateUtils'; 
 import BottomNav from '../../components/BottomNav'; 
-import LogoutButton from '../../components/LogoutButton';
 import InventoryModal from '../../components/InventoryAlertModal'; // Import the modal component
-
+import NavBar from '../../components/NavBar';
 const AdminDash = () => {
   const [inventory, setInventory] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
@@ -53,18 +52,7 @@ const AdminDash = () => {
     fetchItemTracking();
   }, []);
 
-  // Status icon mapping
-  const getStatusIcon = (status) => {
-    switch(status) {
-      case 'For repair':
-        return 'table-imgs/repair.svg';
-      case 'Low stock':
-        return 'table-imgs/lowstock.svg';
-      case 'For maintenance':
-        return 'table-imgs/maintenance.svg';
-    
-    }
-  };
+
 
   const navItems = [
     { path: '/admin', icon: 'active-home', label: 'Home' },
@@ -76,22 +64,17 @@ const AdminDash = () => {
 
   return (
     <div className="admin-dashboard">
-      <LogoutButton />
-      <header>
-        <h1>Inventory Admin</h1>
-        <h2>Hi, Welcome Back!</h2>
-        <h3>{formattedDate}</h3>
-      </header>
+      <NavBar />
 
-      <section className="inventory-alerts">
-        <div className="card-header">
-          <img src='table-imgs/alert.svg' alt='Alert Icon' className="icon" />
-          <h2>Inventory Alerts</h2>
-        </div>
-        <div className="table-container">
+
+      {/* Inventory Alerts Section */}
+      <section className="dashboard-section">
+        <h2>Inventory Alerts</h2>
+        <div className="table-wrapper">
           <table>
             <thead>
               <tr>
+                <th>ID</th>
                 <th>Item</th>
                 <th>Status</th>
               </tr>
@@ -101,29 +84,25 @@ const AdminDash = () => {
                 .filter(item => item.status !== 'In Stock')
                 .map((item) => (
                   <tr key={item.id}>
-                    <td data-label="Item">{item.name}</td>
-                    <td data-label="Status"> 
-                      {item.status}
+                    <td>{item.id}</td>
+                    <td>{item.name}</td>
+                    <td>
+                      <span className={`status ${item.status.toLowerCase().replace(' ', '-')}`}>
+                        {item.status}
+                      </span>
                     </td>
                   </tr>
               ))}
-              {inventory.filter(item => item.status !== 'In Stock').length === 0 && (
-                <tr>
-                  <td colSpan="2" style={{ textAlign: 'center' }}>No inventory alerts</td>
-                </tr>
-              )}
             </tbody>
           </table>
+          <button className="view-all-button">View all</button>
         </div>
-        <button className="view-all-btn" onClick={() => setIsModalOpen(true)}>View all</button> {/* View All button */}
       </section>
 
-      <section className="recent-activities">
-        <div className="card-header">
-          <img src='table-imgs/recent.svg' alt='Recent Activities Icon' className="icon" />
-          <h2>Recent Activities</h2>
-        </div>
-        <div className="table-container">
+      {/* Reserved Items Section */}
+      <section className="dashboard-section">
+        <h2>Reserved Items</h2>
+        <div className="table-wrapper">
           <table>
             <thead>
               <tr>
@@ -138,22 +117,24 @@ const AdminDash = () => {
                 <tr key={activity.id}>
                   <td>{activity.date}</td>
                   <td>{activity.user}</td>
-                  <td>{activity.action}</td>
+                  <td>
+                    <span className={`status ${activity.action.toLowerCase()}`}>
+                      {activity.action}
+                    </span>
+                  </td>
                   <td>{activity.item}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <button className="view-all-button">View all</button>
         </div>
-        <button className="view-all-btn">View all</button>
       </section>
 
-      <section className="item-tracking">
-        <div className="card-header">
-          <img src='table-imgs/track.svg' alt='Item Tracking Icon' className="icon" />
-          <h2>Item Tracking</h2>
-        </div>
-        <div className="table-container">
+      {/* Logs Section */}
+      <section className="dashboard-section">
+        <h2>Logs</h2>
+        <div className="table-wrapper">
           <table>
             <thead>
               <tr>
@@ -168,14 +149,18 @@ const AdminDash = () => {
                 <tr key={tracking.id}>
                   <td>{tracking.date}</td>
                   <td>{tracking.user}</td>
-                  <td>{tracking.action}</td>
+                  <td>
+                    <span className={`status ${tracking.action.toLowerCase()}`}>
+                      {tracking.action}
+                    </span>
+                  </td>
                   <td>{tracking.item}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <button className="view-all-button">View all</button>
         </div>
-        <button className="view-all-btn">View all</button>
       </section>
 
       <BottomNav navItems={navItems} />
@@ -183,7 +168,7 @@ const AdminDash = () => {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         inventory={inventory} 
-      /> {/* Modal component */}
+      />
     </div>
   );
 }

@@ -90,42 +90,57 @@ router.post('/bulk', async (req, res) => {
   try {
     const items = req.body;
     
+    // Define category code mapping
+    const categoryCodes = {
+      'devices': 'DEV',
+      'books': 'BOOK',
+      'miscellaneous': 'MISC',
+      'misc': 'MISC',
+      'lab equipment': 'LAB',
+      'lab equipments': 'LAB',
+      'Lab Equipments': 'LAB',
+      'software': 'SW'
+      // Add more categories as needed
+    };
+
     if (!Array.isArray(items)) {
       return res.status(400).json({ error: 'Invalid data format. Expected an array of items.' });
     }
 
-    // First, get all existing items to check highest IDs for each category
     const existingItems = await Item.find({});
     const categoryMaxIds = {};
 
-    // Initialize max IDs for each category
+    // Initialize max IDs for each category code
     existingItems.forEach(item => {
       if (item.id) {
-        const [category, numStr] = item.id.split('-');
+        const [categoryCode, numStr] = item.id.split('-');
         const num = parseInt(numStr);
-        if (!categoryMaxIds[category] || num > categoryMaxIds[category]) {
-          categoryMaxIds[category] = num;
+        if (!categoryMaxIds[categoryCode] || num > categoryMaxIds[categoryCode]) {
+          categoryMaxIds[categoryCode] = num;
         }
       }
     });
 
     const createdItems = [];
     
-    // Process items sequentially to avoid ID conflicts
     for (const item of items) {
       try {
-        const category = item.category.toLowerCase().replace(/\s+/g, '');
+        // Normalize the category name by converting to lowercase and removing extra spaces
+        const categoryName = item.category.toLowerCase().trim();
+        
+        // Look up the category code
+        const categoryCode = categoryCodes[categoryName] || categoryName.substring(0, 4).toUpperCase();
         
         // Initialize category counter if it doesn't exist
-        if (!categoryMaxIds[category]) {
-          categoryMaxIds[category] = 0;
+        if (!categoryMaxIds[categoryCode]) {
+          categoryMaxIds[categoryCode] = 0;
         }
         
         // Increment the counter for this category
-        categoryMaxIds[category]++;
+        categoryMaxIds[categoryCode]++;
         
-        // Generate new unique ID
-        const newId = `${category}-${categoryMaxIds[category]}`;
+        // Generate new unique ID with category code
+        const newId = `${categoryCode}-${categoryMaxIds[categoryCode]}`;
 
         const newItem = new Item({
           ...item,
@@ -171,6 +186,18 @@ router.get('/find/:itemId', async (req, res) => {
   } catch (error) {
     console.error('Error finding item:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Add this new route to get category count
+router.get('/category-count/:category', async (req, res) => {
+  try {
+    const category = req.params.category;
+    const count = await Item.countDocuments({ category: category });
+    res.json({ count });
+  } catch (error) {
+    console.error('Error getting category count:', error);
+    res.status(500).json({ error: 'Error getting category count' });
   }
 });
 

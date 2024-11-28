@@ -20,7 +20,7 @@ const ViewLabEquipments = () => {
             const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', {
                 withCredentials: true
             });
-            const filteredLabEquipments = response.data.filter(item => item.category === 'Lab Equipments');
+            const filteredLabEquipments = response.data.filter(item => item.category === 'Lab Equipment');
             setLabEquipments(filteredLabEquipments);
         } catch (error) {
             console.error('Error fetching lab equipments:', error);

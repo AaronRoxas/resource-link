@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../../styles/StaffDash.css'
-import { getFormattedDate } from '../../utils/dateUtils'; // Import the function
 import BottomNav from '../../components/BottomNav'; // Import the BottomNav component
-import LogoutButton from '../../components/LogoutButton';
 import QrScanner from 'react-qr-scanner';
 import ItemInformation from '../../components/ItemInformation';
 import { useNavigate, useLocation } from 'react-router-dom';
+import NavBar from '../../components/NavBar';
 
 const StaffDash = () => {
   const navigate = useNavigate();
@@ -34,7 +33,7 @@ const StaffDash = () => {
     fetchBorrowings();
   }, []);
 
-  const formattedDate = getFormattedDate(); // Call the function
+  // Call the function
 
   // Define the navigation items
   const navItems = [
@@ -76,28 +75,28 @@ const StaffDash = () => {
     }
   };
 
-  const handleCheckout = async (borrowId) => {
-    try {
-      // Update the status to 'borrowed'
-      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
-        status: 'borrowed'
-      });
+  // const handleCheckout = async (borrowId) => {
+  //   try {
+  //     // Update the status to 'borrowed'
+  //     await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
+  //       status: 'borrowed'
+  //     });
 
-      // Update the item's availability
-      const borrowing = borrowings.find(b => b._id === borrowId);
-      if (borrowing?.itemId) {
-        await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${borrowing.itemId._id}`, {
-          availability: 'Borrowed'
-        });
-      }
+  //     // Update the item's availability
+  //     const borrowing = borrowings.find(b => b._id === borrowId);
+  //     if (borrowing?.itemId) {
+  //       await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${borrowing.itemId._id}`, {
+  //         availability: 'Borrowed'
+  //       });
+  //     }
       
-      // Close modal and refresh the borrowings list
-      setShowModal(false);
-      fetchBorrowings();
-    } catch (error) {
-      console.error('Error checking out item:', error);
-    }
-  };
+  //     // Close modal and refresh the borrowings list
+  //     setShowModal(false);
+  //     fetchBorrowings();
+  //   } catch (error) {
+  //     console.error('Error checking out item:', error);
+  //   }
+  // };
 
   const handleCheckoutClick = () => {
     setShowModal(false); // Close the reservation receipt modal
@@ -181,12 +180,10 @@ const StaffDash = () => {
   }, [location]);
 
   return (
+    
     <div className="staff-dashboard">
-      <LogoutButton />
-      <header className="staff-header">
-        <h1>Hi, { localStorage.getItem('username')}! <br/>Welcome Back!</h1>
-        <h3>{formattedDate}</h3>
-      </header>
+      <NavBar/>
+
 
       <section className="staff-section">
         <div className="section-header">
@@ -302,7 +299,7 @@ const StaffDash = () => {
             <h2>Reservation Receipt</h2>
             
             <div className="user-info">
-              <img src="/dashboard-imgs/placeholder.svg" alt="User" className="user-avatar" />
+              <img src="/dashboard-imgs/profile-placeholder.svg" alt="User" className="user-avatar" />
               <div className="user-details">
                 <h3>{selectedBorrow.borrower}</h3>
                 <p>Teacher</p>
@@ -374,7 +371,7 @@ const StaffDash = () => {
             <div className="search-section">
               <input 
                 type="text" 
-                placeholder="category-1" 
+                placeholder="DEV-1" 
                 className="search-input"
                 value={searchId}
                 onChange={(e) => setSearchId(e.target.value)}

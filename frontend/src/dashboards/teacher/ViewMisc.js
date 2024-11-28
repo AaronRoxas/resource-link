@@ -19,7 +19,7 @@ const ViewMisc = () => {
             const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', {
                 withCredentials: true
             });
-            const filteredMisc = response.data.filter(item => item.category === 'Misc');
+            const filteredMisc = response.data.filter(item => item.category === 'Miscellaneous');
             setMisc(filteredMisc);
         } catch (error) {
             console.error('Error fetching devices:', error);

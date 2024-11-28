@@ -9,7 +9,8 @@
   width: 100%;
   height: 100%;
   margin: 0 auto;
-  padding: 20px;
+  padding: 16px;
+  background-color: #fff;
 }
 
 .admin-dashboard header {
@@ -157,21 +158,110 @@
   background-color: #f8f9fa;
 }
 
-.view-all-btn {
-  background-color: #242423;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 5px;
-  position: absolute;
-  right: 20px;
-  bottom: 15px;
-  cursor: pointer;
-  font-size: 10px;
+
+.dashboard-section {
+  margin-bottom: 24px;
 }
 
+.dashboard-section h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 35px 0 12px 0;
+  color: #000;
+  padding: 0 4px;
+}
 
+.table-wrapper {
+  background: #f8f8f8;
+  border-radius: 12px;
+  padding: 12px;
+  position: relative;
+  padding-bottom: 48px;
+}
 
+.dashboard-section table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dashboard-section table th {
+  text-align: left;
+  padding: 8px;
+  color: #666;
+  font-weight: normal;
+  font-size: 14px;
+}
+
+.dashboard-section table td {
+  padding: 8px;
+  font-size: 14px;
+}
+
+.dashboard-section table tr:not(:last-child) td {
+  border-bottom: 1px solid #eee;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.status.low-stock {
+  background-color: #FFE5E5;
+  color: #FF4444;
+}
+
+.status.for-maintenance {
+  background-color: #E5F6FF;
+  color: #0088CC;
+}
+
+.status.pending {
+  background-color: #FFF3E0;
+  color: #FF9800;
+}
+
+.status.declined {
+  background-color: #FFEBEE;
+  color: #F44336;
+}
+
+.status.removed {
+  background-color: #E8EAF6;
+  color: #3F51B5;
+}
+
+.status.checked-out {
+  background-color: #FFE0B2;
+  color: #F57C00;
+}
+
+.status.checked-in {
+  background-color: #E8F5E9;
+  color: #4CAF50;
+}
+
+.dashboard-section .view-all-button {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: #006C3A;
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  width: auto;
+  min-width: 70px;
+  text-align: center;
+}
+
+.dashboard-section .view-all-button:hover {
+  background-color: #058a4c;
+}
 
 @media (max-width: 768px) {
   .table-container th, td {

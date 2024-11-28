@@ -11,7 +11,7 @@ const BorrowReceipt = ({ item, onClose }) => {
                 <h2>Borrow Request Receipt</h2>
                 
                 <div className="user-info">
-                    <img src="dashboard-imgs/placeholder.svg" alt="User" className="user-avatar" />
+                    <img src="dashboard-imgs/profile-placeholder.svg" alt="User" className="user-avatar" />
                     <div className="user-details">
                         <h3>{item.borrower}</h3>
                         <p>Teacher</p>
@@ -63,8 +63,8 @@ const BorrowReceipt = ({ item, onClose }) => {
 
 const TeacherInventory = () => {
     const navItems = [
-        { path: '/teacher', icon: 'home'},
-        { path: '/teacherInventory', icon: 'active-cube'},
+        { path: '/teacher', icon: 'home', label: 'Home'},
+        { path: '/teacherInventory', icon: 'active-cube', label: 'Inventory'},
     ];
     const [borrowedItems, setBorrowedItems] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);

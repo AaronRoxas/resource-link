@@ -80,7 +80,7 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                     <h2>Borrow Request Receipt</h2>
                     
                     <div className="user-info">
-                        <img src="dashboard-imgs/placeholder.svg" alt="User" className="user-avatar" />
+                        <img src="dashboard-imgs/profile-placeholder.svg" alt="User" className="user-avatar" />
                         <div className="user-details">
                             <h3>{borrowFormData.borrower}</h3>
                             <p>Teacher</p>

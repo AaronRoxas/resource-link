@@ -140,8 +140,22 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/staff/:itemId" element={<ItemPage />} />
-        <Route path="/staff/*" element={<StaffDash />} />
+        <Route 
+          path="/staff/*" 
+          element={
+            <ProtectedRoute allowedRoles={['staff']}>
+              <StaffDash />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/staff/:itemId" 
+          element={
+            <ProtectedRoute allowedRoles={['staff']}>
+              <ItemPage />
+            </ProtectedRoute>
+          } 
+        />
         {/* Other routes */}
       </Routes>
     </Router>

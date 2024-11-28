@@ -20,7 +20,7 @@ const AddItem = () => {
   const [bulkItems, setBulkItems] = useState([]);
   const [previewData, setPreviewData] = useState([]);
 
-  const [currentId, setCurrentId] = useState(1);
+  const [generatedId, setGeneratedId] = useState('');
 
   const navItems = [
     { path: '/admin', icon: 'home', label: 'Home' },
@@ -30,21 +30,45 @@ const AddItem = () => {
     { path: '/adminCategories', icon: 'cube', label: 'Inventory' },
   ];
 
+  const categoryCodes = {
+    'Devices': 'DEV',
+    'Books': 'BOOK',
+    'Lab Equipments': 'LAB',
+    'Misc': 'MISC'
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    
+    if (name === 'category' && value) {
+      fetchCategoryCount(value);
+    }
+  };
+
+  const fetchCategoryCount = async (category) => {
+    try {
+      const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/category-count/${category}`);
+      const count = response.data.count;
+      const categoryCode = categoryCodes[category] || category.substring(0, 4).toUpperCase();
+      setGeneratedId(`${categoryCode}-${count + 1}`);
+    } catch (error) {
+      console.error('Error fetching category count:', error);
+      setGeneratedId('');
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Send data to the backend
     try {
-      const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/items', { ...formData, id: currentId });
+      const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/items', { 
+        ...formData, 
+        id: generatedId 
+      });
       console.log('Item added:', response.data);
       setFormData({
         name: '',
-        status: '',
+        status: 'In Stock',
         serialNo: '',
         purchaseDate: '',
         purchaseCost: '',
@@ -52,24 +76,11 @@ const AddItem = () => {
         stocks: '',
         category: ''
       });
-      setCurrentId(currentId + 1);
+      setGeneratedId('');
     } catch (error) {
       console.error('Error adding item:', error);
     }
   };
-
-  useEffect(() => {
-    const fetchLastId = async () => {
-      try {
-        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/items/last-id');
-        setCurrentId(response.data.lastId + 1); // Increment for the next item
-      } catch (error) {
-        console.error('Error fetching last ID:', error);
-      }
-    };
-
-    fetchLastId();
-  }, []);
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -145,7 +156,12 @@ const AddItem = () => {
           <div className="fields-container">
             <div className="field">
               <label>ID</label>
-              <input type="text" name="id" value={currentId} readOnly />
+              <input 
+                type="text" 
+                name="id" 
+                value={generatedId || 'Select a category'} 
+                readOnly 
+              />
             </div>
             <div className="field">
               <label>Name</label>
@@ -158,12 +174,13 @@ const AddItem = () => {
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
+                required
               >
                 <option value="" disabled>Select a category</option>
                 <option value="Devices">Devices</option>
                 <option value="Books">Books</option>
                 <option value="Lab Equipments">Lab Equipments</option>
-                <option value="Misc">Misc</option>
+                <option value="Miscellaneous">Miscellaneous</option>
               </select>
             </div>
             <div className="field">

@@ -1,7 +1,7 @@
 import React from 'react'
 import '../../styles/TeacherDash.css'
 import { getFormattedDate } from '../../utils/dateUtils'
-import LogoutButton from '../../components/LogoutButton'
+import NavBar from '../../components/NavBar';
 import { useNavigate } from 'react-router-dom'
 import BottomNav from '../../components/BottomNav'
 const TeacherDash = () => {
@@ -14,12 +14,7 @@ const TeacherDash = () => {
   return (
     <div className="dashboard">
       <div className="dashboard-content">
-        <header>
-          <LogoutButton />
-          <h1>Hi, Welcome Back!</h1>
-          <h2>{formattedDate}</h2>
-        </header>
-
+      <NavBar/>
         <div className="search-section">
           <h3>Request an Item</h3>
           <div className="search-container">
