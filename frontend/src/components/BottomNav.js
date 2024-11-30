@@ -22,7 +22,7 @@ const BottomNav = ({ navItems, setShowQRScanner }) => {
           className={`${item.icon}-icon ${location.pathname === item.path ? 'active' : ''} ${item.label === 'QR Code' ? 'qr-icon' : ''}`} 
           onClick={() => handleNavigation(item.path)}
         >
-          <img src={`footer-imgs/${item.icon}.svg`} alt={item.label} />
+          <img src={`/footer-imgs/${item.icon}.svg`} alt={item.label} />
           <span>{item.label}</span>
         </div>
       ))}
