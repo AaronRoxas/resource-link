@@ -19,7 +19,7 @@ itemSchema.pre('save', async function(next) {
   try {
     if (!this.id) {
       const items = await this.constructor.find({ category: this.category });
-      
+
       let maxNumber = 0;
       items.forEach(item => {
         if (item.id) {
@@ -32,7 +32,7 @@ itemSchema.pre('save', async function(next) {
 
       const newNumber = maxNumber + 1;
       const paddedNumber = String(newNumber).padStart(3, '0');
-      
+
       // Generate abbreviated category code (up to 3 letters)
       let categoryCode = this.category
         .toUpperCase()
@@ -45,7 +45,7 @@ itemSchema.pre('save', async function(next) {
       if (!categoryCode) {
         categoryCode = 'ITM';
       }
-      
+
       this.id = `${categoryCode}-${paddedNumber}`;
     }
     next();
@@ -55,5 +55,3 @@ itemSchema.pre('save', async function(next) {
 });
 
 const Item = mongoose.model('Item', itemSchema);
-
-module.exports = Item;
