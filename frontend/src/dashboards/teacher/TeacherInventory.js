@@ -136,9 +136,10 @@ const TeacherInventory = () => {
                                         {item.itemId ? item.itemId.category : 'Category not found'}
                                     </p>
                                     <div className="borrow-details">
-                                        <p><b>Borrow request ID: {item._id.slice(0, 10)}</b></p>
+                                    <p><b>Borrow request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
                                         <p>Borrowed On: {new Date(item.borrowDate).toLocaleDateString()}</p>
                                         <p>Return On: {new Date(item.returnDate).toLocaleDateString()}</p>
+                                        <p>Status: {item.receiptData?.status}</p>
                                     </div>
                                 </div>
                             </div>

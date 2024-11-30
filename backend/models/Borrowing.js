@@ -30,6 +30,9 @@ const borrowingSchema = new mongoose.Schema({
         },
         status: {
             type: String
+        },
+        availability: {
+            type: String
         }
     }
 });

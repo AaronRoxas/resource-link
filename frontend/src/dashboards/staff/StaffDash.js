@@ -19,6 +19,7 @@ const StaffDash = () => {
   const [searchId, setSearchId] = useState('');
   const [foundItem, setFoundItem] = useState(null);
   const [showItemInfo, setShowItemInfo] = useState(false);
+  const [activities, setActivities] = useState([]);
 
   const fetchBorrowings = async () => {
     try {
@@ -29,8 +30,18 @@ const StaffDash = () => {
     }
   };
 
+  const fetchActivities = async () => {
+    try {
+      const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/activities');
+      setActivities(response.data);
+    } catch (error) {
+      console.error('Error fetching activities:', error);
+    }
+  };
+
   useEffect(() => {
     fetchBorrowings();
+    fetchActivities();
   }, []);
 
   // Call the function
@@ -179,6 +190,17 @@ const StaffDash = () => {
     fetchItemFromUrl();
   }, [location]);
 
+  const getActionStyle = (action) => {
+    const styles = {
+      'check-out': 'action-checkout',
+      'check-in': 'action-checkin',
+      'removed': 'action-removed',
+      'added': 'action-added',
+      'updated': 'action-updated'
+    };
+    return styles[action.toLowerCase()] || '';
+  };
+
   return (
     
     <div className="staff-dashboard">
@@ -208,7 +230,7 @@ const StaffDash = () => {
 
       <section className="staff-section">
         <div className="section-header">
-          <h2>Item Tracking</h2>
+          <h2>Logs</h2>
         </div>
         <div className="staff-table-container">
           <table className="staff-table">
@@ -216,12 +238,45 @@ const StaffDash = () => {
               <tr>
                 <th>Date</th>
                 <th>User</th>
-                <th>Action</th>
                 <th>Item</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {/* Add your table data here */}
+              {/* Combine and sort both borrowings and activities */}
+              {[...borrowings
+                .filter(borrowing => borrowing.receiptData?.status === 'On-going')
+                .map(borrowing => ({
+                  date: new Date(borrowing.borrowDate),
+                  borrower: borrowing.borrower,
+                  itemName: borrowing.itemId?.name,
+                  action: 'Check-out',
+                  _id: borrowing._id,
+                  type: 'borrowing'
+                })),
+                ...activities.map(activity => ({
+                  date: new Date(activity.timestamp),
+                  borrower: activity.borrower,
+                  itemName: activity.itemName,
+                  action: activity.action,
+                  _id: activity._id,
+                  type: 'activity'
+                }))
+              ]
+                .sort((a, b) => b.date - a.date) // Sort by date, newest first
+                .slice(0, 10) // Take only the first 5 items
+                .map((item) => (
+                  <tr key={item._id}>
+                    <td>{item.date.toLocaleDateString()}</td>
+                    <td>{item.borrower}</td>
+                    <td>{item.itemName}</td>
+                    <td>
+                      <span className={`action-badge ${getActionStyle(item.action)}`}>
+                        {item.action.toLowerCase()}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -243,44 +298,48 @@ const StaffDash = () => {
               </tr>
             </thead>
             <tbody>
-              {borrowings.map((borrow) => (
-                <tr key={borrow._id}>
-                  <td>{new Date(borrow.receiptData?.borrowTime).toLocaleDateString()}</td>
-                  <td>{borrow.borrower}</td>
-                  <td>{borrow.itemId?.name}</td>
-                  <td>
-                    <span className={`status-pill status-${borrow.receiptData?.status?.toLowerCase()}`}>
-                      {borrow.receiptData?.status === 'reserved' && (
-                        <span 
-                          className="status-reserved"
-                          onClick={() => handleStatusClick(borrow)}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          Reserved
-                        </span>
-                      )}
-                      {borrow.receiptData?.status === 'pending' && (
-                        <span 
-                          className="status-pending"
-                          onClick={() => handleStatusClick(borrow)}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          Pending
-                        </span>
-                      )}
-                      {borrow.receiptData?.status === 'declined' && (
-                        <span 
-                          className="status-declined"
-                          onClick={() => handleStatusClick(borrow)}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          Declined
-                        </span>
-                      )}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {borrowings
+                .filter(borrow => 
+                  ['reserved', 'pending', 'declined'].includes(borrow.receiptData?.status?.toLowerCase())
+                )
+                .map((borrow) => (
+                  <tr key={borrow._id}>
+                    <td>{new Date(borrow.receiptData?.borrowTime).toLocaleDateString()}</td>
+                    <td>{borrow.borrower}</td>
+                    <td>{borrow.itemId?.name}</td>
+                    <td>
+                      <span className={`status-pill status-${borrow.receiptData?.status?.toLowerCase()}`}>
+                        {borrow.receiptData?.status === 'reserved' && (
+                          <span 
+                            className="status-reserved"
+                            onClick={() => handleStatusClick(borrow)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            Reserved
+                          </span>
+                        )}
+                        {borrow.receiptData?.status === 'pending' && (
+                          <span 
+                            className="status-pending"
+                            onClick={() => handleStatusClick(borrow)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            Pending
+                          </span>
+                        )}
+                        {borrow.receiptData?.status === 'declined' && (
+                          <span 
+                            className="status-declined"
+                            onClick={() => handleStatusClick(borrow)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            Declined
+                          </span>
+                        )}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -293,67 +352,70 @@ const StaffDash = () => {
       {showModal && selectedBorrow && (
         <div className="modal-overlay">
           <div className="modal-content reservation-receipt">
-            <div className="modal-top">
-              <span className="close-button" onClick={() => setShowModal(false)}>x</span>
+            <div className="modal-header">
+              <h2>Reservation Receipt</h2>
+              <span className="close-button" onClick={() => setShowModal(false)}>×</span>
             </div>
-            <h2>Reservation Receipt</h2>
             
             <div className="user-info">
               <img src="/dashboard-imgs/profile-placeholder.svg" alt="User" className="user-avatar" />
               <div className="user-details">
                 <h3>{selectedBorrow.borrower}</h3>
-                <p>Teacher</p>
+                <p>{selectedBorrow.receiptData?.borrowerType || 'Teacher'}</p>
               </div>
             </div>
 
-            <div className="reservation-details">
-              <p className="section-label">To Borrow</p>
-              <div className="item-preview">
-                <img 
+            <p className="to-borrow-label">To Borrow</p>
+            
+            <div className="item-preview">
+               <img 
                   src={selectedBorrow.itemId?.image || "/dashboard-imgs/placeholder.svg"} 
                   alt={selectedBorrow.itemId?.name} 
                 />
-                <div className="item-info">
-                  <h4>{selectedBorrow.itemId?.name}</h4>
-                  <p>{selectedBorrow.itemId?.category}</p>
-                </div>
+              <div className="item-info">
+                <h3>{selectedBorrow.itemId?.name}</h3>
+                <p>{selectedBorrow.itemId?.category}</p>
               </div>
-
-              <p className="section-label">Date</p>
-              <div className="date-container">
-                <div className="date-field">
-                  <p>Borrow Date:</p>
-                  <p>{new Date(selectedBorrow.borrowDate).toLocaleDateString()}</p>
-                </div>
-                <div className="date-field">
-                  <p>Return Date:</p>
-                  <p>{new Date(selectedBorrow.returnDate).toLocaleDateString()}</p>
-                </div>
-              </div>
-
-              <div className="receipt-footer">
-                <p>Borrow request ID: {selectedBorrow.receiptData?.requestId?.slice(0, 10)}</p>
-                <p>Date: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleDateString()}</p>
-                <p>Time: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleTimeString()}</p>
-              </div>
-
-              {/* Show different buttons based on status */}
-              {selectedBorrow.receiptData?.status === 'reserved' && (
-                <button className="checkout-button" onClick={handleCheckoutClick}>
-                  Checkout
-                </button>
-              )}
-              {selectedBorrow.receiptData?.status === 'pending' && (
-                <div className="action-buttons">
-                  <button className="accept-button" onClick={() => handleAccept(selectedBorrow._id)}>
-                    Accept
-                  </button>
-                  <span className="decline-text" onClick={() => handleDecline(selectedBorrow._id)}>
-                    Decline
-                  </span>
-                </div>
-              )}
             </div>
+
+            <p className="date-label">Date</p>
+            <div className="date-container">
+              <div className="date-row">
+                <span>Borrow Date:</span>
+                <span>{new Date(selectedBorrow.borrowDate).toLocaleDateString()}</span>
+              </div>
+              <div className="date-row">
+                <span>Return Date:</span>
+                <span>{new Date(selectedBorrow.returnDate).toLocaleDateString()}</span>
+              </div>
+            </div>
+
+            <div className="receipt-footer">
+              <p>Borrow request ID: {selectedBorrow.receiptData?.requestId?.slice(0, 10)}</p>
+              <p>Date: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleDateString()}</p>
+              <p>Time: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+            </div>
+
+            {selectedBorrow.receiptData?.status === 'pending' ? (
+              <div className="action-container">
+                <button 
+                  className="accept-button" 
+                  onClick={() => handleAccept(selectedBorrow._id)}
+                >
+                  Accept
+                </button>
+                <div 
+                  className="decline-text"
+                  onClick={() => handleDecline(selectedBorrow._id)}
+                >
+                  Decline
+                </div>
+              </div>
+            ) : selectedBorrow.receiptData?.status === 'reserved' && (
+              <button className="checkout-button" onClick={handleCheckoutClick}>
+                Checkout
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -426,6 +488,10 @@ const StaffDash = () => {
                 setFoundItem(null);
                 setSearchId('');
                 navigate('/staff', { replace: true });
+              }}
+              onBorrowingComplete={() => {
+                fetchBorrowings();
+                fetchActivities();
               }}
             />
           </div>

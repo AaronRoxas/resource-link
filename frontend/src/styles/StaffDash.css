@@ -250,21 +250,37 @@
   
   .action-buttons {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    gap: 10px;
     margin-top: 20px;
   }
   
-  .accept-button {
+  .staff-dashboard .accept-button, .decline-button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .staff-dashboard .accept-button {
+    background-color: #14AE5C;
+    color: white;
+  }
+  
+  .staff-dashboard .decline-button {
+    background-color: #FF4D4F;
+    color: white;
+  }
+  
+  .staff-dashboard  .checkout-button {
     width: 100%;
-    padding: 14px;
-    background: #006B3E;
+    padding: 12px;
+    background: #14AE5C;
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 16px;
-    font-weight: 500;
+    margin-top: 20px;
     cursor: pointer;
   }
   
@@ -328,129 +344,97 @@
   
   /* Reservation Receipt Styles */
   .reservation-receipt {
-    background: white;
-    padding: 24px;
     width: 90%;
     max-width: 400px;
+    background: white;
     border-radius: 12px;
-    position: relative;
-    margin: auto;
+    padding: 20px;
   }
   
-  .reservation-receipt h2 {
-    text-align: center;
-    margin: 24px 0;
-    font-size: 18px;
-    font-weight: 600;
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0;
   }
   
   .user-info {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px;
-    border: 1px solid #eee;
+    gap: 15px;
+    padding: 15px;
     border-radius: 8px;
-    margin-bottom: 24px;
+    background: white;
+    margin-bottom: 20px;
   }
   
   .user-avatar {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
   }
   
-  .user-details h3 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 500;
-  }
-  
-  .user-details p {
-    margin: 4px 0 0;
+  .to-borrow-label {
     color: #666;
-    font-size: 14px;
-  }
-  
-  .section-label {
-    color: #666;
-    font-size: 14px;
-    margin: 16px 0 8px;
+    margin: 10px 0;
   }
   
   .item-preview {
-    display: flex;
-    gap: 12px;
-    padding: 12px;
-    background: #f5f5f5;
+    background: #f9f9f9;
+    padding: 15px;
     border-radius: 8px;
-    margin-bottom: 16px;
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
   }
   
-  .item-preview img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 4px;
+  .date-section {
+    margin: 20px 0;
   }
   
-  .item-info h4 {
-    margin: 0;
-    font-size: 16px;
-  }
-  
-  .item-info p {
-    margin: 4px 0 0;
+  .date-label {
+    text-align: center;
     color: #666;
-    font-size: 14px;
+    margin-bottom: 10px;
   }
   
   .date-container {
-    background: #f5f5f5;
-    padding: 16px;
+    background: #f9f9f9;
+    padding: 15px;
     border-radius: 8px;
-    margin-bottom: 24px;
   }
   
-  .date-field {
+  .date-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
-  }
-  
-  .date-field:last-child {
-    margin-bottom: 0;
-  }
-  
-  .date-field p {
-    margin: 0;
-    font-size: 14px;
+    margin: 5px 0;
   }
   
   .receipt-footer {
-    padding-top: 16px;
-    border-top: 1px solid #eee;
-    margin-bottom: 24px;
-    text-align: left;
+    margin-top: 20px;
+    font-size: 0.875rem;
+    color: #666;
   }
   
   .receipt-footer p {
-    margin: 8px 0;
-    font-size: 14px;
-    color: #666;
+    margin: 5px 0;
   }
   
   .checkout-button {
     width: 100%;
-    padding: 14px;
-    background: #006B3E;
+    padding: 12px;
+    background: #14AE5C;
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 16px;
-    font-weight: 500;
+    margin-top: 20px;
     cursor: pointer;
-    transition: background-color 0.2s;
   }
   
   .checkout-button:hover {
@@ -551,7 +535,7 @@
   
   .divider {
     text-align: center;
-    margin: 24px 0;
+    margin: 4px 0;
     position: relative;
   }
   
@@ -601,4 +585,87 @@
     align-items: center;
     gap: 16px;
     padding: 16px 0;
+  }
+  
+  .action-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .action-checkout {
+    background-color: #FFE4E4;
+    color: #FF4D4D;
+  }
+  
+  .action-checkin {
+    background-color: #E3FFE4;
+    color: #4CAF50;
+  }
+  
+  .action-removed {
+    background-color: #F0E6FF;
+    color: #7B61FF;
+  }
+  
+  .action-added {
+    background-color: #E5F6FF;
+    color: #2196F3;
+  }
+  
+  .action-updated {
+    background-color: #FFF3E0;
+    color: #FF9800;
+  }
+  
+  .action-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  
+  .accept-button {
+    width: 100%;
+    padding: 12px;
+    background: #14AE5C;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .decline-text {
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .decline-text:hover {
+    text-decoration: underline;
+  }
+  
+  .checkout-button {
+    width: 100%;
+    padding: 12px;
+    background: #14AE5C;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    margin-top: 20px;
+    cursor: pointer;
+  }
+  
+  .file-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+    border-radius: 8px;
+    font-size: 24px;
   }

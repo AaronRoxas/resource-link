@@ -21,6 +21,8 @@ import ViewMisc from './dashboards/teacher/ViewMisc.js';
 import TeacherInventory from './dashboards/teacher/TeacherInventory.js';
 import ItemPage from './components/ItemPage';
 import QRScan from './components/QRScan.js';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -167,6 +169,7 @@ function App() {
         />
         {/* Other routes */}
       </Routes>
+      <ToastContainer position="top-right" autoClose={3000} />
     </Router>
   );
 }

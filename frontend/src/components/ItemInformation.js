@@ -1,18 +1,23 @@
 import React, { useState, useCallback } from 'react'
 import '../styles/ItemInformation.css'
 import debounce from 'lodash/debounce'
+import { toast } from 'react-toastify';
 
 const getCurrentDate = () => {
   const today = new Date();
   return today.toISOString().split('T')[0];
 };
 
-const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
+const ItemInformation = ({ selectedItem, handleCloseItemInfo, onBorrowingComplete }) => {
   const [activeTab, setActiveTab] = useState('Info');
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [employeeSearch, setEmployeeSearch] = useState('');
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [isReservedCheckoutOpen, setIsReservedCheckoutOpen] = useState(false);
+  const [requestId, setRequestId] = useState('');
+  const [borrowDate, setBorrowDate] = useState(getCurrentDate());
+  const [returnDate, setReturnDate] = useState('');
 
   const handleCheckoutClick = () => {
     setIsCheckoutModalOpen(true);
@@ -23,6 +28,117 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
   const handleCloseModal = () => {
     setIsCheckoutModalOpen(false);
     document.getElementById('main-modal').style.display = 'block';
+  };
+
+  const handleReservedCheckoutClick = () => {
+    setIsReservedCheckoutOpen(true);
+    document.getElementById('main-modal').style.display = 'none';
+  };
+
+  const handleCloseReservedModal = () => {
+    setIsReservedCheckoutOpen(false);
+    document.getElementById('main-modal').style.display = 'block';
+  };
+
+  const handleRequestIdChange = async (e) => {
+    const value = e.target.value;
+    setRequestId(value);
+    
+    // Only search if we have enough characters
+    if (value.length >= 6) {
+      try {
+        console.log('Searching for request ID:', value);
+        
+        const response = await fetch(`http://localhost:5000/api/borrowings/search`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            'receiptData.requestId': value,
+            'receiptData.status': 'reserved'
+          })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok && data) {
+          console.log('Found borrowing:', data);
+          // Set the complete request ID
+          setRequestId(data.receiptData.requestId);
+          // Auto-fill the dates
+          setBorrowDate(new Date(data.borrowDate).toISOString().split('T')[0]);
+          setReturnDate(new Date(data.returnDate).toISOString().split('T')[0]);
+        } else {
+          console.log('No borrowing found:', data.message);
+          // Keep the partial request ID but clear dates
+          setBorrowDate('');
+          setReturnDate('');
+        }
+      } catch (error) {
+        console.error('Error finding borrowing request:', error);
+        setBorrowDate('');
+        setReturnDate('');
+      }
+    }
+  };
+
+  const handleEmployeeCheckoutContinue = async () => {
+    if (!requestId) {
+      toast.error('Please enter a request ID');
+      return;
+    }
+
+    try {
+      console.log('Updating status for request ID:', requestId);
+      
+      // First find the borrowing to make sure it exists and is reserved
+      const searchResponse = await fetch('http://localhost:5000/api/borrowings/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          'receiptData.requestId': requestId,
+          'receiptData.status': 'reserved'
+        })
+      });
+
+      if (!searchResponse.ok) {
+        throw new Error('Reserved borrowing not found');
+      }
+
+      const borrowing = await searchResponse.json();
+      
+      // Update the status to Check-out
+      const updateResponse = await fetch('http://localhost:5000/api/borrowings/updateStatus', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          requestId: borrowing.receiptData.requestId,
+          status: 'On-going'
+        })
+      });
+
+      if (!updateResponse.ok) {
+        throw new Error('Failed to update borrowing status');
+      }
+
+      // Close modal and show success message
+      handleCloseReservedModal();
+      toast.success('Reserved item checked out successfully');
+      
+      // Refresh the parent component
+      if (onBorrowingComplete) {
+        onBorrowingComplete();
+      }
+
+    } catch (error) {
+      console.error('Error during check-out:', error);
+      toast.error(error.message || 'Failed to check out item');
+    }
   };
 
   const debouncedSearch = useCallback(
@@ -126,7 +242,12 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
           >
             Check-out
           </button>
-          <button className="reserved-checkout-button">Reserved Check-out</button>
+          <button 
+            className="reserved-checkout-button"
+            onClick={handleReservedCheckoutClick}
+          >
+            Reserved Check-out
+          </button>
         </div>
 
         <div className="action-buttons">
@@ -196,6 +317,60 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo }) => {
               </div>
             </div>
             <button className="continue-button">Continue</button>
+          </div>
+        </div>
+      )}
+
+      {isReservedCheckoutOpen && (
+        <div className="checkout-modal" onClick={handleCloseReservedModal}>
+          <div className="checkout-modal-content" onClick={e => e.stopPropagation()}>
+            <span className="modal-close-button" onClick={handleCloseReservedModal}>
+              ×
+            </span>
+            <h2>Check-out</h2>
+            
+            <div className="item-preview">
+            <img src={selectedItem.imageUrl || '/dashboard-imgs/placeholder.svg'} alt={selectedItem.name} />
+              <div className="item-details">
+                <h3>{selectedItem?.name}</h3>
+                <p>{selectedItem?.category}</p>
+              </div>
+            </div>
+
+            <div className="input-field">
+              <input
+                type="text"
+                placeholder="Enter request ID"
+                value={requestId}
+                onChange={handleRequestIdChange}
+              />
+            </div>
+
+            <div className="date-fields">
+              <div className="date-field">
+                <label>Borrow Date:</label>
+                <input 
+                  type="date" 
+                  value={borrowDate}
+                  readOnly
+                />
+              </div>
+              <div className="date-field">
+                <label>Return Date:</label>
+                <input 
+                  type="date"
+                  value={returnDate}
+                  readOnly
+                />
+              </div>
+            </div>
+
+            <button 
+              className="continue-button"
+              onClick={handleEmployeeCheckoutContinue}
+            >
+              Continue
+            </button>
           </div>
         </div>
       )}
