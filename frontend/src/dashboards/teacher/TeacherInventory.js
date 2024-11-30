@@ -44,7 +44,7 @@ const BorrowReceipt = ({ item, onClose }) => {
                 </div>
 
                 <div className="receipt-footer">
-                    <p><b>Borrow request ID: {item._id.slice(0, 10)}</b></p>
+                    <p><b>Borrow request ID:{item.receiptData?.requestId?.slice(0, 10)}</b></p>
                     <p>Date: {new Date(item.borrowDate).toLocaleDateString()}</p>
                     <p>Time: {new Date(item.receiptData?.borrowTime).toLocaleTimeString('en-US', {
                         hour: '2-digit',
@@ -111,6 +111,28 @@ const TeacherInventory = () => {
         setSelectedItem(item);
     };
 
+    const formatStatus = (status) => {
+        const statusMap = {
+            'on-going': 'On-going',
+            'pending': 'Pending',
+            'reserved': 'Reserved',
+            'overdue': 'Overdue'
+        };
+        return statusMap[status?.toLowerCase()] || status;
+    };
+
+    const getStatus = (item) => {
+        const currentDate = new Date();
+        const returnDate = new Date(item.returnDate);
+        
+        // If return date has passed and status is 'on-going', mark as overdue
+        if (returnDate < currentDate && item.receiptData?.status?.toLowerCase() === 'on-going') {
+            return 'overdue';
+        }
+        
+        return item.receiptData?.status?.toLowerCase();
+    };
+
     return (
         <div className="teacher-inventory">
             <header>
@@ -136,10 +158,14 @@ const TeacherInventory = () => {
                                         {item.itemId ? item.itemId.category : 'Category not found'}
                                     </p>
                                     <div className="borrow-details">
-                                    <p><b>Borrow request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
-                                        <p>Borrowed On: {new Date(item.borrowDate).toLocaleDateString()}</p>
+                                        <p><b>Borrow request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
+                                        <p>{item.receiptData?.status?.toLowerCase() === 'on-going' 
+                                            ? 'Borrowed On: ' 
+                                            : 'Borrow On: '}{new Date(item.borrowDate).toLocaleDateString()}</p>
                                         <p>Return On: {new Date(item.returnDate).toLocaleDateString()}</p>
-                                        <p>Status: {item.receiptData?.status}</p>
+                                        <span className={`status-pill ${getStatus(item)}`}>
+                                            {formatStatus(getStatus(item))}
+                                        </span>
                                     </div>
                                 </div>
                             </div>

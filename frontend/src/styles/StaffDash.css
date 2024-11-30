@@ -588,35 +588,36 @@
   }
   
   .action-badge {
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.875rem;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
     font-weight: 500;
+    text-transform: capitalize;
   }
   
-  .action-checkout {
-    background-color: #FFE4E4;
-    color: #FF4D4D;
+  .action-badge-green {
+    background-color: #E2F8F3;
+    color: #006B3E;
   }
   
-  .action-checkin {
-    background-color: #E3FFE4;
-    color: #4CAF50;
+  .action-badge-red {
+    background-color: #F2E4FF;
+    color: #6B2BAD;
   }
   
-  .action-removed {
-    background-color: #F0E6FF;
-    color: #7B61FF;
+  .action-badge-blue {
+    background-color: #FFE7F9;
+    color: #B7168C;
   }
   
-  .action-added {
-    background-color: #E5F6FF;
-    color: #2196F3;
+  .action-badge-purple {
+    background-color: #E8FFE9;
+    color: #1F8722;
   }
   
-  .action-updated {
-    background-color: #FFF3E0;
-    color: #FF9800;
+  .action-badge-orange {
+    background-color: #FFE9E9;
+    color: #D14343;
   }
   
   .action-container {

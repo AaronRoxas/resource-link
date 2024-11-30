@@ -3,6 +3,8 @@ import * as XLSX from 'xlsx';
 import '../../styles/AddItem.css'; 
 import BottomNav from '../../components/BottomNav'; 
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AddItem = () => {
   const [formData, setFormData] = useState({
@@ -66,6 +68,7 @@ const AddItem = () => {
         id: generatedId 
       });
       console.log('Item added:', response.data);
+      toast.success('Item added successfully!');
       setFormData({
         name: '',
         status: 'Good Condition',
@@ -79,6 +82,7 @@ const AddItem = () => {
       setGeneratedId('');
     } catch (error) {
       console.error('Error adding item:', error);
+      toast.error('Failed to add item. Please try again.');
     }
   };
 
@@ -106,10 +110,13 @@ const AddItem = () => {
       console.log('Bulk import response:', response.data);
       setPreviewData([]);
       setBulkItems([]);
-      alert(`${response.data.message}\nSuccessful: ${response.data.successfulItems.length}\nFailed: ${response.data.failedItems.length}`);
+      toast.success(`Successfully imported ${response.data.successfulItems.length} items!`);
+      if (response.data.failedItems.length > 0) {
+        toast.warning(`Failed to import ${response.data.failedItems.length} items.`);
+      }
     } catch (error) {
       console.error('Error adding bulk items:', error);
-      alert('Error adding items. Please check the format and try again.');
+      toast.error('Failed to import items. Please check the format and try again.');
     }
   };
 
@@ -271,6 +278,7 @@ const AddItem = () => {
       )}
 
       <BottomNav navItems={navItems} />
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };

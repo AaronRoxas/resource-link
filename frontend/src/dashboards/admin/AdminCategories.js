@@ -4,6 +4,8 @@ import BottomNav from '../../components/BottomNav';
 import ItemInformation from '../../components/ItemInformation';
 import '../../styles/AdminCategories.css';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AdminCategories = () => {
   const [inventory, setInventory] = useState([]);
@@ -62,25 +64,25 @@ const AdminCategories = () => {
   };
 
   const handleDelete = async (itemId) => {
-    // Confirm deletion
     const confirmDelete = window.confirm("Are you sure you want to delete this item?");
-    if (!confirmDelete) return; // Exit if the user cancels
+    if (!confirmDelete) return;
 
-    console.log("Attempting to delete item with ID:", itemId); // Log the item ID
+    console.log("Attempting to delete item with ID:", itemId);
 
-    // Logic for deleting the item
     try {
-        const response = await axios.delete(`https://resource-link-main-14c755858b60.herokuapp.com/api/inventory/${itemId}`, {
-            withCredentials: true
-        });
-        if (response.status === 200) { // Check if the deletion was successful
-            // Update the inventory state to remove the deleted item
-            setInventory(inventory.filter(item => item._id !== itemId));
-        } else {
-            console.error('Error deleting item:', response.data);
-        }
+      const response = await axios.delete(`https://resource-link-main-14c755858b60.herokuapp.com/api/inventory/${itemId}`, {
+        withCredentials: true
+      });
+      if (response.status === 200) {
+        setInventory(inventory.filter(item => item._id !== itemId));
+        toast.success('Item deleted successfully!');
+      } else {
+        console.error('Error deleting item:', response.data);
+        toast.error('Failed to delete item');
+      }
     } catch (error) {
-        console.error('Error deleting item:', error.response ? error.response.data : error.message);
+      console.error('Error deleting item:', error.response ? error.response.data : error.message);
+      toast.error('Failed to delete item. Please try again.');
     }
   };
   
@@ -237,6 +239,7 @@ const AdminCategories = () => {
       )}
 
       <BottomNav navItems={navItems} />
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

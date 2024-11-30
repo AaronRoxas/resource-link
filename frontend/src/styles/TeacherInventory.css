@@ -227,3 +227,31 @@
     background: #fdfdfd;
     color: black
 }
+
+.status-pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.status-pill.on-going {
+    background-color: #E8D5FF;
+    color: #9747FF;
+}
+
+.status-pill.pending {
+    background-color: #FFF4D5;
+    color: #FFA726;
+}
+
+.status-pill.reserved {
+    background-color: #D5FFE3;
+    color: #00C853;
+}
+
+.status-pill.overdue {
+    background-color: #FFD5D5;
+    color: #FF4747;
+}

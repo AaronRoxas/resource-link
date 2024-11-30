@@ -81,16 +81,18 @@ const LoginComponent = () => {
           placeholder="Email" 
           className="login-input" 
           value={email} 
+          autoComplete="on"
           onChange={(e) => setEmail(e.target.value)}
-          required // Added required attribute
+          required
         />
         <input 
           type="password" 
           placeholder="Password" 
           className="login-input" 
           value={password} 
+          autoComplete="on"
           onChange={(e) => setPassword(e.target.value)}
-          required // Added required attribute
+          required 
         />
         {loading && <p className="loading-message">Logging in...</p>}
         {error && <p className="error-message">{error}</p>}

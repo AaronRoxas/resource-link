@@ -228,6 +228,7 @@ const AdminDash = () => {
             <tbody>
             {[...borrowings
                 .filter(borrowing => borrowing.receiptData?.status === 'On-going')
+                .slice(0, 5)
                 .map(borrowing => ({
                   date: new Date(borrowing.borrowDate),
                   borrower: borrowing.borrower,
