@@ -45,7 +45,7 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/borrowings', borrowingsRoutes);
 app.use('/api/users', userRoutes);
-
+app.use('/inventory', inventoryRoutes);
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);

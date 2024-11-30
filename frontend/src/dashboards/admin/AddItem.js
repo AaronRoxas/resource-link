@@ -7,7 +7,7 @@ import axios from 'axios';
 const AddItem = () => {
   const [formData, setFormData] = useState({
     name: '',
-    status: 'In Stock',
+    status: 'Good Condition',
     serialNo: '',
     purchaseDate: '',
     purchaseCost: '',
@@ -68,7 +68,7 @@ const AddItem = () => {
       console.log('Item added:', response.data);
       setFormData({
         name: '',
-        status: 'In Stock',
+        status: 'Good Condition',
         serialNo: '',
         purchaseDate: '',
         purchaseCost: '',

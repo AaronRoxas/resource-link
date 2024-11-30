@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const Borrowing = require('../models/Borrowing');
 
 
-router.get('/api/inventory', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const items = await Item.find(); // Fetch items from the database
     res.json(items);

@@ -23,7 +23,7 @@ const AdminCategories = () => {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', {
+        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/inventory', {
           withCredentials: true
         });
         setInventory(response.data);
@@ -180,7 +180,7 @@ const AdminCategories = () => {
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
               >
                 <option value="" disabled>Select status</option>
-                <option value="In Stock">In Stock</option>
+                <option value="Good Condition">Good Condition</option>
                 <option value="For repair">For repair</option>
                 <option value="For maintenance">For maintenance</option>
                 <option value="Low stock">Low stock</option>

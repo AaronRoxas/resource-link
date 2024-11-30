@@ -1,0 +1,161 @@
+.inventory-alerts-page {
+  background-color: white;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.back-button img {
+  width: 24px;
+  height: 24px;
+}
+
+.back-button span {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.filter-icon {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+.remove-filter{
+    cursor: pointer;
+}
+
+.alerts-table-container {
+  padding: 16px;
+}
+
+.alerts-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.alerts-table th {
+  text-align: left;
+  padding: 12px 8px;
+  border-bottom: 1px solid #eee;
+  color: #666;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.alerts-table td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.status-badge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-block;
+  text-align: center;
+}
+
+.status-badge.for-repair {
+  background-color: #F8F0FF;
+  color: #8250C4;
+}
+
+.status-badge.low-stock {
+  background-color: #FFE9E9;
+  color: #D14343;
+}
+
+.status-badge.for-maintenance {
+  background-color: #E8F7FF;
+  color: #3B95D2;
+}
+
+.filter-modal {
+  position: absolute;
+  top: 60px;
+  right: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 200px;
+}
+
+.filter-content {
+  padding: 16px;
+}
+
+.filter-content h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-badge {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.filter-badge:hover {
+  opacity: 0.8;
+}
+
+.filter-badge.for-repair {
+  background-color: #F8F0FF;
+  color: #8250C4;
+}
+
+.filter-badge.low-stock {
+  background-color: #FFE9E9;
+  color: #D14343;
+}
+
+.filter-badge.for-maintenance {
+  background-color: #E8F7FF;
+  color: #3B95D2;
+}
+
+.filter-badge.active {
+  outline: 2px solid currentColor;
+}
+
+.remove-filter {
+  margin-top: 8px;
+  padding: 8px 16px;
+  color: #FF4747;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  border-top: 1px solid #eee;
+}
+
+.remove-filter:hover {
+  background-color: #FFF5F5;
+}

@@ -18,7 +18,7 @@ itemSchema.pre('save', async function(next) {
     if (this.stocks < 10) {
       this.status = 'Low Stock';
     } else {
-      this.status = 'In Stock';
+      this.status = 'Good Condition';
     }
 
     if (!this.id) {

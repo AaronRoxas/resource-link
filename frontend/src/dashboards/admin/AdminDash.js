@@ -2,56 +2,98 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../../styles/AdminDash.css';
 import BottomNav from '../../components/BottomNav'; 
-import InventoryModal from '../../components/InventoryAlertModal'; // Import the modal component
 import NavBar from '../../components/NavBar';
+import { useNavigate, useLocation } from 'react-router-dom';
 const AdminDash = () => {
-  const [inventory, setInventory] = useState([]);
-  const [recentActivities, setRecentActivities] = useState([]);
-  const [itemTracking, setItemTracking] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  // new
+  const [inventoryAlerts, setInventoryAlerts] = useState([]);
+  const [borrowings, setBorrowings] = useState([]);
+  const [, setSelectedBorrow] = useState(null);
+  const [, setShowModal] = useState(false);
+  const [activities, setActivities] = useState([]);
+  const [reservedItems, setReservedItems] = useState([]);
 
-  // Fetch inventory data
+  const getActionStyle = (action) => {
+    const styles = {
+      'check-out': 'action-checkout',
+      'check-in': 'action-checkin',
+      'removed': 'action-removed',
+      'added': 'action-added',
+      'updated': 'action-updated'
+    };
+    return styles[action.toLowerCase()] || '';
+  };
+
+  const handleStatusClick = (borrow) => {
+    setSelectedBorrow(borrow);
+    setShowModal(true);
+  };
+
   useEffect(() => {
-    const fetchInventory = async () => {
+    const fetchInventoryAlerts = async () => {
       try {
-        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', {
-          withCredentials: true
-        });
-        setInventory(response.data);
+        const response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/items');
+        const data = await response.json();
+        // Filter items that need attention (low stock, maintenance, repair)
+        const alerts = data.filter(item => 
+          item.status === 'For repair' || 
+          item.status === 'Low Stock' || 
+          item.status === 'For Maintenance'
+        );
+        setInventoryAlerts(alerts);
       } catch (error) {
-        console.error('Error fetching inventory:', error);
+        console.error('Error fetching inventory alerts:', error);
       }
     };
 
-    const fetchRecentActivities = async () => {
-      try {
-        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/activities', {
-          withCredentials: true
-        });
-        setRecentActivities(response.data);
-      } catch (error) {
-        console.error('Error fetching recent activities:', error);
-      }
-    };
-
-    const fetchItemTracking = async () => {
-      try {
-        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/item-tracking', {
-          withCredentials: true
-        });
-        setItemTracking(response.data);
-      } catch (error) {
-        console.error('Error fetching item tracking:', error);
-      }
-    };
-
-    fetchInventory();
-    fetchRecentActivities();
-    fetchItemTracking();
+    fetchInventoryAlerts();
   }, []);
 
+  const fetchBorrowings = async () => {
+    try {
+      const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
+      setBorrowings(response.data);
+    } catch (error) {
+      console.error('Error fetching borrowings:', error);
+    }
+  };
 
+  const fetchActivities = async () => {
+    try {
+      const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/activities');
+      setActivities(response.data);
+    } catch (error) {
+      console.error('Error fetching activities:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBorrowings();
+    fetchActivities();
+  }, []);
+
+  useEffect(() => {
+    const fetchReservedItems = async () => {
+      try {
+        const response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
+        const data = await response.json();
+        // Filter only items with status: reserved, pending, or declined
+        const filteredData = data.filter(item => 
+          item.receiptData?.status === 'reserved' || 
+          item.receiptData?.status === 'pending' || 
+          item.receiptData?.status === 'declined'
+        );
+        setReservedItems(filteredData);
+      } catch (error) {
+        console.error('Error fetching reserved items:', error);
+      }
+    };
+
+    fetchReservedItems();
+  }, []);
 
   const navItems = [
     { path: '/admin', icon: 'active-home', label: 'Home' },
@@ -60,6 +102,18 @@ const AdminDash = () => {
     { path: '/addUser', icon: 'profile', label: 'Add User' },
     { path: '/adminCategories', icon: 'cube', label: 'Categories' },
   ];
+
+  const handleViewAllInventoryAlerts = () => {
+    navigate('/admin/inventory-alerts');
+  };
+
+  const handleViewAllLogs = () => {
+    navigate('/admin/logs');
+  };
+
+  const handleViewAllReserved = () => {
+    navigate('/admin/reserved');
+  };
 
   return (
     <div className="admin-dashboard">
@@ -79,22 +133,20 @@ const AdminDash = () => {
               </tr>
             </thead>
             <tbody>
-              {inventory
-                .filter(item => item.status !== 'In Stock')
-                .map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.id}</td>
-                    <td>{item.name}</td>
-                    <td>
-                      <span className={`status ${item.status.toLowerCase().replace(' ', '-')}`}>
-                        {item.status}
-                      </span>
-                    </td>
-                  </tr>
+            {inventoryAlerts.slice(0, 5).map((item) => (
+                <tr key={item._id}>
+                  <td>{item.id}</td>
+                  <td>{item.name}</td>
+                  <td>
+                    <span className={`status-badge ${item.status.toLowerCase().replace(' ', '-')}`}>
+                      {item.status}
+                    </span>
+                  </td>
+                </tr>
               ))}
             </tbody>
           </table>
-          <button className="view-all-button">View all</button>
+          <button className="view-all-button" onClick={handleViewAllInventoryAlerts}>View all</button>
         </div>
       </section>
 
@@ -112,21 +164,51 @@ const AdminDash = () => {
               </tr>
             </thead>
             <tbody>
-              {recentActivities.map((activity) => (
-                <tr key={activity.id}>
-                  <td>{activity.date}</td>
-                  <td>{activity.user}</td>
-                  <td>
-                    <span className={`status ${activity.action.toLowerCase()}`}>
-                      {activity.action}
-                    </span>
-                  </td>
-                  <td>{activity.item}</td>
-                </tr>
-              ))}
+            {borrowings
+                .filter(borrow => 
+                  ['reserved', 'pending', 'declined'].includes(borrow.receiptData?.status?.toLowerCase())
+                )
+                .map((borrow) => (
+                  <tr key={borrow._id}>
+                    <td>{new Date(borrow.receiptData?.borrowTime).toLocaleDateString()}</td>
+                    <td>{borrow.borrower}</td>
+                    <td>{borrow.itemId?.name}</td>
+                    <td>
+                      <span className={`status-pill status-${borrow.receiptData?.status?.toLowerCase()}`}>
+                        {borrow.receiptData?.status === 'reserved' && (
+                          <span 
+                            className="status-reserved"
+                            onClick={() => handleStatusClick(borrow)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            Reserved
+                          </span>
+                        )}
+                        {borrow.receiptData?.status === 'pending' && (
+                          <span 
+                            className="status-pending"
+                            onClick={() => handleStatusClick(borrow)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            Pending
+                          </span>
+                        )}
+                        {borrow.receiptData?.status === 'declined' && (
+                          <span 
+                            className="status-declined"
+                            onClick={() => handleStatusClick(borrow)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            Declined
+                          </span>
+                        )}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
-          <button className="view-all-button">View all</button>
+          <button className="view-all-button" onClick={handleViewAllReserved}>View all</button>
         </div>
       </section>
 
@@ -144,30 +226,46 @@ const AdminDash = () => {
               </tr>
             </thead>
             <tbody>
-              {itemTracking.map((tracking) => (
-                <tr key={tracking.id}>
-                  <td>{tracking.date}</td>
-                  <td>{tracking.user}</td>
-                  <td>
-                    <span className={`status ${tracking.action.toLowerCase()}`}>
-                      {tracking.action}
-                    </span>
-                  </td>
-                  <td>{tracking.item}</td>
-                </tr>
-              ))}
+            {[...borrowings
+                .filter(borrowing => borrowing.receiptData?.status === 'On-going')
+                .map(borrowing => ({
+                  date: new Date(borrowing.borrowDate),
+                  borrower: borrowing.borrower,
+                  itemName: borrowing.itemId?.name,
+                  action: 'Check-out',
+                  _id: borrowing._id,
+                  type: 'borrowing'
+                })),
+                ...activities.map(activity => ({
+                  date: new Date(activity.timestamp),
+                  borrower: activity.borrower,
+                  itemName: activity.itemName,
+                  action: activity.action,
+                  _id: activity._id,
+                  type: 'activity'
+                }))
+              ]
+                .sort((a, b) => b.date - a.date) // Sort by date, newest first
+                .slice(0, 10) // Take only the first 5 items
+                .map((item) => (
+                  <tr key={item._id}>
+                    <td>{item.date.toLocaleDateString()}</td>
+                    <td>{item.borrower}</td>
+                    <td>{item.itemName}</td>
+                    <td>
+                      <span className={`action-badge ${getActionStyle(item.action)}`}>
+                        {item.action.toLowerCase()}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
-          <button className="view-all-button">View all</button>
+          <button className="view-all-button" onClick={handleViewAllLogs}>View all</button>
         </div>
       </section>
 
       <BottomNav navItems={navItems} />
-      <InventoryModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        inventory={inventory} 
-      />
     </div>
   );
 }

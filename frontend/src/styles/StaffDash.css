@@ -669,3 +669,26 @@
     border-radius: 8px;
     font-size: 24px;
   }
+  
+  .status-badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-block;
+  }
+  
+  .status-badge.for-repair {
+    background-color: #F8F0FF;
+    color: #8250C4;
+  }
+  
+  .status-badge.low-stock {
+    background-color: #FFE9E9;
+    color: #D14343;
+  }
+  
+  .status-badge.for-maintenance {
+    background-color: #E8F7FF;
+    color: #3B95D2;
+  }

@@ -23,6 +23,9 @@ import ItemPage from './components/ItemPage';
 import QRScan from './components/QRScan.js';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import InventoryAlert from './components/InventoryAlert';
+import Logs from './components/Logs';
+import ReservedItems from './components/ReservedItems';
 
 function App() {
   return (
@@ -164,6 +167,54 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['staff']}>
               <ItemPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/staff/inventory-alerts" 
+          element={
+            <ProtectedRoute requiredRole="staff">
+              <InventoryAlert />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/staff/logs" 
+          element={
+            <ProtectedRoute requiredRole="staff">
+              <Logs />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/staff/reserved" 
+          element={
+            <ProtectedRoute requiredRole="staff">
+              <ReservedItems />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/inventory-alerts" 
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <InventoryAlert />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/logs" 
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <Logs />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/reserved" 
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <ReservedItems />
             </ProtectedRoute>
           } 
         />

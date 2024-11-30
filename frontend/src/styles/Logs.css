@@ -1,0 +1,89 @@
+.logs-page {
+    background-color: white;
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background-color: white;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .back-button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+  }
+  
+  .back-button img {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .back-button span {
+    font-size: 18px;
+    font-weight: 500;
+  }
+  
+  .logs-table-container {
+    padding: 16px;
+  }
+  
+  .logs-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .logs-table th {
+    text-align: left;
+    padding: 12px 8px;
+    border-bottom: 1px solid #eee;
+    color: #666;
+    font-weight: 500;
+    font-size: 14px;
+  }
+  
+  .logs-table td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+  }
+  
+  .action-badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-block;
+  }
+  
+  .action-badge.action-checkout {
+    background-color: #FFE9E9;
+    color: #D14343;
+  }
+  
+  .action-badge.action-checkin {
+    background-color: #F0FFF4;
+    color: #2F855A;
+  }
+  
+  .action-badge.action-removed {
+    background-color: #FFE9E9;
+    color: #D14343;
+  }
+  
+  .action-badge.action-added {
+    background-color: #F0FFF4;
+    color: #2F855A;
+  }
+  
+  .action-badge.action-updated {
+    background-color: #F8F0FF;
+    color: #8250C4;
+  }

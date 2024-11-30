@@ -20,6 +20,7 @@ const StaffDash = () => {
   const [foundItem, setFoundItem] = useState(null);
   const [showItemInfo, setShowItemInfo] = useState(false);
   const [activities, setActivities] = useState([]);
+  const [inventoryAlerts, setInventoryAlerts] = useState([]);
 
   const fetchBorrowings = async () => {
     try {
@@ -42,6 +43,26 @@ const StaffDash = () => {
   useEffect(() => {
     fetchBorrowings();
     fetchActivities();
+  }, []);
+
+  useEffect(() => {
+    const fetchInventoryAlerts = async () => {
+      try {
+        const response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/items');
+        const data = await response.json();
+        // Filter items that need attention (low stock, maintenance, repair)
+        const alerts = data.filter(item => 
+          item.status === 'For repair' || 
+          item.status === 'Low Stock' || 
+          item.status === 'For Maintenance'
+        );
+        setInventoryAlerts(alerts);
+      } catch (error) {
+        console.error('Error fetching inventory alerts:', error);
+      }
+    };
+
+    fetchInventoryAlerts();
   }, []);
 
   // Call the function
@@ -201,12 +222,24 @@ const StaffDash = () => {
     return styles[action.toLowerCase()] || '';
   };
 
+  const handleViewAllInventoryAlerts = () => {
+    navigate('/staff/inventory-alerts');
+  };
+
+  const handleViewAllLogs = () => {
+    navigate('/staff/logs');
+  };
+
+  const handleViewAllReserved = () => {
+    navigate('/staff/reserved');
+  };
+
   return (
     
     <div className="staff-dashboard">
       <NavBar/>
 
-
+        {/* Inventory Alerts Section */}
       <section className="staff-section">
         <div className="section-header">
           <h2>Inventory Alerts</h2>
@@ -215,73 +248,34 @@ const StaffDash = () => {
           <table className="staff-table">
             <thead>
               <tr>
-                <th>Tag</th>
+                <th>ID</th>
                 <th>Item</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {/* Add your table data here */}
+              {inventoryAlerts.slice(0, 5).map((item) => (
+                <tr key={item._id}>
+                  <td>{item.id}</td>
+                  <td>{item.name}</td>
+                  <td>
+                    <span className={`status-badge ${item.status.toLowerCase().replace(' ', '-')}`}>
+                      {item.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
-        <button className="view-all-button">View all</button>
+        <button 
+          className="view-all-button" 
+          onClick={handleViewAllInventoryAlerts}
+        >
+          View all
+        </button>
       </section>
 
-      <section className="staff-section">
-        <div className="section-header">
-          <h2>Logs</h2>
-        </div>
-        <div className="staff-table-container">
-          <table className="staff-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>User</th>
-                <th>Item</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Combine and sort both borrowings and activities */}
-              {[...borrowings
-                .filter(borrowing => borrowing.receiptData?.status === 'On-going')
-                .map(borrowing => ({
-                  date: new Date(borrowing.borrowDate),
-                  borrower: borrowing.borrower,
-                  itemName: borrowing.itemId?.name,
-                  action: 'Check-out',
-                  _id: borrowing._id,
-                  type: 'borrowing'
-                })),
-                ...activities.map(activity => ({
-                  date: new Date(activity.timestamp),
-                  borrower: activity.borrower,
-                  itemName: activity.itemName,
-                  action: activity.action,
-                  _id: activity._id,
-                  type: 'activity'
-                }))
-              ]
-                .sort((a, b) => b.date - a.date) // Sort by date, newest first
-                .slice(0, 10) // Take only the first 5 items
-                .map((item) => (
-                  <tr key={item._id}>
-                    <td>{item.date.toLocaleDateString()}</td>
-                    <td>{item.borrower}</td>
-                    <td>{item.itemName}</td>
-                    <td>
-                      <span className={`action-badge ${getActionStyle(item.action)}`}>
-                        {item.action.toLowerCase()}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-        <button className="view-all-button">View all</button>
-      </section>
 
       <section className="staff-section">
         <div className="section-header">
@@ -343,7 +337,72 @@ const StaffDash = () => {
             </tbody>
           </table>
         </div>
-        <button className="view-all-button">View all</button>
+        <button 
+          className="view-all-button"
+          onClick={handleViewAllReserved}
+        >
+          View all
+        </button>
+      </section>
+
+      <section className="staff-section">
+        <div className="section-header">
+          <h2>Logs</h2>
+        </div>
+        <div className="staff-table-container">
+          <table className="staff-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>User</th>
+                <th>Item</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* Combine and sort both borrowings and activities */}
+              {[...borrowings
+                .filter(borrowing => borrowing.receiptData?.status === 'On-going')
+                .map(borrowing => ({
+                  date: new Date(borrowing.borrowDate),
+                  borrower: borrowing.borrower,
+                  itemName: borrowing.itemId?.name,
+                  action: 'Check-out',
+                  _id: borrowing._id,
+                  type: 'borrowing'
+                })),
+                ...activities.map(activity => ({
+                  date: new Date(activity.timestamp),
+                  borrower: activity.borrower,
+                  itemName: activity.itemName,
+                  action: activity.action,
+                  _id: activity._id,
+                  type: 'activity'
+                }))
+              ]
+                .sort((a, b) => b.date - a.date) // Sort by date, newest first
+                .slice(0, 10) // Take only the first 5 items
+                .map((item) => (
+                  <tr key={item._id}>
+                    <td>{item.date.toLocaleDateString()}</td>
+                    <td>{item.borrower}</td>
+                    <td>{item.itemName}</td>
+                    <td>
+                      <span className={`action-badge ${getActionStyle(item.action)}`}>
+                        {item.action.toLowerCase()}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+        <button 
+          className="view-all-button"
+          onClick={handleViewAllLogs}
+        >
+          View all
+        </button>
       </section>
 
       <BottomNav navItems={navItems} setShowQRScanner={setShowQRScanner} /> {/* Use the BottomNav component */}
