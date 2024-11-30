@@ -49,7 +49,7 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo, onBorrowingComplet
       try {
         console.log('Searching for request ID:', value);
         
-        const response = await fetch(`http://localhost:5000/api/borrowings/search`, {
+        const response = await fetch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/search`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo, onBorrowingComplet
       console.log('Updating status for request ID:', requestId);
       
       // First find the borrowing to make sure it exists and is reserved
-      const searchResponse = await fetch('http://localhost:5000/api/borrowings/search', {
+      const searchResponse = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ const ItemInformation = ({ selectedItem, handleCloseItemInfo, onBorrowingComplet
       const borrowing = await searchResponse.json();
       
       // Update the status to Check-out
-      const updateResponse = await fetch('http://localhost:5000/api/borrowings/updateStatus', {
+      const updateResponse = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/updateStatus', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
