@@ -1,6 +1,8 @@
 {
   "dependencies": {
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "mongodb": "^6.11.0",
+    "mongoose": "^8.8.3"
   },
   "name": "resourcelink",
   "version": "1.0.0",
@@ -11,6 +13,5 @@
   },
   "author": "",
   "license": "ISC",
-  "devDependencies": {},
   "keywords": []
 }
