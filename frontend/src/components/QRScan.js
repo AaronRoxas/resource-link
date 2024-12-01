@@ -22,7 +22,7 @@ const QRScan = () => {
     try {
       const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${searchId}`);
       if (response.data) {
-        navigate(`/staff/item/${searchId}`, { replace: true });
+        navigate(`/staff/category/${response.data.category.toLowerCase()}/${searchId}`, { replace: true });
       } else {
         alert('Item not found');
       }
@@ -37,14 +37,17 @@ const QRScan = () => {
       console.log('QR Code scanned:', data.text);
       try {
         const url = new URL(data.text);
-        if (url.hostname === 'resource-link.vercel.app' && url.pathname.startsWith('/staff/item/')) {
-          const itemId = url.pathname.split('/').pop();
+        if (url.hostname === 'resource-link.vercel.app') {
+          const pathParts = url.pathname.split('/');
+          const itemId = pathParts[pathParts.length - 1];
+          const category = pathParts[pathParts.length - 2];
+          
           setShowQRScanner(false);
           
           try {
             const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`);
             if (response.data) {
-              navigate(`/staff/item/${itemId}`, { replace: true });
+              navigate(`/staff/category/${category}/${itemId}`, { replace: true });
             } else {
               alert('Item not found');
             }
