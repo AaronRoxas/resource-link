@@ -40,10 +40,28 @@ router.get('/', async (req, res) => {
 // Update an item
 router.put('/:id', async (req, res) => {
   try {
-    const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { availability, qty, status } = req.body;
+    
+    const updatedItem = await Item.findByIdAndUpdate(
+      req.params.id,
+      {
+        availability,
+        qty,
+        status,
+        // If the item is being checked in, update stocks
+        ...(availability === 'Check-in' && { stocks: 1 })
+      },
+      { new: true }
+    );
+
+    if (!updatedItem) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+
     res.status(200).json(updatedItem);
-  } catch (err) {
-    res.status(500).json(err);
+  } catch (error) {
+    console.error('Error updating item:', error);
+    res.status(500).json({ message: 'Error updating item' });
   }
 });
 

@@ -47,12 +47,24 @@ const LoginComponent = () => {
         }
       );
 
-      // Store token in localStorage
+      console.log('Login response:', response.data); // Add this to see the response
+
+      // Store user data in localStorage
       localStorage.setItem('authToken', response.data.token);
       localStorage.setItem('userRole', response.data.role);
-      localStorage.setItem('first_name', response.data.first_name);  // Add this
+      localStorage.setItem('first_name', response.data.first_name);
       localStorage.setItem('last_name', response.data.last_name);
       localStorage.setItem('email', email);
+      localStorage.setItem('employee_id', response.data.employee_id); // Add this
+      
+      // Store the complete user object
+      localStorage.setItem('user', JSON.stringify({
+        first_name: response.data.first_name,
+        last_name: response.data.last_name,
+        email: email,
+        role: response.data.role,
+        employee_id: response.data.employee_id
+      }));
 
       // Navigate to dashboard
       if (response.data.dashboardUrl) {

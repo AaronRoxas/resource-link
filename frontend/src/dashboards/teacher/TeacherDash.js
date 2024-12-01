@@ -3,9 +3,33 @@ import '../../styles/TeacherDash.css'
 import NavBar from '../../components/NavBar';
 import { useNavigate } from 'react-router-dom'
 import BottomNav from '../../components/BottomNav'
-const TeacherDash = () => {
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
+const TeacherDash = () => {
   const navigate = useNavigate()
+  const [categories, setCategories] = useState([])
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/categories', {
+          withCredentials: true
+        });
+        setCategories(response.data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const handleCategoryClick = (categoryName) => {
+    const formattedName = categoryName.toLowerCase().replace(/[&\s]+/g, '-');
+    navigate(`/teacher/category/${formattedName}`);
+  };
+
   const navItems = [
     { path: '/teacher', icon: 'active-home', label: 'Home' },
     { path: '/teacherInventory', icon: 'cube', label: 'Inventory' },
@@ -34,49 +58,20 @@ const TeacherDash = () => {
         <div className="categories-section">
           <h3>Categories</h3>
           <div className="categories-grid">
-            <div className="category-card" onClick={() => navigate('/viewBooks')}>
-              <div className="image-placeholder">
-                <img src="dashboard-imgs/placeholder.svg" alt="Books" />
+            {categories.map((category) => (
+              <div 
+                key={category._id} 
+                className="category-card" 
+                onClick={() => handleCategoryClick(category.name)}
+              >
+                <div className="image-placeholder">
+                  <img src={category.image || "dashboard-imgs/placeholder.svg"} alt={category.name} />
+                </div>
+                <div className="category-info">
+                  <h4>{category.name}</h4>
+                </div>
               </div>
-              <div className="category-info">
-                <h4>Books, Modules</h4>
-                <p>Textbooks, library books</p>
-                <p>Educational materials and workbooks</p>
-              </div>
-            </div>
-
-            <div className="category-card" onClick={() => navigate('/viewDevices')}>
-              <div className="image-placeholder">
-                <img src="dashboard-imgs/placeholder.svg" alt="Electronics" />
-              </div>
-              <div className="category-info">
-                <h4>Electronics & IT Equipment</h4>
-                <p>Laptops, Tablets, Camera, Printers</p>
-                <p>Speakers, etc.</p>
-              </div>
-            </div>
-
-            <div className="category-card" onClick={() => navigate('/ViewLabEquipments')}>
-              <div className="image-placeholder">
-                <img src="dashboard-imgs/placeholder.svg" alt="Lab Equipment" />
-              </div>
-              <div className="category-info">
-                <h4>Laboratory & Science Equipment</h4>
-                <p>Microscopes, Test tubes, Anatomy</p>
-                <p>Models, etc.</p>
-              </div>
-            </div>
-
-            <div className="category-card" onClick={() => navigate('/viewMisc')}>
-              <div className="image-placeholder">
-                <img src="dashboard-imgs/placeholder.svg" alt="Art & Music" />
-              </div>
-              <div className="category-info">
-                <h4>Miscellaneous</h4>
-                <p>Routers, Tools</p>
-                <p>Furnitures, etc.</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

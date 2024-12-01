@@ -1,15 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import '../styles/ItemInformation.css';
+import { debounce } from 'lodash';
+import { toast } from 'react-toastify';
 
-const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo }) => {
+const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, onBorrowingComplete }) => {
   const [activeTab, setActiveTab] = useState('Info');
   const [selectedItem, setSelectedItem] = useState(propSelectedItem);
   const [loading, setLoading] = useState(!propSelectedItem);
   const { categoryName, itemId } = useParams();
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState(null);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [employees, setEmployees] = useState([]);
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [returnDate, setReturnDate] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
+  const [showConfirmCheckInModal, setShowConfirmCheckInModal] = useState(false);
 
   useEffect(() => {
     if (!propSelectedItem && itemId) {
@@ -32,11 +43,23 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo }
   }, [itemId, propSelectedItem]);
 
   useEffect(() => {
-    const fetchUserRole = () => {
-      const user = JSON.parse(localStorage.getItem('user'));
-      setUserRole(user?.role?.toLowerCase());
+    const user = JSON.parse(localStorage.getItem('user'));
+    setCurrentUser(user);
+    setUserRole(user?.role?.toLowerCase());
+  }, []);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/employees');
+        if (!response.ok) throw new Error('Failed to fetch employees');
+        const data = await response.json();
+        setEmployees(data);
+      } catch (error) {
+        console.error('Error fetching employees:', error);
+      }
     };
-    fetchUserRole();
+    fetchEmployees();
   }, []);
 
   const handleClose = () => {
@@ -54,6 +77,145 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo }
       return `https://resource-link.vercel.app/staff/category/${category}/${itemId}`;
     }
     return '';
+  };
+
+  const getCurrentDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
+  const handleSearch = useCallback(
+    debounce(async (value) => {
+      setSearchTerm(value);
+      setShowDropdown(true);
+      
+      if (value.length < 1) {
+        setFilteredEmployees([]);
+        return;
+      }
+
+      try {
+        const response = await fetch(`https://resource-link-main-14c755858b60.herokuapp.com/api/users/search?query=${encodeURIComponent(value)}`);
+        if (!response.ok) throw new Error('Failed to fetch employees');
+        const employees = await response.json();
+        setFilteredEmployees(employees);
+      } catch (error) {
+        console.error('Error searching employees:', error);
+        setFilteredEmployees([]);
+      }
+    }, 300),
+    []
+  );
+
+  const handleEmployeeSelect = (employee) => {
+    setSelectedEmployee(employee);
+    setSearchTerm(`${employee.employee_id} - ${employee.first_name} ${employee.last_name}`);
+    setShowDropdown(false);
+  };
+
+  const handleCheckout = async () => {
+    if (!selectedEmployee || !returnDate) {
+      toast.error('Please select an employee and return date');
+      return;
+    }
+
+    try {
+      const userData = JSON.parse(localStorage.getItem('user'));
+      
+      if (!userData || !userData.first_name) {
+        toast.error('User session expired. Please log in again.');
+        return;
+      }
+
+      const approverName = userData.employee_id ? 
+        `${userData.first_name} ${userData.last_name} (${userData.employee_id})` : 
+        `${userData.first_name} ${userData.last_name}`;
+
+      const borrowingData = {
+        itemId: selectedItem._id,
+        borrower: `${selectedEmployee.first_name} ${selectedEmployee.last_name}`,
+        borrowDate: getCurrentDate(),
+        returnDate: returnDate,
+        receiptData: {
+          requestId: Math.random().toString(36).substr(2, 9),
+          borrowerType: selectedEmployee.role,
+          borrowTime: new Date().toISOString(),
+          status: "On-going",
+          availability: "Check-out",
+          approvedBy: approverName
+        }
+      };
+
+      console.log('Sending borrowing data:', borrowingData);
+
+      const borrowingResponse = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(borrowingData)
+      });
+
+      if (!borrowingResponse.ok) {
+        throw new Error('Failed to create borrowing');
+      }
+
+      setShowCheckoutModal(false);
+      toast.success('Item checked out successfully');
+      
+      if (onBorrowingComplete) {
+        onBorrowingComplete();
+      }
+
+    } catch (error) {
+      console.error('Error during checkout:', error);
+      toast.error('Failed to check out item');
+    }
+  };
+
+  const handleCheckIn = async () => {
+    try {
+      const borrowingResponse = await fetch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${selectedItem._id}/return`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: 'Returned',
+        })
+      });
+
+      if (!borrowingResponse.ok) {
+        throw new Error('Failed to update borrowing status');
+      }
+
+      const itemResponse = await fetch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${selectedItem._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          availability: 'Check-in',
+          qty: 1,
+          status: 'Good Condition'
+        })
+      });
+
+      if (!itemResponse.ok) {
+        throw new Error('Failed to update item status');
+      }
+
+      toast.success('Item checked in successfully');
+      setShowConfirmCheckInModal(false);
+      
+      if (onBorrowingComplete) {
+        onBorrowingComplete();
+      }
+      
+    } catch (error) {
+      console.error('Error during check-in:', error);
+      toast.error('Failed to check in item');
+    }
   };
 
   const renderTabContent = () => {
@@ -155,7 +317,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo }
                   img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
                 }}
               >
-                Download QR
+                Download
               </button>
             </div>
           </div>
@@ -165,51 +327,197 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo }
     }
   };
 
-  return (
-    <div className="modal-overlay">
-      <div className="item-info-container">
-        <button className="modal-close" onClick={handleClose}>×</button>
-        
-        <div className="item-preview-section">
-          <div className="image-placeholder">
+  const renderCheckoutModal = () => {
+    if (!showCheckoutModal) return null;
+    
+    return (
+      <div className="modal-overlay">
+        <div className="checkout-modal">
+          <button className="modal-close" onClick={() => setShowCheckoutModal(false)}>×</button>
+          <h2>Check-out</h2>
+          
+          <div className="checkout-item-preview">
             <img 
               src={selectedItem?.itemImage || '/dashboard-imgs/placeholder.svg'} 
-              alt="Item Preview"
+              alt="Item Preview" 
+              className="checkout-item-image"
             />
+            <div className="checkout-item-details">
+              <h3>{selectedItem?.name}</h3>
+              <p>{selectedItem?.id}</p>
+            </div>
           </div>
-          <span className="item-category">{selectedItem?.subCategory || 'N/A'}</span>
-        </div>
 
-        <div className="info-tabs">
-          <button 
-            className={`info-tab ${activeTab === 'Info' ? 'active' : ''}`}
-            onClick={() => setActiveTab('Info')}
-          >
-            Info
-          </button>
-          <button 
-            className={`info-tab ${activeTab === 'History' ? 'active' : ''}`}
-            onClick={() => setActiveTab('History')}
-          >
-            History
-          </button>
-          <button 
-            className={`info-tab ${activeTab === 'QR Code' ? 'active' : ''}`}
-            onClick={() => setActiveTab('QR Code')}
-          >
-            QR Code
-          </button>
-        </div>
-
-        {renderTabContent()}
-
-        <div className="action-buttons">
-          <button className="action-button check-in">Check-in</button>
-          <button className="action-button check-out">Check-out</button>
-          <button className="action-button reserved-checkout">Reserved Check-out</button>
+          <div className="checkout-form">
+            <label>Check-out to</label>
+            <div className="dropdown-container">
+              <input 
+                type="text" 
+                placeholder="Enter employee number or name"
+                className="checkout-input"
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                onFocus={() => setShowDropdown(true)}
+              />
+              {showDropdown && filteredEmployees.length > 0 && (
+                <div className="employee-dropdown">
+                  {filteredEmployees.map((employee) => (
+                    <div 
+                      key={employee.employee_id}
+                      className="employee-option"
+                      onClick={() => handleEmployeeSelect(employee)}
+                    >
+                      <span className="employee-id">{employee.employee_id}</span>
+                      <span className="employee-name">
+                        {employee.first_name} {employee.last_name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="return-date">
+              <label>Return Date</label>
+              <input 
+                type="date"
+                className="date-input"
+                min={getCurrentDate()}
+                value={returnDate}
+                onChange={(e) => setReturnDate(e.target.value)}
+              />
+            </div>
+            <button 
+              className="continue-button"
+              onClick={handleCheckout}
+            >
+              Continue
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    );
+  };
+
+  const renderCheckInModal = () => {
+    if (!showConfirmCheckInModal) return null;
+
+    return (
+      <div className="modal-overlay">
+        <div className="confirm-checkin-modal">
+          <button className="modal-close" onClick={() => setShowConfirmCheckInModal(false)}>×</button>
+          
+          <div className="checkin-header">
+            <h2>Confirm Check-in</h2>
+          </div>
+
+          <div className="checkin-item-preview">
+            <img 
+              src={selectedItem?.itemImage || '/dashboard-imgs/placeholder.svg'} 
+              alt="Item Preview" 
+              className="checkin-item-image"
+            />
+            <div className="checkin-item-details">
+              <h3>{selectedItem?.name}</h3>
+              <p className="item-id">{selectedItem?.id}</p>
+            </div>
+          </div>
+
+          <div className="checkin-warning">
+            <p>Are you sure you want to check in this item?</p>
+            <small>This action cannot be undone.</small>
+          </div>
+
+          <div className="checkin-actions">
+            <button 
+              className="checkin-cancel-button"
+              onClick={() => setShowConfirmCheckInModal(false)}
+            >
+              Cancel
+            </button>
+            <button 
+              className="checkin-confirm-button"
+              onClick={handleCheckIn}
+            >
+              Confirm Check-in
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <div className="modal-overlay">
+        <div className="item-info-container">
+          <button className="modal-close" onClick={handleClose}>×</button>
+          
+          <div className="item-preview-section">
+            <div className="image-placeholder">
+              <img 
+                src={selectedItem?.itemImage || '/dashboard-imgs/placeholder.svg'} 
+                alt="Item Preview"
+              />
+            </div>
+            <span className="item-category">{selectedItem?.subCategory || 'N/A'}</span>
+          </div>
+
+          <div className="info-tabs">
+            <button 
+              className={`info-tab ${activeTab === 'Info' ? 'active' : ''}`}
+              onClick={() => setActiveTab('Info')}
+            >
+              Info
+            </button>
+            <button 
+              className={`info-tab ${activeTab === 'History' ? 'active' : ''}`}
+              onClick={() => setActiveTab('History')}
+            >
+              History
+            </button>
+            <button 
+              className={`info-tab ${activeTab === 'QR Code' ? 'active' : ''}`}
+              onClick={() => setActiveTab('QR Code')}
+            >
+              QR Code
+            </button>
+          </div>
+
+          {renderTabContent()}
+
+          <div className="action-buttons">
+            <button 
+              className="action-button check-in"
+              disabled={selectedItem?.availability !== 'Check-out'}
+              style={selectedItem?.availability !== 'Check-out' ? 
+                {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
+              onClick={() => setShowConfirmCheckInModal(true)}
+            >
+              Check-in
+            </button>
+            <button 
+              className="action-button check-out"
+              disabled={selectedItem?.availability === 'Check-out'}
+              style={selectedItem?.availability === 'Check-out' ? 
+                {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
+              onClick={() => setShowCheckoutModal(true)}
+            >
+              Check-out
+            </button>
+            <button 
+              className="action-button reserved-checkout"
+              disabled={selectedItem?.availability === 'Check-out'}
+              style={selectedItem?.availability === 'Check-out' ? 
+                {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
+            >
+              Reserved Check-out
+            </button>
+          </div>
+        </div>
+      </div>
+      {renderCheckoutModal()}
+      {renderCheckInModal()}
+    </>
   );
 };
 

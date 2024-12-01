@@ -10,7 +10,7 @@ const itemRoutes = require('../routes/items');
 const borrowingsRoutes = require('../routes/borrowings');
 const userRoutes = require('../routes/user');
 const categoryRoutes = require('../routes/categories');
-
+const withdrawalsRoutes = require('../routes/withdrawals');
 const app = express();
 
 // Add logging middleware BEFORE routes
@@ -47,6 +47,7 @@ app.use('/api/items', itemRoutes);
 app.use('/api/borrowings', borrowingsRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/withdrawals', withdrawalsRoutes);
 app.use('/api',userRoutes);
 // Global error handler
 app.use((err, req, res, next) => {

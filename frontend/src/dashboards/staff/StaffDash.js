@@ -21,6 +21,7 @@ const StaffDash = () => {
   const [showItemInfo, setShowItemInfo] = useState(false);
   const [activities, setActivities] = useState([]);
   const [inventoryAlerts, setInventoryAlerts] = useState([]);
+  const [withdrawRequests, setWithdrawRequests] = useState([]);
 
   const fetchBorrowings = async () => {
     try {
@@ -40,9 +41,19 @@ const StaffDash = () => {
     }
   };
 
+  const fetchWithdrawRequests = async () => {
+    try {
+      const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals');
+      setWithdrawRequests(response.data);
+    } catch (error) {
+      console.error('Error fetching withdraw requests:', error);
+    }
+  };
+
   useEffect(() => {
     fetchBorrowings();
     fetchActivities();
+    fetchWithdrawRequests();
   }, []);
 
   useEffect(() => {
@@ -74,8 +85,8 @@ const StaffDash = () => {
     { path: '/categories', icon: 'cube', label: 'Categories' },
   ];
 
-  const handleStatusClick = (borrow) => {
-    setSelectedBorrow(borrow);
+  const handleStatusClick = (item) => {
+    setSelectedBorrow(item);
     setShowModal(true);
   };
 
@@ -95,7 +106,7 @@ const StaffDash = () => {
 
   const handleDecline = async (borrowId) => {
     try {
-      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
+        await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
         status: 'declined'
       });
       
@@ -146,7 +157,7 @@ const StaffDash = () => {
           setShowQRScanner(false);
           
           try {
-            const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`);
+              const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`);
             if (response.data) {
               setFoundItem(response.data);
               setShowItemInfo(true);
@@ -176,7 +187,7 @@ const StaffDash = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${searchId}`);
+        const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${searchId}`);
       if (response.data) {
         setFoundItem(response.data);
         setShowItemInfo(true);
@@ -197,7 +208,7 @@ const StaffDash = () => {
       if (match) {
         const itemId = match[1];
         try {
-          const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`);
+              const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`);
           if (response.data) {
             setFoundItem(response.data);
             setShowItemInfo(true);
@@ -232,6 +243,30 @@ const StaffDash = () => {
 
   const handleViewAllReserved = () => {
     navigate('/staff/reserved');
+  };
+
+  const handleWithdrawAccept = async (withdrawId) => {
+    try {
+      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals/${withdrawId}/status`, {
+        status: 'approved'
+      });
+      setShowModal(false);
+      fetchWithdrawRequests();
+    } catch (error) {
+      console.error('Error accepting withdraw request:', error);
+    }
+  };
+
+  const handleWithdrawDecline = async (withdrawId) => {
+    try {
+      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals/${withdrawId}/status`, {
+        status: 'rejected'
+      });
+      setShowModal(false);
+      fetchWithdrawRequests();
+    } catch (error) {
+      console.error('Error declining withdraw request:', error);
+    }
   };
 
   return (
@@ -292,44 +327,41 @@ const StaffDash = () => {
               </tr>
             </thead>
             <tbody>
-              {borrowings
-                .filter(borrow => 
-                  ['reserved', 'pending', 'declined'].includes(borrow.receiptData?.status?.toLowerCase())
-                )
-                .map((borrow) => (
-                  <tr key={borrow._id}>
-                    <td>{new Date(borrow.receiptData?.borrowTime).toLocaleDateString()}</td>
-                    <td>{borrow.borrower}</td>
-                    <td>{borrow.itemId?.name}</td>
+              {[
+                ...borrowings
+                  .filter(borrow => 
+                    ['reserved', 'pending', 'declined'].includes(borrow.receiptData?.status?.toLowerCase())
+                  )
+                  .map(borrow => ({
+                    ...borrow,
+                    date: new Date(borrow.receiptData?.borrowTime),
+                    type: 'borrow'
+                  })),
+                ...withdrawRequests
+                  .filter(request => 
+                    ['pending', 'approved', 'declined'].includes(request.status?.toLowerCase())
+                  )
+                  .map(request => ({
+                    ...request,
+                    date: new Date(request.requestDate),
+                    type: 'withdraw'
+                  }))
+              ]
+                .sort((a, b) => b.date - a.date)
+                .map((item) => (
+                  <tr key={item._id}>
+                    <td>{item.date.toLocaleDateString()}</td>
+                    <td>{item.borrower}</td>
+                    <td>{item.itemId?.name}</td>
                     <td>
-                      <span className={`status-pill status-${borrow.receiptData?.status?.toLowerCase()}`}>
-                        {borrow.receiptData?.status === 'reserved' && (
-                          <span 
-                            className="status-reserved"
-                            onClick={() => handleStatusClick(borrow)}
-                            style={{ cursor: 'pointer' }}
-                          >
-                            Reserved
-                          </span>
-                        )}
-                        {borrow.receiptData?.status === 'pending' && (
-                          <span 
-                            className="status-pending"
-                            onClick={() => handleStatusClick(borrow)}
-                            style={{ cursor: 'pointer' }}
-                          >
-                            Pending
-                          </span>
-                        )}
-                        {borrow.receiptData?.status === 'declined' && (
-                          <span 
-                            className="status-declined"
-                            onClick={() => handleStatusClick(borrow)}
-                            style={{ cursor: 'pointer' }}
-                          >
-                            Declined
-                          </span>
-                        )}
+                      <span className={`status-pill status-${item.type === 'withdraw' ? item.status : item.receiptData?.status?.toLowerCase()}`}>
+                        <span 
+                          className={`status-${item.type === 'withdraw' ? item.status : item.receiptData?.status?.toLowerCase()}`}
+                          onClick={() => handleStatusClick(item)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          {item.type === 'withdraw' ? `Withdraw (${item.status})` : item.receiptData?.status}
+                        </span>
                       </span>
                     </td>
                   </tr>
@@ -412,7 +444,7 @@ const StaffDash = () => {
         <div className="modal-overlay">
           <div className="modal-content reservation-receipt">
             <div className="modal-header">
-              <h2>Reservation Receipt</h2>
+              <h2>{selectedBorrow.type === 'withdraw' ? 'Withdraw Request Receipt' : 'Reservation Receipt'}</h2>
               <span className="close-button" onClick={() => setShowModal(false)}>×</span>
             </div>
             
@@ -420,60 +452,108 @@ const StaffDash = () => {
               <img src="/dashboard-imgs/profile-placeholder.svg" alt="User" className="user-avatar" />
               <div className="user-details">
                 <h3>{selectedBorrow.borrower}</h3>
-                <p>{selectedBorrow.receiptData?.borrowerType || 'Teacher'}</p>
+                <p>{selectedBorrow.type === 'withdraw' ? 'Teacher' : selectedBorrow.receiptData?.borrowerType}</p>
               </div>
             </div>
 
-            <p className="to-borrow-label">To Borrow</p>
-            
-            <div className="item-preview">
-               <img 
-                  src={selectedBorrow.itemId?.image || "/dashboard-imgs/placeholder.svg"} 
-                  alt={selectedBorrow.itemId?.name} 
-                />
-              <div className="item-info">
-                <h3>{selectedBorrow.itemId?.name}</h3>
-                <p>{selectedBorrow.itemId?.category}</p>
-              </div>
-            </div>
-
-            <p className="date-label">Date</p>
-            <div className="date-container">
-              <div className="date-row">
-                <span>Borrow Date:</span>
-                <span>{new Date(selectedBorrow.borrowDate).toLocaleDateString()}</span>
-              </div>
-              <div className="date-row">
-                <span>Return Date:</span>
-                <span>{new Date(selectedBorrow.returnDate).toLocaleDateString()}</span>
-              </div>
-            </div>
-
-            <div className="receipt-footer">
-              <p>Borrow request ID: {selectedBorrow.receiptData?.requestId?.slice(0, 10)}</p>
-              <p>Date: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleDateString()}</p>
-              <p>Time: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-            </div>
-
-            {selectedBorrow.receiptData?.status === 'pending' ? (
-              <div className="action-container">
-                <button 
-                  className="accept-button" 
-                  onClick={() => handleAccept(selectedBorrow._id)}
-                >
-                  Accept
-                </button>
-                <div 
-                  className="decline-text"
-                  onClick={() => handleDecline(selectedBorrow._id)}
-                >
-                  Decline
+            {selectedBorrow.type === 'withdraw' ? (
+              <>
+                <p className="to-borrow-label">To Withdraw</p>
+                <div className="item-preview">
+                  <img 
+                    src={selectedBorrow.itemId?.image || "/dashboard-imgs/placeholder.svg"} 
+                    alt={selectedBorrow.itemId?.name} 
+                  />
+                  <div className="item-info">
+                    <h3>{selectedBorrow.itemId?.name}</h3>
+                    <p>QTY: {selectedBorrow.quantity}</p>
+                  </div>
                 </div>
-              </div>
-            ) : selectedBorrow.receiptData?.status === 'reserved' && (
-              <button className="checkout-button" onClick={handleCheckoutClick}>
-                Checkout
-              </button>
+
+                <p className="date-label">Claim on</p>
+                <div className="date-container">
+                  <div className="date-row">
+                    <span>Claim date:</span>
+                    <span>{new Date(selectedBorrow.withdrawDate).toLocaleDateString()}</span>
+                  </div>
+                </div>
+
+                <div className="receipt-footer">
+                  <p>Withdraw request ID: {selectedBorrow._id?.slice(0, 8)}</p>
+                  <p>Date requested: {new Date(selectedBorrow.withdrawDate).toLocaleDateString()}</p>
+                  <p>Time requested: {new Date(selectedBorrow.withdrawDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                </div>
+
+                {selectedBorrow.status === 'pending' && (
+                  <div className="action-container">
+                    <button 
+                      className="accept-button" 
+                      onClick={() => handleWithdrawAccept(selectedBorrow._id)}
+                    >
+                      Accept
+                    </button>
+                    <div 
+                      className="decline-text"
+                      onClick={() => handleWithdrawDecline(selectedBorrow._id)}
+                    >
+                      Decline
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <p className="to-borrow-label">To Borrow</p>
+                <div className="item-preview">
+                  <img 
+                    src={selectedBorrow.itemId?.image || "/dashboard-imgs/placeholder.svg"} 
+                    alt={selectedBorrow.itemId?.name} 
+                  />
+                  <div className="item-info">
+                    <h3>{selectedBorrow.itemId?.name}</h3>
+                    <p>{selectedBorrow.itemId?.category}</p>
+                  </div>
+                </div>
+
+                <p className="date-label">Date</p>
+                <div className="date-container">
+                  <div className="date-row">
+                    <span>Borrow Date:</span>
+                    <span>{new Date(selectedBorrow.borrowDate).toLocaleDateString()}</span>
+                  </div>
+                  <div className="date-row">
+                    <span>Return Date:</span>
+                    <span>{new Date(selectedBorrow.returnDate).toLocaleDateString()}</span>
+                  </div>
+                </div>
+
+                <div className="receipt-footer">
+                  <p>Borrow request ID: {selectedBorrow.receiptData?.requestId?.slice(0, 10)}</p>
+                  <p>Date: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleDateString()}</p>
+                  <p>Time: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                </div>
+
+                {selectedBorrow.receiptData?.status === 'pending' ? (
+                  <div className="action-container">
+                    <button 
+                      className="accept-button" 
+                      onClick={() => handleAccept(selectedBorrow._id)}
+                    >
+                      Accept
+                    </button>
+                    <div 
+                      className="decline-text"
+                      onClick={() => handleDecline(selectedBorrow._id)}
+                    >
+                      Decline
+                    </div>
+                  </div>
+                ) : selectedBorrow.receiptData?.status === 'reserved' && (
+                  <button className="checkout-button" onClick={handleCheckoutClick}>
+                    Checkout
+                  </button>
+                )}
+              </>
             )}
           </div>
         </div>

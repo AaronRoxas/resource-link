@@ -1,242 +1,238 @@
+.borrow-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 500px;
+    z-index: 1000;
+}
+
+.modal-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 0;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #2E7D32;
+    box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.1);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.borrow-btn {
+    flex: 1;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.borrow-btn.primary {
+    background-color: #2E7D32;
+    color: white;
+}
+
+.borrow-btn.secondary {
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.borrow-btn:hover {
+    opacity: 0.9;
+}
+
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
 }
 
-.modal-content {
+.receipt {
     background: white;
-    padding: 24px;
-    border-radius: 12px;
     width: 90%;
-    max-width: 400px;
+    max-width: 360px;
+    border-radius: 12px;
+    padding: 20px;
 }
 
-.modal-content.receipt {
-    background: white;
-    padding: 24px;
-}
-
-.modal-content h2 {
-    margin: 0 0 24px 0;
+.receipt h2 {
     font-size: 20px;
-    text-align: center;
-}
-
-.form-group {
-    margin-bottom: 16px;
-}
-
-.form-group label {
-    display: block;
-    text-align: left;
-    margin-bottom: 8px;
+    color: #333;
+    margin: 0 0 20px 0;
     font-weight: 500;
 }
 
-.form-group input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-}
-
-.button-group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 24px;
-}
-
-.borrow-btn {
-    padding: 12px;
-    background: #006E3C;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.modal-content .cancel-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #a00000;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 5px;
-}
-
-/* Receipt Styles */
 .user-info {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 16px 0;
+    padding-bottom: 16px;
     border-bottom: 1px solid #eee;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .user-avatar {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    object-fit: cover;
+    margin-right: 12px;
 }
 
 .user-details h3 {
-    margin: 0;
     font-size: 16px;
+    color: #333;
+    margin: 0;
+    font-weight: 500;
 }
 
-.user-details p {
-    margin: 4px 0 0 0;
-    color: #666;
+.user-details span {
     font-size: 14px;
+    color: #666;
 }
 
-.borrow-details h4 {
-    margin: 24px 0 12px 0;
-    color: #666;
+.item-details {
+    margin: 16px 0;
 }
 
 .item-preview {
-    display: flex;
-    gap: 16px;
-    padding: 16px;
     background: #f5f5f5;
     border-radius: 8px;
-    margin-bottom: 24px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
 }
 
 .item-preview img {
-    width: 64px;
-    height: 64px;
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
     object-fit: cover;
-    border-radius: 8px;
 }
 
-.date-details {
-    background: #f5f5f5;
-    padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 24px;
+.item-preview div h4 {
+    font-size: 15px;
+    color: #333;
+    margin: 0 0 4px 0;
+    font-weight: 500;
 }
 
-.date-details div {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
+.item-preview div span {
+    display: block;
+    font-size: 13px;
+    color: #666;
 }
 
-.receipt-footer {
-    border-top: 1px solid #eee;
-    padding-top: 16px;
-    margin-top: 24px;
+.request-info {
+    margin-top: 20px;
+}
+
+.info-row {
+    margin: 8px 0;
     font-size: 14px;
     color: #666;
 }
 
-.receipt-footer p {
-    margin: 4px 0;
-}
-
-.continue-btn {
+.receipt-close-button {
     width: 100%;
     padding: 12px;
-    background: #006E3C;
+    background: #00693E;
     color: white;
     border: none;
     border-radius: 8px;
     font-size: 16px;
+    font-weight: 500;
     cursor: pointer;
-    margin-top: 24px;
+    text-transform: capitalize;
+    margin-top: 20px;
 }
-/* Add these styles to your existing CSS */
-.edit-item-modal-content.receipt {
+
+.receipt-close-button:hover {
+    background: #005432;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 0.75rem;
+    background: #2E7D32;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background-color 0.2s;
+}
+
+.submit-button:hover {
+    background: #1b5e20;
+}
+
+.withdraw-modal {
     max-width: 400px;
 }
 
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px 0;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 24px;
+.withdraw-modal select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: white;
+    cursor: pointer;
 }
 
-.user-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    object-fit: cover;
+.withdraw-modal select:focus {
+    outline: none;
+    border-color: #2E7D32;
+    box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.1);
 }
 
-.user-details h3 {
-    margin: 0;
-    font-size: 16px;
-}
-
-.user-details p {
-    margin: 4px 0 0 0;
-    color: #666;
-    font-size: 14px;
-}
-
-.borrow-details h4 {
-    margin: 24px 0 12px 0;
-    color: #666;
-}
-
-.item-preview {
-    display: flex;
-    gap: 16px;
-    padding: 16px;
-    background: #f5f5f5;
-    border-radius: 8px;
-    margin-bottom: 24px;
-}
-
-.item-preview img {
-    width: 64px;
-    height: 64px;
-    object-fit: cover;
-    border-radius: 8px;
-}
-
-.date-details {
-    background: #f5f5f5;
-    padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 24px;
-}
-
-.date-details div {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-}
-
-.receipt-footer {
-    border-top: 1px solid #eee;
-    padding-top: 16px;
-    margin-top: 24px;
-    font-size: 14px;
-    color: #666;
-}
-
-.receipt-footer p {
-    margin: 4px 0;
+.withdraw-modal .submit-button {
+    margin-top: 2rem;
 }

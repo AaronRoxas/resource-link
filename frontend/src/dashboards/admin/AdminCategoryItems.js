@@ -31,6 +31,7 @@ const AdminCategoryItems = () => {
     const navigate = useNavigate();
     const [showItemTypeModal, setShowItemTypeModal] = useState(false);
     const [showAddConsumableModal, setShowAddConsumableModal] = useState(false);
+    const [borrowings, setBorrowings] = useState({});
 
     const navItems = [
         { path: '/admin', icon: 'home', label: 'Home' },
@@ -70,6 +71,25 @@ const AdminCategoryItems = () => {
 
             const categoryItems = itemsResponse.data.filter(item => item.category === foundCategory.name);
             setItems(categoryItems);
+
+            // Fetch borrowings for all items
+            const borrowingsResponse = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings', {
+                withCredentials: true
+            });
+
+            // Create a map of itemId to borrower info
+            const borrowingsMap = borrowingsResponse.data.reduce((acc, borrowing) => {
+                // Only include active borrowings
+                if (borrowing.receiptData?.status === 'On-going') {
+                    // Use the _id from the populated itemId object
+                    const itemId = borrowing.itemId._id;
+                    acc[itemId] = borrowing;
+                }
+                return acc;
+            }, {});
+
+            console.log('Final borrowings map:', borrowingsMap);
+            setBorrowings(borrowingsMap);
 
         } catch (error) {
             console.error('Error fetching items:', error);
@@ -652,7 +672,7 @@ const AdminCategoryItems = () => {
                             <th>Status</th>
                             <th>Check-in/Check-out</th>
                             <th>Assigned To</th>
-                            <th>Staff In Charge</th>
+                            <th>Approved By</th>
                             <th>Date</th>
                             <th>Stock</th>
                             <th>Action</th>
@@ -681,9 +701,9 @@ const AdminCategoryItems = () => {
                                         {item.availability}
                                     </span>
                                 </td>
-                                <td>{item.assignedTo}</td>
-                                <td>{item.staffInCharge}</td>
-                                <td>{item.date}</td>
+                                <td>{borrowings[item._id]?.borrower || '-'}</td>
+                                <td>{borrowings[item._id]?.receiptData?.approvedBy || '-'}</td>
+                                <td>{borrowings[item._id]?.borrowDate ? new Date(borrowings[item._id].borrowDate).toLocaleDateString() : '-'}</td>
                                 <td>{item.qty}</td>
                                 <td className="actions-cell">
                                     <div className="action-buttons-container">

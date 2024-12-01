@@ -237,5 +237,236 @@
   font-weight: bold;
   font-size: 1.1em;
 }
+
+.checkout-modal {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+}
+
+.checkout-item-preview {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 20px 0;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.checkout-item-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.checkout-item-details h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.checkout-item-details p {
+  margin: 5px 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.checkout-input, .date-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.continue-button {
+  background: #006D3B;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.continue-button:hover {
+  background: #005730;
+}
+
+label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+.employee-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.employee-option {
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+}
+
+.employee-option:last-child {
+  border-bottom: none;
+}
+
+.employee-option:hover {
+  background: #f5f5f5;
+}
+
+.employee-id {
+  font-weight: 500;
+}
+
+.employee-name {
+  color: #666;
+  font-size: 0.9em;
+}
+
+/* Add these to ensure the dropdown scrollbar looks good */
+.employee-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.employee-dropdown::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.employee-dropdown::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.employee-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.confirm-checkin-modal {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  width: 90%;
+  max-width: 480px;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.checkin-header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.checkin-header h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0;
+}
+
+.checkin-item-preview {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.checkin-item-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 16px;
+}
+
+.checkin-item-details h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.checkin-item-details .item-id {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.checkin-warning {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.checkin-warning p {
+  margin: 0 0 8px 0;
+  color: #666;
+}
   
- 
+.checkin-warning small {
+  color: #666;
+}
+
+.checkin-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.checkin-actions button {
+  padding: 8px 24px;
+  border-radius: 4px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.checkin-cancel-button {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.checkin-cancel-button:hover {
+  background-color: #dee2e6;
+}
+
+.checkin-confirm-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.checkin-confirm-button:hover {
+  background-color: #0056b3;
+}

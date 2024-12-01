@@ -21,7 +21,7 @@ const BorrowReceipt = ({ item, onClose }) => {
                 <div className="to-borrow-section">
                     <p className="section-label">To Borrow</p>
                     <div className="borrowed-item-preview">
-                        <img src="dashboard-imgs/placeholder.svg" alt={item.itemId?.name} />
+                        <img src={item.itemId?.itemImage || "dashboard-imgs/placeholder.svg"} alt={item.itemId?.name} />
                         <div>
                             <h4>{item.itemId?.name}</h4>
                             <p>{item.itemId?.category}</p>
@@ -61,26 +61,85 @@ const BorrowReceipt = ({ item, onClose }) => {
     );
 };
 
+const WithdrawReceipt = ({ item, onClose }) => {
+    return (
+        <div className="receipt-modal-overlay">
+            <div className="receipt-modal">
+                <h2>Withdrawal Request Receipt</h2>
+                
+                <div className="user-info">
+                    <img src="dashboard-imgs/profile-placeholder.svg" alt="User" className="user-avatar" />
+                    <div className="user-details">
+                        <h3>{item.borrower}</h3>
+                        <p>Teacher</p>
+                    </div>
+                </div>
+
+                <div className="to-borrow-section">
+                    <p className="section-label">To Withdraw</p>
+                    <div className="borrowed-item-preview">
+                        <img src={item.itemId?.image || "dashboard-imgs/placeholder.svg"} alt={item.itemId?.name} />
+                        <div>
+                            <h4>{item.itemId?.name}</h4>
+                            <p>{item.itemId?.category}</p>
+                            <p>Quantity: {item.quantity}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="receipt-footer">
+                    <p><b>Withdrawal request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
+                    <p>Date: {new Date(item.receiptData?.withdrawTime).toLocaleDateString()}</p>
+                    <p>Time: {new Date(item.receiptData?.withdrawTime).toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    })}</p>
+                </div>
+
+                <button className="close-btn" onClick={onClose}>
+                    Close
+                </button>
+            </div>
+        </div>
+    );
+};
+
 const TeacherInventory = () => {
     const navItems = [
         { path: '/teacher', icon: 'home', label: 'Home'},
         { path: '/teacherInventory', icon: 'active-cube', label: 'Inventory'},
     ];
     const [borrowedItems, setBorrowedItems] = useState([]);
+    const [withdrawals, setWithdrawals] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
     // const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchBorrowedItems = async () => {
+        const fetchItems = async () => {
             try {
-                const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
-                setBorrowedItems(response.data);
+                const [borrowingsRes, withdrawalsRes] = await Promise.all([
+                    axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings'),
+                    axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals')
+                ]);
+                
+                // Map the status from withdrawals to match the receipt data structure
+                const formattedWithdrawals = withdrawalsRes.data.map(withdrawal => ({
+                    ...withdrawal,
+                    receiptData: {
+                        ...withdrawal.receiptData,
+                        status: withdrawal.status // Use the status from the withdrawal model
+                    }
+                }));
+                
+                setBorrowedItems(borrowingsRes.data);
+                setWithdrawals(formattedWithdrawals);
             } catch (error) {
-                console.error('Error fetching borrowed items:', error);
+                console.error('Error fetching items:', error);
             }
         };
 
-        fetchBorrowedItems();
+        fetchItems();
     }, []);
 
     // const handleBack = () => {
@@ -116,7 +175,9 @@ const TeacherInventory = () => {
             'on-going': 'On-going',
             'pending': 'Pending',
             'reserved': 'Reserved',
-            'overdue': 'Overdue'
+            'overdue': 'Overdue',
+            'approved': 'Approved',
+            'rejected': 'Rejected'
         };
         return statusMap[status?.toLowerCase()] || status;
     };
@@ -136,52 +197,91 @@ const TeacherInventory = () => {
     return (
         <div className="teacher-inventory">
             <header>
-                <h1>Borrowed Items</h1>
+                <h1>Borrowed & Withdrawn Items</h1>
             </header>
 
             <div className="borrowed-items-grid">
-                {borrowedItems.length > 0 && borrowedItems.filter(item => item.borrower === currentUser).length > 0 ? (
-                    borrowedItems
-                        .filter(item => item.borrower === currentUser)
-                        .map(item => (
-                            <div 
-                                className="borrowed-item-card" 
-                                key={item._id}
-                                onClick={() => handleItemClick(item)}
-                            >
-                                <div className="item-image">
-                                    <img src="dashboard-imgs/placeholder.svg" alt={item.itemId?.name} />
-                                </div>
-                                <div className="item-info">
-                                    <h3>{item.itemId ? item.itemId.name : 'Item not found'}</h3>
-                                    <p className="category">
-                                        {item.itemId ? item.itemId.category : 'Category not found'}
-                                    </p>
-                                    <div className="borrow-details">
-                                        <p><b>Borrow request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
-                                        <p>{item.receiptData?.status?.toLowerCase() === 'on-going' 
-                                            ? 'Borrowed On: ' 
-                                            : 'Borrow On: '}{new Date(item.borrowDate).toLocaleDateString()}</p>
-                                        <p>Return On: {new Date(item.returnDate).toLocaleDateString()}</p>
-                                        <span className={`status-pill ${getStatus(item)}`}>
-                                            {formatStatus(getStatus(item))}
-                                        </span>
-                                    </div>
+                {/* Show borrowed items */}
+                {borrowedItems
+                    .filter(item => item.borrower === currentUser)
+                    .map(item => (
+                        <div 
+                            className="borrowed-item-card" 
+                            key={item._id}
+                            onClick={() => handleItemClick(item)}
+                        >
+                            <div className="item-image">
+                                <img src={item.itemId?.image || "dashboard-imgs/placeholder.svg"} alt={item.itemId?.name} />
+                            </div>
+                            <div className="item-info">
+                                <h3>{item.itemId ? item.itemId.name : 'Item not found'}</h3>
+                                <p className="category">
+                                    {item.itemId ? item.itemId.category : 'Category not found'}
+                                </p>
+                                <div className="borrow-details">
+                                    <p><b>Borrow request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
+                                    <p>{item.receiptData?.status?.toLowerCase() === 'on-going' 
+                                        ? 'Borrowed On: ' 
+                                        : 'Borrow On: '}{new Date(item.borrowDate).toLocaleDateString()}</p>
+                                    <p>Return On: {new Date(item.returnDate).toLocaleDateString()}</p>
+                                    <span className={`status-pill ${getStatus(item)}`}>
+                                        {formatStatus(getStatus(item))}
+                                    </span>
                                 </div>
                             </div>
-                        ))
-                ) : (
+                        </div>
+                    ))}
+
+                {/* Show withdrawals */}
+                {withdrawals
+                    .filter(item => item.borrower === currentUser)
+                    .map(item => (
+                        <div 
+                            className="borrowed-item-card" 
+                            key={item._id}
+                            onClick={() => handleItemClick({ ...item, type: 'withdrawal' })}
+                        >
+                            <div className="item-image">
+                                <img src={item.itemId?.image || "dashboard-imgs/placeholder.svg"} alt={item.itemId?.name} />
+                            </div>
+                            <div className="item-info">
+                                <h3>{item.itemId ? item.itemId.name : 'Item not found'}</h3>
+                                <p className="category">
+                                    {item.itemId ? item.itemId.category : 'Category not found'}
+                                </p>
+                                <div className="borrow-details">
+                                    <p><b>Withdrawal request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
+                                    <p>Withdraw Date: {new Date(item.withdrawDate).toLocaleDateString()}</p>
+                                    <p>Quantity: {item.quantity}</p>
+                                    <span className={`status-pill ${item.status.toLowerCase()}`}>
+                                        {formatStatus(item.status)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+
+                {/* Show no items message if both arrays are empty */}
+                {borrowedItems.filter(item => item.borrower === currentUser).length === 0 && 
+                 withdrawals.filter(item => item.borrower === currentUser).length === 0 && (
                     <div className="no-items-message">
-                        <p>No items borrowed.</p>
+                        <p>No items borrowed or withdrawn.</p>
                     </div>
                 )}
             </div>
             
             {selectedItem && (
-                <BorrowReceipt 
-                    item={selectedItem} 
-                    onClose={() => setSelectedItem(null)} 
-                />
+                selectedItem.type === 'withdrawal' ? (
+                    <WithdrawReceipt 
+                        item={selectedItem} 
+                        onClose={() => setSelectedItem(null)} 
+                    />
+                ) : (
+                    <BorrowReceipt 
+                        item={selectedItem} 
+                        onClose={() => setSelectedItem(null)} 
+                    />
+                )
             )}
             
             <BottomNav navItems={navItems} />

@@ -14,10 +14,6 @@ import PublicRoute from './PublicRoute';
 import ChangePassword from './components/ChangePassword.js';
 import AdminChart from './dashboards/admin/AdminChart.js';
 import AddItem from './dashboards/admin/AddItem.js';
-import ViewDevices from './dashboards/teacher/ViewDevices.js';
-import ViewLabEquipments from './dashboards/teacher/ViewLabEquipments.js';
-import ViewBooks from './dashboards/teacher/ViewBooks.js';
-import ViewMisc from './dashboards/teacher/ViewMisc.js';
 import TeacherInventory from './dashboards/teacher/TeacherInventory.js';
 import ItemPage from './components/ItemPage';
 import QRScan from './components/QRScan.js';
@@ -30,7 +26,7 @@ import ReservedItems from './components/ReservedItems';
 import AdminCategoryItems from './dashboards/admin/AdminCategoryItems.js';
 import ItemInformation from './components/ItemInformation';
 import AdminManageUser from './dashboards/admin/AdminManageUser';
-
+import TeacherCategoryItems from './dashboards/teacher/TeacherCategoryItems';
 function App() {
   return (
     <Router>
@@ -77,38 +73,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/viewDevices"
-          element={
-            <ProtectedRoute allowedRoles={['teacher']}>
-              <ViewDevices/>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/viewBooks"
-          element={
-            <ProtectedRoute allowedRoles={['teacher']}>
-              <ViewBooks/>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/viewLabEquipments"
-          element={
-            <ProtectedRoute allowedRoles={['teacher']}>
-              <ViewLabEquipments/>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/viewMisc"
-          element={
-            <ProtectedRoute allowedRoles={['teacher']}>
-              <ViewMisc/>
-            </ProtectedRoute>
-          }
-        />
+
         <Route
           path="/admin"
           element={
@@ -255,6 +220,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <AdminManageUser />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/teacher/category/:categoryName" 
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <TeacherCategoryItems />
             </ProtectedRoute>
           } 
         />

@@ -35,6 +35,11 @@ router.post('/', async (req, res) => {
   try {
     const { itemId, borrower, borrowDate, returnDate, receiptData } = req.body;
 
+    // Validate required receipt data
+    if (!receiptData.approvedBy) {
+      return res.status(400).json({ message: 'Approver information is required' });
+    }
+
     // Check if item exists and has available stock
     const item = await Item.findById(itemId);
     if (!item) {
@@ -45,18 +50,19 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Item is out of stock' });
     }
 
-    // Create new borrowing
+    // Create new borrowing with approver info
     const newBorrowing = new Borrowing({
       itemId,
       borrower,
       borrowDate,
       returnDate,
-      receiptData
+      receiptData: {
+        ...receiptData,
+        approvedBy: receiptData.approvedBy
+      }
     });
 
     const savedBorrowing = await newBorrowing.save();
-    
-    // Populate item details if needed
     const populatedBorrowing = await savedBorrowing.populate('itemId');
 
     res.status(201).json(populatedBorrowing);
@@ -108,7 +114,7 @@ router.delete('/:id', async (req, res) => {
 // Update borrowing status
 router.patch('/:id/status', async (req, res) => {
     try {
-        const { status, borrowDate, returnDate } = req.body;
+        const { status, borrowDate, returnDate, approvedBy } = req.body;
         const borrowing = await Borrowing.findById(req.params.id);
         
         if (!borrowing) {
@@ -123,6 +129,7 @@ router.patch('/:id/status', async (req, res) => {
         
         if (borrowDate) borrowing.borrowDate = borrowDate;
         if (returnDate) borrowing.returnDate = returnDate;
+        if (approvedBy) borrowing.receiptData.approvedBy = approvedBy;
 
         const updatedBorrowing = await borrowing.save();
         res.json(updatedBorrowing);
@@ -165,10 +172,11 @@ router.patch('/request/:requestId', async (req, res) => {
   }
 });
 
+// Update status with approver info
 router.patch('/updateStatus', async (req, res) => {
   try {
-    const { requestId, status } = req.body;
-    console.log('Received request to update status:', { requestId, status });
+    const { requestId, status, approvedBy } = req.body;
+    console.log('Received request to update status:', { requestId, status, approvedBy });
 
     const borrowing = await Borrowing.findOne({
       'receiptData.requestId': requestId
@@ -180,6 +188,10 @@ router.patch('/updateStatus', async (req, res) => {
     }
 
     borrowing.receiptData.status = status;
+    if (approvedBy) {
+      borrowing.receiptData.approvedBy = approvedBy;
+    }
+    
     // Set availability to match status when it's "On-going"
     if (status === 'On-going') {
       borrowing.receiptData.availability = 'Check-out';
@@ -192,6 +204,29 @@ router.patch('/updateStatus', async (req, res) => {
   } catch (error) {
     console.error('Error updating borrowing:', error);
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Add this new route for returning items
+router.put('/:id/return', async (req, res) => {
+  try {
+    const borrowing = await Borrowing.findOneAndUpdate(
+      { itemId: req.params.id, 'receiptData.status': { $ne: 'Returned' } },
+      { 
+        'receiptData.status': 'Returned',
+        'receiptData.availability': 'Check-in'
+      },
+      { new: true }
+    );
+
+    if (!borrowing) {
+      return res.status(404).json({ message: 'Active borrowing not found for this item' });
+    }
+
+    res.json(borrowing);
+  } catch (error) {
+    console.error('Error updating borrowing:', error);
+    res.status(500).json({ message: 'Error updating borrowing status' });
   }
 });
 
