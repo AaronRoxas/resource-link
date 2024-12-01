@@ -62,9 +62,14 @@ const AdminInventory = () => {
     const handleImageSelect = (e) => {
         const file = e.target.files[0];
         if (file) {
+            if (file.size > 5000000) { // 5MB limit
+                alert('File is too large. Please choose an image under 5MB.');
+                return;
+            }
+            
             const reader = new FileReader();
             reader.onloadend = () => {
-                setSelectedImage(reader.result);
+                setSelectedImage(reader.result); // This is already base64
                 setImagePreview(reader.result);
             };
             reader.readAsDataURL(file);
@@ -74,12 +79,17 @@ const AdminInventory = () => {
     const handleSubmitCategory = async (e) => {
         e.preventDefault();
         try {
+            if (!selectedImage) {
+                alert('Please select an image');
+                return;
+            }
+
             const response = await axios.post(
                 'https://resource-link-main-14c755858b60.herokuapp.com/api/categories',
                 {
                     name: newCategory.name,
                     description: newCategory.description,
-                    image: selectedImage
+                    image: selectedImage // Already base64 encoded
                 },
                 { 
                     withCredentials: true,
@@ -92,6 +102,7 @@ const AdminInventory = () => {
             handleCloseModal();
         } catch (error) {
             console.error('Error creating category:', error);
+            alert('Failed to create category. Please try again.');
         }
     };
 

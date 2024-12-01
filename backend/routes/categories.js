@@ -12,13 +12,14 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Create new category
+// Create new category - using base64 image directly
 router.post('/', async (req, res) => {
     try {
+        // The image is already base64 encoded from the frontend
         const category = new Category({
             name: req.body.name,
             description: req.body.description,
-            image: req.body.image
+            image: req.body.image // This is the base64 string
         });
         const newCategory = await category.save();
         res.status(201).json(newCategory);
