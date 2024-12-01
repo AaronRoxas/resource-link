@@ -37,11 +37,21 @@ const QRScan = () => {
       console.log('QR Code scanned:', data.text);
       try {
         const url = new URL(data.text);
-        if (url.hostname === 'resource-link.vercel.app') {
-          const pathParts = url.pathname.split('/');
-          const itemId = pathParts[pathParts.length - 1];
-          const category = pathParts[pathParts.length - 2];
-          
+        console.log('Parsed URL:', {
+          hostname: url.hostname,
+          pathname: url.pathname,
+          fullUrl: url.href
+        });
+
+        const pathParts = url.pathname.split('/');
+        console.log('Path parts:', pathParts);
+        
+        const itemId = pathParts[pathParts.length - 1];
+        const category = pathParts[pathParts.length - 2];
+        
+        console.log('Extracted:', { category, itemId });
+        
+        if (itemId && category) {
           setShowQRScanner(false);
           
           try {
@@ -56,11 +66,12 @@ const QRScan = () => {
             alert('Error searching for item');
           }
         } else {
-          alert('Invalid QR code format');
+          alert('Could not extract item information from QR code');
         }
       } catch (error) {
-        console.error('Invalid URL format:', error);
-        alert('Invalid QR code format');
+        console.error('QR code parsing error:', error);
+        console.error('QR code content:', data.text);
+        alert('Invalid QR code format. Please try again.');
       }
     }
   };

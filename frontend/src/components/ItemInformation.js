@@ -48,8 +48,10 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo }
   };
 
   const getItemUrl = () => {
-    if (selectedItem && userRole) {
-      return `https://resource-link.vercel.app/${userRole}/category/${selectedItem.category.toLowerCase()}/${selectedItem.id}`;
+    if (selectedItem) {
+      const category = selectedItem.category.toLowerCase().trim();
+      const itemId = selectedItem.id.trim();
+      return `https://resource-link.vercel.app/staff/category/${category}/${itemId}`;
     }
     return '';
   };
@@ -97,14 +99,6 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo }
               <div className="info-label">Notes</div>
               <div className="info-value">{selectedItem?.notes || '-'}</div>
             </div>
-            <div className="info-row">
-              <div className="info-label">Direct Link</div>
-              <div className="info-value">
-                <a href={getItemUrl()} target="_blank" rel="noopener noreferrer">
-                  {getItemUrl()}
-                </a>
-              </div>
-            </div>
           </div>
         );
       case 'History':
@@ -114,22 +108,32 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo }
           </div>
         );
       case 'QR Code':
+        const qrUrl = getItemUrl();
+        console.log('Generated QR URL:', qrUrl);
+        
         return (
           <div className="qr-code-content">
             <div className="qr-code-container">
               <div className="item-id">ID: {selectedItem?.id}</div>
               <QRCodeSVG
-                value={getItemUrl()}
-                size={200}
+                value={qrUrl}
+                size={256}
                 level="H"
                 includeMargin={true}
+                style={{
+                  width: '100%',
+                  maxWidth: '256px',
+                  height: 'auto',
+                  padding: '20px',
+                  background: 'white'
+                }}
               />
-              <div className="qr-url">{getItemUrl()}</div>
+              <div className="qr-url">
+                Scan to view item details:<br />
+                <small>{qrUrl}</small>
+              </div>
             </div>
             <div className="qr-code-actions">
-              <button className="qr-action-button" onClick={() => window.print()}>
-                Print
-              </button>
               <button 
                 className="qr-action-button"
                 onClick={() => {
@@ -151,7 +155,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo }
                   img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
                 }}
               >
-                Download
+                Download QR
               </button>
             </div>
           </div>

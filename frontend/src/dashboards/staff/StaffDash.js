@@ -492,7 +492,7 @@ const StaffDash = () => {
             <div className="search-section">
               <input 
                 type="text" 
-                placeholder="DEV-1" 
+                placeholder="D-0000" 
                 className="search-input"
                 value={searchId}
                 onChange={(e) => setSearchId(e.target.value)}
