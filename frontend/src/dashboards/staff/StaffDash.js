@@ -92,7 +92,7 @@ const StaffDash = () => {
 
   const handleAccept = async (borrowId) => {
     try {
-      await axios.patch(`http://localhost:5000/api/borrowings/${borrowId}/status`, {
+      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
         status: 'reserved'
       });
       
@@ -106,7 +106,7 @@ const StaffDash = () => {
 
   const handleDecline = async (borrowId) => {
     try {
-      await axios.patch(`http://localhost:5000/api/borrowings/${borrowId}/status`, {
+      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
         status: 'declined'
       });
       
@@ -157,7 +157,7 @@ const StaffDash = () => {
           setShowQRScanner(false);
           
           try {
-            const response = await axios.get(`http://localhost:5000/api/items/find/${itemId}`);
+            const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`);
             if (response.data) {
               setFoundItem(response.data);
               setShowItemInfo(true);
@@ -187,7 +187,7 @@ const StaffDash = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/items/find/${searchId}`);
+      const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${searchId}`);
       if (response.data) {
         setFoundItem(response.data);
         setShowItemInfo(true);
@@ -208,7 +208,7 @@ const StaffDash = () => {
       if (match) {
         const itemId = match[1];
         try {
-          const response = await axios.get(`http://localhost:5000/api/items/find/${itemId}`);
+          const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`);
           if (response.data) {
             setFoundItem(response.data);
             setShowItemInfo(true);
