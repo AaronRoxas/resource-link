@@ -5,9 +5,9 @@ const AdminChart = () => {
     const navItems = [
         { path: '/admin', icon: 'home', label: 'Home' },
         { path: '/adminChart', icon: 'active-chart', label: 'Chart' },
-        { path: '/addItem', icon: 'qr', label: 'Add Item' },
+        
         { path: '/addUser', icon: 'profile', label: 'Add User' },
-        { path: '/adminCategories', icon: 'cube', label: 'Categories' },
+        { path: '/admin/inventory', icon: 'cube', label: 'Inventory' },
       ];
   return (
     <div>

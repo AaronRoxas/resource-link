@@ -14,30 +14,34 @@ const AdminCategoryItems = () => {
     const [newSubCategory, setNewSubCategory] = useState('');
     const [showAddItemModal, setShowAddItemModal] = useState(false);
     const [newItem, setNewItem] = useState({
+        type: '',
         name: '',
         serialNo: '',
         purchaseDate: '',
         purchaseCost: '',
         notes: '',
         image: null,
-        subCategory: ''
+        subCategory: '',
+        qty: 0,
+        id: ''
     });
     const [selectedItems, setSelectedItems] = useState([]);
     const [showItemInfo, setShowItemInfo] = useState(false);
     const { categoryName: urlCategoryName } = useParams();
     const navigate = useNavigate();
+    const [showItemTypeModal, setShowItemTypeModal] = useState(false);
+    const [showAddConsumableModal, setShowAddConsumableModal] = useState(false);
 
     const navItems = [
         { path: '/admin', icon: 'home', label: 'Home' },
         { path: '/admin/inventory', icon: 'chart', label: 'Chart' },
-        { path: '/adminQr', icon: 'qr', label: 'QR' },
         { path: '/addUser', icon: 'profile', label: 'Add User' },
-        { path: '/adminUsers', icon: 'active-cube', label: 'Inventory' }
+        { path: '/admin/inventory', icon: 'cube', label: 'Inventory' },
     ];
 
     const fetchCategoryItems = async () => {
         try {
-            const categoriesResponse = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/categories', {
+            const categoriesResponse = await axios.get('http://localhost:5000/api/categories', {
                 withCredentials: true
             });
             
@@ -60,7 +64,7 @@ const AdminCategoryItems = () => {
                 }));
             }
 
-            const itemsResponse = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', {
+            const itemsResponse = await axios.get('http://localhost:5000/api/inventory', {
                 withCredentials: true
             });
 
@@ -103,7 +107,7 @@ const AdminCategoryItems = () => {
         e.preventDefault();
         try {
             await axios.patch(
-                `https://resource-link-main-14c755858b60.herokuapp.com/api/categories/${category._id}/subcategories`,
+                `http://localhost:5000/api/categories/${category._id}/subcategories`,
                 { name: newSubCategory },
                 { withCredentials: true }
             );
@@ -120,7 +124,42 @@ const AdminCategoryItems = () => {
 
     const handleAddItem = () => {
         setShowDropdown(false);
-        setShowAddItemModal(true);
+        setShowItemTypeModal(true);
+    };
+
+    const handleItemTypeSelect = (type) => {
+        setNewItem(prev => ({ ...prev, type }));
+        setShowItemTypeModal(false);
+        if (type === 'Non-Consumable') {
+            setShowAddItemModal(true);
+        } else if (type === 'Consumable') {
+            setShowAddConsumableModal(true);
+        }
+    };
+
+    const handleIdChange = async (e) => {
+        const enteredId = e.target.value.toUpperCase();
+        setNewItem(prev => ({
+            ...prev,
+            id: enteredId
+        }));
+
+        if (enteredId) {
+            const existingItem = items.find(item => item.id === enteredId);
+            if (existingItem) {
+                setNewItem({
+                    type: 'Consumable',
+                    name: existingItem.name,
+                    purchaseDate: existingItem.purchaseDate.split('T')[0],
+                    purchaseCost: existingItem.purchaseCost,
+                    notes: existingItem.notes || '',
+                    image: existingItem.itemImage || null,
+                    subCategory: existingItem.subCategory,
+                    qty: existingItem.qty || 0,
+                    id: existingItem.id
+                });
+            }
+        }
     };
 
     const handleSubmitItem = async (e) => {
@@ -128,46 +167,64 @@ const AdminCategoryItems = () => {
         try {
             let imageBase64 = '';
             if (newItem.image) {
-                const reader = new FileReader();
-                imageBase64 = await new Promise((resolve) => {
-                    reader.onload = (e) => resolve(e.target.result);
-                    reader.readAsDataURL(newItem.image);
-                });
+                if (typeof newItem.image === 'string') {
+                    imageBase64 = newItem.image;
+                } else {
+                    const reader = new FileReader();
+                    imageBase64 = await new Promise((resolve) => {
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.readAsDataURL(newItem.image);
+                    });
+                }
             }
 
             const itemData = {
                 name: newItem.name,
-                serialNo: newItem.serialNo,
                 purchaseDate: newItem.purchaseDate,
                 purchaseCost: newItem.purchaseCost,
                 notes: newItem.notes,
                 category: categoryName,
                 subCategory: newItem.subCategory,
                 itemImage: imageBase64,
-                status: 'Good Condition'
+                status: 'Good Condition',
+                itemType: newItem.type,
+                id: newItem.id,
+                qty: newItem.type === 'Non-Consumable' ? 1 : newItem.qty,
+                serialNo: newItem.type === 'Non-Consumable' ? newItem.serialNo : undefined
             };
 
-            console.log('Submitting item with data:', itemData);
+            const existingItem = items.find(item => item.id === newItem.id);
+            
+            if (existingItem) {
+                await axios.put(`http://localhost:5000/api/inventory/${existingItem._id}`, itemData, {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                toast.success('Item updated successfully!');
+            } else {
+                await axios.post('http://localhost:5000/api/inventory', itemData, {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                toast.success('Item added successfully!');
+            }
 
-            const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', itemData, {
-                withCredentials: true,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            console.log('Server response:', response.data);
-
-            toast.success('Item added successfully!');
-            setShowAddItemModal(false);
+            setShowAddConsumableModal(false);
             setNewItem({
+                type: '',
                 name: '',
                 serialNo: '',
                 purchaseDate: '',
                 purchaseCost: '',
                 notes: '',
                 image: null,
-                subCategory: category?.subCategories?.[0]?.name || ''
+                subCategory: category?.subCategories?.[0]?.name || '',
+                qty: 0,
+                id: ''
             });
             fetchCategoryItems();
         } catch (error) {
@@ -192,6 +249,33 @@ const AdminCategoryItems = () => {
         if (selectedItems.length === 1) {
             setShowItemInfo(false);
         }
+    };
+
+    const generateAbbreviatedId = (itemName) => {
+        if (!itemName) return '';
+
+        const categoryPrefix = categoryName.charAt(0).toUpperCase();
+        
+        const similarIds = items
+            .filter(item => item.id.startsWith(categoryPrefix))
+            .map(item => {
+                const num = parseInt(item.id.split('-')[1]);
+                return isNaN(num) ? 0 : num;
+            });
+
+        const nextNum = similarIds.length > 0 ? Math.max(...similarIds) + 1 : 1;
+        const formattedNum = String(nextNum).padStart(4, '0');
+        
+        return `${categoryPrefix}-${formattedNum}`;
+    };
+
+    const handleNameChange = (e) => {
+        const newName = e.target.value;
+        setNewItem(prev => ({
+            ...prev,
+            name: newName,
+            id: generateAbbreviatedId(newName)
+        }));
     };
 
     return (
@@ -262,6 +346,39 @@ const AdminCategoryItems = () => {
                 </div>
             )}
 
+            {showItemTypeModal && (
+                <div className="modal-backdrop">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h2>Add new Item</h2>
+                            <button 
+                                className="close-button"
+                                onClick={() => setShowItemTypeModal(false)}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <div className="form-group">
+                            <label>Type</label>
+                            <select
+                                onChange={(e) => handleItemTypeSelect(e.target.value)}
+                                defaultValue=""
+                            >
+                                <option value="" disabled>Select type</option>
+                                <option value="Consumable">Consumable</option>
+                                <option value="Non-Consumable">Non-Consumable</option>
+                            </select>
+                        </div>
+                        <button 
+                            className="cancel-button"
+                            onClick={() => setShowItemTypeModal(false)}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {showAddItemModal && (
                 <div className="modal-backdrop">
                     <div className="modal-content">
@@ -323,10 +440,7 @@ const AdminCategoryItems = () => {
                                 <input
                                     type="text"
                                     value={newItem.name}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        name: e.target.value
-                                    })}
+                                    onChange={handleNameChange}
                                     required
                                 />
                             </div>
@@ -384,6 +498,120 @@ const AdminCategoryItems = () => {
                 </div>
             )}
 
+            {showAddConsumableModal && (
+                <div className="modal-backdrop">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h2>Add new Consumable Item</h2>
+                            <button 
+                                className="close-button"
+                                onClick={() => setShowAddConsumableModal(false)}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <form onSubmit={handleSubmitItem}>
+                            <div className="form-group">
+                                <label>Add Image</label>
+                                <div className="image-upload-box">
+                                    {newItem.image ? (
+                                        <img 
+                                            src={typeof newItem.image === 'string' ? newItem.image : URL.createObjectURL(newItem.image)} 
+                                            alt="Preview" 
+                                            className="image-preview"
+                                        />
+                                    ) : (
+                                        <div className="upload-placeholder">
+                                            <span>+</span>
+                                        </div>
+                                    )}
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            image: e.target.files[0]
+                                        })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label>Type</label>
+                                <input type="text" value="Consumable" readOnly />
+                            </div>
+                            <div className="form-group">
+                                <label>ID</label>
+                                <input
+                                    type="text"
+                                    value={newItem.id}
+                                    onChange={handleIdChange}
+                                    placeholder="Enter item ID to search"
+                                 
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Name</label>
+                                <input
+                                    type="text"
+                                    value={newItem.name}
+                                    onChange={handleNameChange}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Purchase Date</label>
+                                <input
+                                    type="date"
+                                    value={newItem.purchaseDate}
+                                    onChange={(e) => setNewItem({
+                                        ...newItem,
+                                        purchaseDate: e.target.value
+                                    })}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Purchase Cost</label>
+                                <input
+                                    type="number"
+                                    value={newItem.purchaseCost}
+                                    onChange={(e) => setNewItem({
+                                        ...newItem,
+                                        purchaseCost: e.target.value
+                                    })}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Qty</label>
+                                <input
+                                    type="number"
+                                    value={newItem.qty}
+                                    onChange={(e) => setNewItem({
+                                        ...newItem,
+                                        qty: e.target.value
+                                    })}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Notes</label>
+                                <textarea
+                                    value={newItem.notes}
+                                    onChange={(e) => setNewItem({
+                                        ...newItem,
+                                        notes: e.target.value
+                                    })}
+                                />
+                            </div>
+                            <button type="submit" className="done-button">
+                                Done
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             {showItemInfo && selectedItems.map(item => (
                 <ItemInformation 
                     key={item._id}
@@ -406,8 +634,11 @@ const AdminCategoryItems = () => {
                             <th>Sub-category</th>
                             <th>Status</th>
                             <th>Check-in/Check-out</th>
+                            <th>Assigned To</th>
                             <th>Staff In Charge</th>
                             <th>Date</th>
+                            <th>Stock</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -433,8 +664,11 @@ const AdminCategoryItems = () => {
                                         {item.availability}
                                     </span>
                                 </td>
+                                <td>{item.assignedTo}</td>
                                 <td>{item.staffInCharge}</td>
                                 <td>{item.date}</td>
+                                <td>{item.qty}</td>
+                                <td>{item.action}</td>
                             </tr>
                         ))}
                     </tbody>
