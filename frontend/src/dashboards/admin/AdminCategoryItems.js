@@ -235,13 +235,7 @@ const AdminCategoryItems = () => {
     };
 
     const handleItemClick = (item) => {
-        const isAlreadySelected = selectedItems.some(selected => selected._id === item._id);
-        if (isAlreadySelected) {
-            setSelectedItems(selectedItems.filter(selected => selected._id !== item._id));
-        } else {
-            setSelectedItems([...selectedItems, item]);
-        }
-        setShowItemInfo(true);
+        navigate(`/admin/category/${item.category.toLowerCase()}/${item.id}`);
     };
 
     const handleCloseItemInfo = (itemId) => {
@@ -611,18 +605,6 @@ const AdminCategoryItems = () => {
                     </div>
                 </div>
             )}
-
-            {showItemInfo && selectedItems.map(item => (
-                <ItemInformation 
-                    key={item._id}
-                    selectedItem={item}
-                    handleCloseItemInfo={() => handleCloseItemInfo(item._id)}
-                    onBorrowingComplete={() => {
-                        fetchCategoryItems();
-                        handleCloseItemInfo(item._id);
-                    }}
-                />
-            ))}
 
             <div className="items-table">
                 <table>

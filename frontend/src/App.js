@@ -225,6 +225,30 @@ function App() {
         <Route path="/admin/category/:categoryName" element={<AdminCategoryItems />} />
         <Route path="/admin/item/:itemId" element={<ItemInformation />} />
         <Route path="/staff/item/:itemId" element={<ItemInformation />} />
+        <Route 
+          path="/item/:itemId" 
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'staff']}>
+              <ItemInformation />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/category/:categoryName/:itemId" 
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <ItemInformation />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/staff/category/:categoryName/:itemId" 
+          element={
+            <ProtectedRoute allowedRoles={['staff']}>
+              <ItemInformation />
+            </ProtectedRoute>
+          } 
+        />
         {/* Other routes */}
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />

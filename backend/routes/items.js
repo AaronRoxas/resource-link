@@ -50,13 +50,19 @@ router.put('/:id', async (req, res) => {
    // GET route for fetching an item by ID
    router.get('/:id', async (req, res) => {
     try {
-        const item = await Item.findById(req.params.id);
+        console.log('Searching for item with ID:', req.params.id); // Debug log
+        const item = await Item.findOne({ id: req.params.id });
+        
         if (!item) {
+            console.log('Item not found'); // Debug log
             return res.status(404).json({ message: 'Item not found' });
         }
-        res.status(200).json(item);
+        
+        console.log('Found item:', item); // Debug log
+        res.json(item);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error fetching item:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
@@ -169,12 +175,12 @@ router.post('/bulk', async (req, res) => {
   }
 });
 
-// Add this new route to find item by ID
+// Use the existing find route
 router.get('/find/:itemId', async (req, res) => {
   try {
     const { itemId } = req.params;
     console.log('Searching for item with ID:', itemId);
-    const item = await Item.findOne({ id: new RegExp(`^${itemId}$`, 'i') });
+    const item = await Item.findOne({ id: itemId });
     
     if (!item) {
       console.log('Item not found in database');
