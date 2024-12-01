@@ -97,27 +97,12 @@ router.post('/borrow/:id', async (req, res) => {
 // POST route to create a new inventory item
 router.post('/', async (req, res) => {
   try {
-    console.log('Received item data:', req.body);
-
-    const newItem = new Item({
-      name: req.body.name,
-      serialNo: req.body.serialNo,
-      purchaseDate: req.body.purchaseDate,
-      purchaseCost: req.body.purchaseCost,
-      notes: req.body.notes,
-      category: req.body.category,
-      subCategory: req.body.subCategory,
-      itemImage: req.body.itemImage,
-      status: req.body.status || 'Good Condition',
-      availability: req.body.availability || 'Check-in'
-    });
-
+    const newItem = new Item(req.body);
     const savedItem = await newItem.save();
-    console.log('Saved item:', savedItem);
     res.status(201).json(savedItem);
-  } catch (err) {
-    console.error('Error adding item:', err);
-    res.status(500).json({ error: 'Internal Server Error', details: err.message });
+  } catch (error) {
+    console.error('Error creating inventory item:', error);
+    res.status(500).json({ message: 'Error creating inventory item', error: error.message });
   }
 });
 
