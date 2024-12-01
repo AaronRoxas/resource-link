@@ -41,7 +41,7 @@ const AdminCategoryItems = () => {
 
     const fetchCategoryItems = async () => {
         try {
-            const categoriesResponse = await axios.get('http://localhost:5000/api/categories', {
+            const categoriesResponse = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/categories', {
                 withCredentials: true
             });
             
@@ -64,7 +64,7 @@ const AdminCategoryItems = () => {
                 }));
             }
 
-            const itemsResponse = await axios.get('http://localhost:5000/api/inventory', {
+            const itemsResponse = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', {
                 withCredentials: true
             });
 
@@ -107,7 +107,7 @@ const AdminCategoryItems = () => {
         e.preventDefault();
         try {
             await axios.patch(
-                `http://localhost:5000/api/categories/${category._id}/subcategories`,
+                `https://resource-link-main-14c755858b60.herokuapp.com/api/categories/${category._id}/subcategories`,
                 { name: newSubCategory },
                 { withCredentials: true }
             );
@@ -196,7 +196,7 @@ const AdminCategoryItems = () => {
             const existingItem = items.find(item => item.id === newItem.id);
             
             if (existingItem) {
-                await axios.put(`http://localhost:5000/api/inventory/${existingItem._id}`, itemData, {
+                await axios.put(`https://resource-link-main-14c755858b60.herokuapp.com/api/inventory/${existingItem._id}`, itemData, {
                     withCredentials: true,
                     headers: {
                         'Content-Type': 'application/json'
@@ -204,7 +204,7 @@ const AdminCategoryItems = () => {
                 });
                 toast.success('Item updated successfully!');
             } else {
-                await axios.post('http://localhost:5000/api/inventory', itemData, {
+                await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', itemData, {
                     withCredentials: true,
                     headers: {
                         'Content-Type': 'application/json'

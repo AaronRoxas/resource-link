@@ -35,7 +35,7 @@ const AdminDash = () => {
   useEffect(() => {
     const fetchInventoryAlerts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/items');
+        const response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/items');
         const data = await response.json();
         // Filter items that need attention (low stock, maintenance, repair)
         const alerts = data.filter(item => 
@@ -54,7 +54,7 @@ const AdminDash = () => {
 
   const fetchBorrowings = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/borrowings');
+      const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
       setBorrowings(response.data);
     } catch (error) {
       console.error('Error fetching borrowings:', error);
@@ -63,7 +63,7 @@ const AdminDash = () => {
 
   const fetchActivities = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/activities');
+      const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/activities');
       setActivities(response.data);
     } catch (error) {
       console.error('Error fetching activities:', error);
@@ -78,7 +78,7 @@ const AdminDash = () => {
   useEffect(() => {
     const fetchReservedItems = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/borrowings');
+        const response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
         const data = await response.json();
         // Filter only items with status: reserved, pending, or declined
         const filteredData = data.filter(item => 
