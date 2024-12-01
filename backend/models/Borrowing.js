@@ -28,6 +28,9 @@ const borrowingSchema = new mongoose.Schema({
             type: Date,
             default: Date.now
         },
+        returnTime: {
+            type: Date
+        },
         status: {
             type: String
         },

@@ -92,7 +92,7 @@ const StaffDash = () => {
 
   const handleAccept = async (borrowId) => {
     try {
-      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
+      await axios.patch(`http://localhost:5000/api/borrowings/${borrowId}/status`, {
         status: 'reserved'
       });
       
@@ -106,7 +106,7 @@ const StaffDash = () => {
 
   const handleDecline = async (borrowId) => {
     try {
-        await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
+      await axios.patch(`http://localhost:5000/api/borrowings/${borrowId}/status`, {
         status: 'declined'
       });
       
@@ -157,7 +157,7 @@ const StaffDash = () => {
           setShowQRScanner(false);
           
           try {
-              const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`);
+            const response = await axios.get(`http://localhost:5000/api/items/find/${itemId}`);
             if (response.data) {
               setFoundItem(response.data);
               setShowItemInfo(true);
@@ -187,7 +187,7 @@ const StaffDash = () => {
 
   const handleSearch = async () => {
     try {
-        const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${searchId}`);
+      const response = await axios.get(`http://localhost:5000/api/items/find/${searchId}`);
       if (response.data) {
         setFoundItem(response.data);
         setShowItemInfo(true);
@@ -208,7 +208,7 @@ const StaffDash = () => {
       if (match) {
         const itemId = match[1];
         try {
-              const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`);
+          const response = await axios.get(`http://localhost:5000/api/items/find/${itemId}`);
           if (response.data) {
             setFoundItem(response.data);
             setShowItemInfo(true);
@@ -392,36 +392,23 @@ const StaffDash = () => {
               </tr>
             </thead>
             <tbody>
-              {/* Combine and sort both borrowings and activities */}
-              {[...borrowings
-                .filter(borrowing => borrowing.receiptData?.status === 'On-going')
-                .map(borrowing => ({
-                  date: new Date(borrowing.borrowDate),
-                  borrower: borrowing.borrower,
-                  itemName: borrowing.itemId?.name,
-                  action: 'Check-out',
-                  _id: borrowing._id,
-                  type: 'borrowing'
-                })),
-                ...activities.map(activity => ({
-                  date: new Date(activity.timestamp),
-                  borrower: activity.borrower,
-                  itemName: activity.itemName,
-                  action: activity.action,
-                  _id: activity._id,
-                  type: 'activity'
-                }))
-              ]
-                .sort((a, b) => b.date - a.date) // Sort by date, newest first
-                .slice(0, 10) // Take only the first 5 items
-                .map((item) => (
-                  <tr key={item._id}>
-                    <td>{item.date.toLocaleDateString()}</td>
-                    <td>{item.borrower}</td>
-                    <td>{item.itemName}</td>
+              {activities
+                .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                .slice(0, 10) // Keep only the 10 most recent activities
+                .map((activity) => (
+                  <tr key={activity._id}>
                     <td>
-                      <span className={`action-badge ${getActionStyle(item.action)}`}>
-                        {item.action.toLowerCase()}
+                      {new Date(activity.timestamp).toLocaleDateString()}, {new Date(activity.timestamp).toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}
+                    </td>
+                    <td>{activity.borrower}</td>
+                    <td>{activity.itemName}</td>
+                    <td>
+                      <span className={`action-badge ${getActionStyle(activity.action)}`}>
+                        {activity.action.toLowerCase()}
                       </span>
                     </td>
                   </tr>
@@ -452,108 +439,60 @@ const StaffDash = () => {
               <img src="/dashboard-imgs/profile-placeholder.svg" alt="User" className="user-avatar" />
               <div className="user-details">
                 <h3>{selectedBorrow.borrower}</h3>
-                <p>{selectedBorrow.type === 'withdraw' ? 'Teacher' : selectedBorrow.receiptData?.borrowerType}</p>
+                <p>{selectedBorrow.receiptData?.borrowerType || 'Teacher'}</p>
               </div>
             </div>
 
-            {selectedBorrow.type === 'withdraw' ? (
-              <>
-                <p className="to-borrow-label">To Withdraw</p>
-                <div className="item-preview">
-                  <img 
-                    src={selectedBorrow.itemId?.image || "/dashboard-imgs/placeholder.svg"} 
-                    alt={selectedBorrow.itemId?.name} 
-                  />
-                  <div className="item-info">
-                    <h3>{selectedBorrow.itemId?.name}</h3>
-                    <p>QTY: {selectedBorrow.quantity}</p>
-                  </div>
-                </div>
+            <p className="to-borrow-label">To Borrow</p>
+            
+            <div className="item-preview">
+               <img 
+                  src={selectedBorrow.itemId?.image || "/dashboard-imgs/placeholder.svg"} 
+                  alt={selectedBorrow.itemId?.name} 
+                />
+              <div className="item-info">
+                <h3>{selectedBorrow.itemId?.name}</h3>
+                <p>{selectedBorrow.itemId?.category}</p>
+              </div>
+            </div>
 
-                <p className="date-label">Claim on</p>
-                <div className="date-container">
-                  <div className="date-row">
-                    <span>Claim date:</span>
-                    <span>{new Date(selectedBorrow.withdrawDate).toLocaleDateString()}</span>
-                  </div>
-                </div>
+            <p className="date-label">Date</p>
+            <div className="date-container">
+              <div className="date-row">
+                <span>Borrow Date:</span>
+                <span>{new Date(selectedBorrow.borrowDate).toLocaleDateString()}</span>
+              </div>
+              <div className="date-row">
+                <span>Return Date:</span>
+                <span>{new Date(selectedBorrow.returnDate).toLocaleDateString()}</span>
+              </div>
+            </div>
 
-                <div className="receipt-footer">
-                  <p>Withdraw request ID: {selectedBorrow._id?.slice(0, 8)}</p>
-                  <p>Date requested: {new Date(selectedBorrow.withdrawDate).toLocaleDateString()}</p>
-                  <p>Time requested: {new Date(selectedBorrow.withdrawDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                </div>
+            <div className="receipt-footer">
+              <p>Borrow request ID: {selectedBorrow.receiptData?.requestId?.slice(0, 10)}</p>
+              <p>Date: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleDateString()}</p>
+              <p>Time: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+            </div>
 
-                {selectedBorrow.status === 'pending' && (
-                  <div className="action-container">
-                    <button 
-                      className="accept-button" 
-                      onClick={() => handleWithdrawAccept(selectedBorrow._id)}
-                    >
-                      Accept
-                    </button>
-                    <div 
-                      className="decline-text"
-                      onClick={() => handleWithdrawDecline(selectedBorrow._id)}
-                    >
-                      Decline
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                <p className="to-borrow-label">To Borrow</p>
-                <div className="item-preview">
-                  <img 
-                    src={selectedBorrow.itemId?.image || "/dashboard-imgs/placeholder.svg"} 
-                    alt={selectedBorrow.itemId?.name} 
-                  />
-                  <div className="item-info">
-                    <h3>{selectedBorrow.itemId?.name}</h3>
-                    <p>{selectedBorrow.itemId?.category}</p>
-                  </div>
+            {selectedBorrow.receiptData?.status === 'pending' ? (
+              <div className="action-container">
+                <button 
+                  className="accept-button" 
+                  onClick={() => handleAccept(selectedBorrow._id)}
+                >
+                  Accept
+                </button>
+                <div 
+                  className="decline-text"
+                  onClick={() => handleDecline(selectedBorrow._id)}
+                >
+                  Decline
                 </div>
-
-                <p className="date-label">Date</p>
-                <div className="date-container">
-                  <div className="date-row">
-                    <span>Borrow Date:</span>
-                    <span>{new Date(selectedBorrow.borrowDate).toLocaleDateString()}</span>
-                  </div>
-                  <div className="date-row">
-                    <span>Return Date:</span>
-                    <span>{new Date(selectedBorrow.returnDate).toLocaleDateString()}</span>
-                  </div>
-                </div>
-
-                <div className="receipt-footer">
-                  <p>Borrow request ID: {selectedBorrow.receiptData?.requestId?.slice(0, 10)}</p>
-                  <p>Date: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleDateString()}</p>
-                  <p>Time: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                </div>
-
-                {selectedBorrow.receiptData?.status === 'pending' ? (
-                  <div className="action-container">
-                    <button 
-                      className="accept-button" 
-                      onClick={() => handleAccept(selectedBorrow._id)}
-                    >
-                      Accept
-                    </button>
-                    <div 
-                      className="decline-text"
-                      onClick={() => handleDecline(selectedBorrow._id)}
-                    >
-                      Decline
-                    </div>
-                  </div>
-                ) : selectedBorrow.receiptData?.status === 'reserved' && (
-                  <button className="checkout-button" onClick={handleCheckoutClick}>
-                    Checkout
-                  </button>
-                )}
-              </>
+              </div>
+            ) : selectedBorrow.receiptData?.status === 'reserved' && (
+              <button className="checkout-button" onClick={handleCheckoutClick}>
+                Checkout
+              </button>
             )}
           </div>
         </div>

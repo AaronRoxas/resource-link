@@ -18,8 +18,7 @@ router.post('/', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const activities = await Activity.find()
-      .sort({ timestamp: -1 })
-      .limit(50);
+      .sort({ timestamp: -1 });
     res.json(activities);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -10,28 +10,12 @@ const Logs = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        // Fetch both borrowings and activities
-        const [borrowingsRes, activitiesRes] = await Promise.all([
-          fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings'),
-          fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/activities')
-        ]);
-
-        const borrowings = await borrowingsRes.json();
+        const activitiesRes = await fetch('http://localhost:5000/api/activities');
         const activities = await activitiesRes.json();
 
-        // Combine and format the logs
-        const combinedLogs = [
-          ...borrowings
-            .filter(borrowing => borrowing.receiptData?.status === 'On-going')
-            .map(borrowing => ({
-              date: new Date(borrowing.borrowDate),
-              borrower: borrowing.borrower,
-              itemName: borrowing.itemId?.name,
-              action: 'Check-out',
-              _id: borrowing._id,
-              type: 'borrowing'
-            })),
-          ...activities.map(activity => ({
+        // Format the activities and ensure newest first
+        const formattedLogs = activities
+          .map(activity => ({
             date: new Date(activity.timestamp),
             borrower: activity.borrower,
             itemName: activity.itemName,
@@ -39,9 +23,9 @@ const Logs = () => {
             _id: activity._id,
             type: 'activity'
           }))
-        ].sort((a, b) => b.date - a.date);
+          .sort((a, b) => b.date.getTime() - a.date.getTime());
 
-        setLogs(combinedLogs);
+        setLogs(formattedLogs);
       } catch (error) {
         console.error('Error fetching logs:', error);
       }
@@ -94,7 +78,13 @@ const Logs = () => {
           <tbody>
             {logs.map((log) => (
               <tr key={log._id}>
-                <td>{log.date.toLocaleDateString()}</td>
+                <td>
+                  {log.date.toLocaleDateString()} {log.date.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit'
+                  })}
+                </td>
                 <td>{log.borrower}</td>
                 <td>{log.itemName}</td>
                 <td>

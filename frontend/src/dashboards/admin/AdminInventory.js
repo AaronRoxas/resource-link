@@ -9,8 +9,7 @@ const AdminInventory = () => {
     const [categoryItemCounts, setCategoryItemCounts] = useState({});
     const [showModal, setShowModal] = useState(false);
     const [newCategory, setNewCategory] = useState({
-        name: '',
-        description: ''
+        name: ''
     });
     const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
@@ -56,7 +55,7 @@ const AdminInventory = () => {
 
     const handleCloseModal = () => {
         setShowModal(false);
-        setNewCategory({ name: '', description: '' });
+        setNewCategory({ name: '' });
     };
 
     const handleImageSelect = (e) => {
@@ -88,8 +87,7 @@ const AdminInventory = () => {
                 'https://resource-link-main-14c755858b60.herokuapp.com/api/categories',
                 {
                     name: newCategory.name,
-                    description: newCategory.description,
-                    image: selectedImage // Already base64 encoded
+                    image: selectedImage
                 },
                 { 
                     withCredentials: true,
@@ -184,19 +182,6 @@ const AdminInventory = () => {
                                     onChange={(e) => setNewCategory({
                                         ...newCategory,
                                         name: e.target.value
-                                    })}
-                                    required
-                                />
-                            </div>
-                            
-                            <div className="category-form-group">
-                                <label>Type</label>
-                                <input
-                                    type="text"
-                                    value={newCategory.description}
-                                    onChange={(e) => setNewCategory({
-                                        ...newCategory,
-                                        description: e.target.value
                                     })}
                                     required
                                 />

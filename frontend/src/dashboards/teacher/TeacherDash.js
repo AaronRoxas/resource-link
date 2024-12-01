@@ -38,26 +38,12 @@ const TeacherDash = () => {
     <div className="dashboard">
       <div className="dashboard-content">
       <NavBar/>
-        <div className="search-section">
-          <h3>Request an Item</h3>
-          <div className="search-container">
-            <svg 
-              className="search-icon" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2"
-            >
-              <circle cx="11" cy="11" r="8"/>
-              <path d="M21 21l-4.35-4.35"/>
-            </svg>
-            <input type="text" placeholder="Search for items..." />
-          </div>
-        </div>
+
 
         <div className="categories-section">
-          <h3>Categories</h3>
+     
           <div className="categories-grid">
+            
             {categories.map((category) => (
               <div 
                 key={category._id} 

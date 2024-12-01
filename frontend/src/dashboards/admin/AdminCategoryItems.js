@@ -268,8 +268,14 @@ const AdminCategoryItems = () => {
     const generateAbbreviatedId = (itemName) => {
         if (!itemName) return '';
 
-        const categoryPrefix = categoryName.charAt(0).toUpperCase();
+        // Take first 2-3 letters of category name as prefix
+        const categoryPrefix = categoryName
+            .slice(0, 3)  // Take first 3 letters
+            .replace(/[aeiou]/gi, '')  // Remove vowels
+            .slice(0, 2)  // Take first 2 consonants
+            .toUpperCase();
         
+        // Find all existing IDs that start with this prefix
         const similarIds = items
             .filter(item => item.id.startsWith(categoryPrefix))
             .map(item => {

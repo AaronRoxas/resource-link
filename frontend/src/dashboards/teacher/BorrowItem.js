@@ -34,7 +34,7 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                     }
                 };
 
-                const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals', withdrawalData);
+                const response = await axios.post('http://localhost:5000/api/withdrawals', withdrawalData);
 
                 setReceiptData({
                     requestId: response.data.receiptData?.requestId || withdrawalData.receiptData.requestId,
@@ -65,7 +65,7 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                     }
                 };
 
-                const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings', borrowingData);
+                const response = await axios.post('http://localhost:5000/api/borrowings', borrowingData);
 
                 setReceiptData({
                     requestId: response.data.receiptData?.requestId || borrowingData.receiptData.requestId,

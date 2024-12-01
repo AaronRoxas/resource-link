@@ -65,6 +65,32 @@ router.post('/', async (req, res) => {
     const savedBorrowing = await newBorrowing.save();
     const populatedBorrowing = await savedBorrowing.populate('itemId');
 
+    // Create check-out activity
+    const Activity = require('../models/Activity');
+    await new Activity({
+      action: 'check-out',
+      itemId: item._id,
+      itemName: item.name,
+      borrower: borrower,
+      borrowerRole: receiptData.borrowerType,
+      data: {
+        borrowingId: savedBorrowing._id,
+        requestId: receiptData.requestId,
+        borrowDate: borrowDate,
+        returnDate: returnDate,
+        status: receiptData.status,
+        itemDetails: {
+          name: item.name,
+          category: item.category,
+          serialNo: item.id
+        },
+        borrowerDetails: {
+          name: borrower,
+          role: receiptData.borrowerType
+        }
+      }
+    }).save();
+
     res.status(201).json(populatedBorrowing);
   } catch (error) {
     console.error('Create borrowing error:', error);
@@ -180,7 +206,7 @@ router.patch('/updateStatus', async (req, res) => {
 
     const borrowing = await Borrowing.findOne({
       'receiptData.requestId': requestId
-    });
+    }).populate('itemId');  // Add populate to get item details
 
     if (!borrowing) {
       console.log('No borrowing found with requestId:', requestId);
@@ -192,13 +218,38 @@ router.patch('/updateStatus', async (req, res) => {
       borrowing.receiptData.approvedBy = approvedBy;
     }
     
-    // Set availability to match status when it's "On-going"
+    // Set availability and record activity for check-out
     if (status === 'On-going') {
       borrowing.receiptData.availability = 'Check-out';
+      
+      // Create check-out activity
+      const Activity = require('../models/Activity');
+      await new Activity({
+        action: 'check-out',
+        itemId: borrowing.itemId._id,
+        itemName: borrowing.itemId.name,
+        borrower: borrowing.borrower,
+        borrowerRole: borrowing.receiptData.borrowerType,
+        data: {
+          borrowingId: borrowing._id,
+          requestId: borrowing.receiptData.requestId,
+          borrowDate: borrowing.borrowDate,
+          returnDate: borrowing.returnDate,
+          status: status,
+          itemDetails: {
+            name: borrowing.itemId.name,
+            category: borrowing.itemId.category,
+            serialNo: borrowing.itemId.id
+          },
+          borrowerDetails: {
+            name: borrowing.borrower,
+            role: borrowing.receiptData.borrowerType
+          }
+        }
+      }).save();
     }
     
     const updatedBorrowing = await borrowing.save();
-
     console.log('Successfully updated borrowing:', updatedBorrowing);
     res.json(updatedBorrowing);
   } catch (error) {
@@ -207,21 +258,48 @@ router.patch('/updateStatus', async (req, res) => {
   }
 });
 
-// Add this new route for returning items
+// Update return route to record check-in activity
 router.put('/:id/return', async (req, res) => {
   try {
     const borrowing = await Borrowing.findOneAndUpdate(
       { itemId: req.params.id, 'receiptData.status': { $ne: 'Returned' } },
       { 
         'receiptData.status': 'Returned',
-        'receiptData.availability': 'Check-in'
+        'receiptData.availability': 'Check-in',
+        'receiptData.returnTime': new Date()
       },
       { new: true }
-    );
+    ).populate('itemId');  // Add populate to get item details
 
     if (!borrowing) {
       return res.status(404).json({ message: 'Active borrowing not found for this item' });
     }
+
+    // Create check-in activity
+    const Activity = require('../models/Activity');
+    await new Activity({
+      action: 'check-in',
+      itemId: borrowing.itemId._id,
+      itemName: borrowing.itemId.name,
+      borrower: borrowing.borrower,
+      borrowerRole: borrowing.receiptData.borrowerType,
+      data: {
+        borrowingId: borrowing._id,
+        requestId: borrowing.receiptData.requestId,
+        borrowDate: borrowing.borrowDate,
+        returnDate: new Date(),
+        status: 'Returned',
+        itemDetails: {
+          name: borrowing.itemId.name,
+          category: borrowing.itemId.category,
+          serialNo: borrowing.itemId.id
+        },
+        borrowerDetails: {
+          name: borrowing.borrower,
+          role: borrowing.receiptData.borrowerType
+        }
+      }
+    }).save();
 
     res.json(borrowing);
   } catch (error) {

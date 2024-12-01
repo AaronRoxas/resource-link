@@ -27,7 +27,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
       const fetchItem = async () => {
         setLoading(true);
         try {
-          const response = await fetch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`);
+          const response = await fetch(`http://localhost:5000/api/items/find/${itemId}`);
           if (!response.ok) throw new Error('Item not found');
           const data = await response.json();
           console.log('Fetched item:', data);
@@ -51,7 +51,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/employees');
+        const response = await fetch('http://localhost:5000/api/employees');
         if (!response.ok) throw new Error('Failed to fetch employees');
         const data = await response.json();
         setEmployees(data);
@@ -74,7 +74,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
     if (selectedItem) {
       const category = selectedItem.category.toLowerCase().trim();
       const itemId = selectedItem.id.trim();
-      return `https://resource-link.vercel.app/staff/category/${category}/${itemId}`;
+      return `http://localhost:5000/staff/category/${category}/${itemId}`;
     }
     return '';
   };
@@ -95,7 +95,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
       }
 
       try {
-        const response = await fetch(`https://resource-link-main-14c755858b60.herokuapp.com/api/users/search?query=${encodeURIComponent(value)}`);
+        const response = await fetch(`http://localhost:5000/api/users/search?query=${encodeURIComponent(value)}`);
         if (!response.ok) throw new Error('Failed to fetch employees');
         const employees = await response.json();
         setFilteredEmployees(employees);
@@ -148,7 +148,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
 
       console.log('Sending borrowing data:', borrowingData);
 
-      const borrowingResponse = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings', {
+      const borrowingResponse = await fetch('http://localhost:5000/api/borrowings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -175,7 +175,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
 
   const handleCheckIn = async () => {
     try {
-      const borrowingResponse = await fetch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${selectedItem._id}/return`, {
+      const borrowingResponse = await fetch(`http://localhost:5000/api/borrowings/${selectedItem._id}/return`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -189,7 +189,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
         throw new Error('Failed to update borrowing status');
       }
 
-      const itemResponse = await fetch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${selectedItem._id}`, {
+      const itemResponse = await fetch(`http://localhost:5000/api/items/${selectedItem._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
