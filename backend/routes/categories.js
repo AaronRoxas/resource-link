@@ -60,11 +60,10 @@ router.patch('/:id/subcategories', async (req, res) => {
         }
 
         category.subCategories.push({ name: req.body.name });
-        await category.save();
-
-        res.json(category);
+        const updatedCategory = await category.save();
+        res.json(updatedCategory);
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(400).json({ message: error.message });
     }
 });
 
