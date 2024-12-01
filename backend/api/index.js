@@ -4,11 +4,11 @@ const cors = require('cors');
 const authRoutes = require('../routes/auth'); 
 const connectDB = require('../config/db'); 
 const recentActivitiesRoutes = require('../routes/activities');
+const itemTrackingRoutes = require('../routes/itemTracking');
 const inventoryRoutes = require('../routes/inventory');
 const itemRoutes = require('../routes/items');
 const borrowingsRoutes = require('../routes/borrowings');
 const userRoutes = require('../routes/user');
-const categoryRoutes = require('../routes/categories');
 
 const app = express();
 
@@ -40,12 +40,12 @@ app.get('/', (req, res) => {
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/activities', recentActivitiesRoutes);
+app.use('/api/item-tracking', itemTrackingRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/borrowings', borrowingsRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/items',itemRoutes);
+app.use('/inventory', inventoryRoutes);
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);

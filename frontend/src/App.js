@@ -8,7 +8,7 @@ import AddUser from './dashboards/admin/AddUser.js';
 import TeacherDash from './dashboards/teacher/TeacherDash.js';
 import AdminDash from './dashboards/admin/AdminDash.js';
 import StaffDash from './dashboards/staff/StaffDash.js';
-import AdminInventory from './dashboards/admin/AdminInventory.js';
+import AdminCategories from './dashboards/admin/AdminCategories.js';
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
 import ChangePassword from './components/ChangePassword.js';
@@ -26,9 +26,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import InventoryAlert from './components/InventoryAlert';
 import Logs from './components/Logs';
 import ReservedItems from './components/ReservedItems';
-import ViewItems from './dashboards/teacher/ViewItems.js';
-import AdminCategoryItems from './dashboards/admin/AdminCategoryItems.js';
-import ItemInformation from './components/ItemInformation';
 
 function App() {
   return (
@@ -133,10 +130,10 @@ function App() {
           }
         />
         <Route
-          path="/admin/inventory"
+          path="/adminCategories"
           element={
             <ProtectedRoute allowedRoles={['admin']}>
-              <AdminInventory/>
+              <AdminCategories />
             </ProtectedRoute>
           }
         />
@@ -221,10 +218,6 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        <Route path="/teacher/inventory/:category" element={<ViewItems />} />
-        <Route path="/admin/category/:categoryName" element={<AdminCategoryItems />} />
-        <Route path="/admin/item/:itemId" element={<ItemInformation />} />
-        <Route path="/staff/item/:itemId" element={<ItemInformation />} />
         {/* Other routes */}
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />

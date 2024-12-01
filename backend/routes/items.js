@@ -17,26 +17,13 @@ router.get('/last-id', async (req, res) => {
 // Create a new item
 router.post('/', async (req, res) => {
   try {
-    console.log('Received item data:', req.body); // Add this for debugging
-
-    const newItem = new Item({
-      name: req.body.name,
-      serialNo: req.body.serialNo,
-      purchaseDate: req.body.purchaseDate,
-      purchaseCost: req.body.purchaseCost,
-      notes: req.body.notes,
-      category: req.body.category,
-      subCategory: req.body.subCategory,  // Make sure this is included
-      itemImage: req.body.itemImage,      // Make sure this is included
-      status: req.body.status || 'Good Condition'
-    });
+    const newItem = new Item(req.body);
 
     const savedItem = await newItem.save();
-    console.log('Saved item:', savedItem); // Add this for debugging
     res.status(201).json(savedItem);
   } catch (err) {
     console.error('Error adding item:', err);
-    res.status(500).json({ error: 'Internal Server Error', details: err.message });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -212,30 +199,6 @@ router.get('/category-count/:category', async (req, res) => {
     console.error('Error getting category count:', error);
     res.status(500).json({ error: 'Error getting category count' });
   }
-});
-
-// Get count of items by category
-router.get('/count-by-category', async (req, res) => {
-    try {
-        // First get all items
-        const items = await Item.find();
-        
-        // Count items per category using reduce
-        const countsByCategory = items.reduce((acc, item) => {
-            const category = item.category;
-            acc[category] = (acc[category] || 0) + 1;
-            return acc;
-        }, {});
-
-        console.log('Counts by category:', countsByCategory); // Debug log
-        res.json(countsByCategory);
-    } catch (error) {
-        console.error('Detailed error:', error); // Detailed error logging
-        res.status(500).json({ 
-            message: 'Error getting item counts',
-            error: error.message 
-        });
-    }
 });
 
 module.exports = router;

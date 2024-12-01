@@ -4,28 +4,6 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-// Auth Middleware
-const auth = async (req, res, next) => {
-    try {
-        // Get token from cookie or header
-        const token = req.cookies.token || req.header('Authorization')?.replace('Bearer ', '');
-
-        if (!token) {
-            return res.status(401).json({ message: 'No token, authorization denied' });
-        }
-
-        // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // Add user info to request
-        req.user = decoded;
-        
-        next();
-    } catch (error) {
-        res.status(401).json({ message: 'Token is not valid' });
-    }
-};
-
 // Login Route
 router.post('/login', async (req, res) => {
   try {
@@ -264,6 +242,4 @@ router.get('/check-employee-id/:id', async (req, res) => {
   }
 });
 
-// Export both router and auth middleware
-router.auth = auth;  // Attach auth middleware to router
-module.exports = router;  // Export the router with auth attached
+module.exports = router;

@@ -3,8 +3,6 @@ const router = express.Router();
 const Item = require('../models/Item'); 
 const mongoose = require('mongoose'); 
 const Borrowing = require('../models/Borrowing');
-const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
 
 
 router.get('/', async (req, res) => {
@@ -95,29 +93,22 @@ router.post('/borrow/:id', async (req, res) => {
 });
 
 // POST route to create a new inventory item
-router.post('/', async (req, res) => {
+router.post('/items', async (req, res) => {
   try {
-    console.log('Received item data:', req.body);
-
+    const { name, description, stocks, /* other fields */ } = req.body;
+    
     const newItem = new Item({
-      name: req.body.name,
-      serialNo: req.body.serialNo,
-      purchaseDate: req.body.purchaseDate,
-      purchaseCost: req.body.purchaseCost,
-      notes: req.body.notes,
-      category: req.body.category,
-      subCategory: req.body.subCategory,
-      itemImage: req.body.itemImage,
-      status: req.body.status || 'Good Condition',
-      availability: req.body.availability || 'Check-in'
+      name,
+      description,
+      stocks: stocks || 0,  // Provide a default value if none is provided
+      // ... other fields ...
     });
 
-    const savedItem = await newItem.save();
-    console.log('Saved item:', savedItem);
-    res.status(201).json(savedItem);
-  } catch (err) {
-    console.error('Error adding item:', err);
-    res.status(500).json({ error: 'Internal Server Error', details: err.message });
+    await newItem.save();
+    res.status(201).json(newItem);
+  } catch (error) {
+    console.error('Error creating item:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

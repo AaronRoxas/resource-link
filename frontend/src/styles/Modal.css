@@ -1,4 +1,4 @@
-/* .modal-overlay {
+.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -28,4 +28,4 @@
   .modal-content h2{
     text-align: center;
     justify-content: center;
-  } */
+  }
