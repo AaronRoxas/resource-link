@@ -11,7 +11,7 @@ const TeacherCategoryItems = () => {
     const [items, setItems] = useState([]);
     const [categoryName, setCategoryName] = useState('');
     const [borrowItem, setBorrowItem] = useState(null);
-    const [ setSelectedItem] = useState(null);
+    const [selectedItem, setSelectedItem] = useState(null);
     const { categoryName: urlCategoryName } = useParams();
     const navigate = useNavigate();
 
@@ -22,23 +22,19 @@ const TeacherCategoryItems = () => {
 
     const fetchCategoryItems = async () => {
         try {
-            const categoriesResponse = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/categories', {
-                withCredentials: true
-            });
+            const categoriesResponse = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/categories');
             const foundCategory = categoriesResponse.data.find(
                 cat => cat.name.toLowerCase().replace(/[&\s]+/g, '-') === urlCategoryName
             );
 
-                if (!foundCategory) {
-                    console.error('Category not found');
-                    return;
-                }
+            if (!foundCategory) {
+                console.error('Category not found');
+                return;
+            }
 
-                setCategoryName(foundCategory.name);
+            setCategoryName(foundCategory.name);
 
-            const itemsResponse = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', {
-                withCredentials: true
-            });
+            const itemsResponse = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory');
             const categoryItems = itemsResponse.data.filter(
                 item => item.category === foundCategory.name
             );
@@ -59,6 +55,21 @@ const TeacherCategoryItems = () => {
 
     const handleCloseItemInfo = () => {
         setSelectedItem(null);
+    };
+
+    const isItemAvailable = (item) => {
+        if (item.itemType === 'Consumable') {
+            return item.qty > 0;
+        } else {
+            return item.qty > 0 && item.status !== 'Check-out';
+        }
+    };
+
+    const getActionButtonText = (item) => {
+        if (!isItemAvailable(item)) {
+            return item.itemType === 'Consumable' ? 'Out of Stock' : 'Unavailable';
+        }
+        return item.itemType === 'Consumable' ? 'Withdraw' : 'Borrow';
     };
 
     return (
@@ -88,11 +99,11 @@ const TeacherCategoryItems = () => {
                             <h3>{item.name}</h3>
                             <p className="sub-category">{item.subCategory || 'Sub category here'}</p>
                             <button 
-                                className={`action-btn ${(item.qty <= 0 || (!item.itemType === 'Consumable' && item.status === 'Check-out')) ? 'disabled' : ''}`}
+                                className={`action-btn ${!isItemAvailable(item) ? 'disabled' : ''}`}
                                 onClick={() => setBorrowItem(item)}
-                                disabled={item.qty <= 0 || (!item.itemType === 'Consumable' && item.status === 'Check-out')}
+                                disabled={!isItemAvailable(item)}
                             >
-                                {item.itemType === 'Consumable' ? 'Withdraw' : 'Borrow'}
+                                {getActionButtonText(item)}
                             </button>
                         </div>
                     </div>
@@ -106,7 +117,6 @@ const TeacherCategoryItems = () => {
                     fetchItems={fetchCategoryItems}
                 />
             )}
-
 
             <BottomNav navItems={navItems} />
         </div>

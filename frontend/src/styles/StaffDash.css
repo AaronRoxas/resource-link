@@ -83,6 +83,17 @@
     color: #43A047;
   }
   
+  .status-pill.status-approved,
+  .action-badge.action-checkin {
+    background-color: #D5FFE3;
+    color: #00C853;
+  }
+  
+  .status-pill.status-pending {
+    background-color: #FFF4D5;
+    color: #FFA726;
+  }
+  
   /* Section headers */
   .section-header {
     display: flex;
@@ -344,101 +355,133 @@
   
   /* Reservation Receipt Styles */
   .reservation-receipt {
-    width: 90%;
-    max-width: 400px;
     background: white;
-    border-radius: 12px;
     padding: 20px;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
   }
   
   .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    text-align: center;
     margin-bottom: 20px;
-  }
-  
-  .modal-header h2 {
-    font-size: 1.2rem;
-    font-weight: 500;
-    margin: 0;
   }
   
   .user-info {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 15px;
-    border-radius: 8px;
-    background: white;
     margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 8px;
+    background: #f5f5f5;
   }
   
   .user-avatar {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
+    margin-right: 15px;
   }
   
-  .to-borrow-label {
+  .user-details h3 {
+    margin: 0;
+    font-size: 16px;
+  }
+  
+  .user-details p {
+    margin: 5px 0 0;
     color: #666;
-    margin: 10px 0;
+    font-size: 14px;
+  }
+  
+  .to-borrow-label, .claim-label {
+    color: #666;
+    margin: 15px 0 10px;
+    font-size: 14px;
+    text-align: center;
   }
   
   .item-preview {
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 8px;
     display: flex;
-    gap: 15px;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    background: #f5f5f5;
     margin-bottom: 20px;
   }
   
-  .date-section {
-    margin: 20px 0;
+  .item-preview img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    margin-right: 15px;
   }
   
-  .date-label {
-    text-align: center;
-    color: #666;
-    margin-bottom: 10px;
+  .item-info h3 {
+    margin: 0;
+    font-size: 16px;
   }
   
-  .date-container {
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 8px;
-  }
-  
-  .date-row {
-    display: flex;
-    justify-content: space-between;
+  .item-info p {
     margin: 5px 0;
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .claim-date-section {
+    margin-bottom: 20px;
+  }
+  
+  .claim-date-section label {
+    display: block;
+    margin-bottom: 5px;
+    color: #666;
+  }
+  
+  .claim-date-section input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
   }
   
   .receipt-footer {
     margin-top: 20px;
-    font-size: 0.875rem;
-    color: #666;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
   }
   
   .receipt-footer p {
     margin: 5px 0;
+    font-size: 12px;
+    color: #666;
   }
   
-  .checkout-button {
-    width: 100%;
-    padding: 12px;
-    background: #14AE5C;
+  .action-buttons {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .accept-button {
+    background: #006B3E;
     color: white;
     border: none;
+    padding: 12px;
     border-radius: 8px;
-    margin-top: 20px;
+    width: 100%;
+    font-size: 16px;
     cursor: pointer;
   }
   
-  .checkout-button:hover {
-    background: #005432;
+  .decline-button {
+    background: none;
+    border: none;
+    color: #666;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
   }
   
   .reservation-receipt .close-button {
@@ -692,4 +735,112 @@
   .status-badge.for-maintenance {
     background-color: #E8F7FF;
     color: #3B95D2;
+  }
+  
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+  }
+  
+  .modal-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+  
+  .to-borrow-label {
+    text-align: center;
+    color: #666;
+    margin: 15px 0;
+  }
+  
+  .item-preview {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .item-preview img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+  }
+  
+  .date-label {
+    text-align: center;
+    color: #666;
+    margin: 15px 0;
+  }
+  
+  .date-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .date-field {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .date-field label {
+    margin-bottom: 5px;
+    color: #666;
+  }
+  
+  .date-field input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f9f9f9;
+  }
+  
+  .receipt-footer {
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: #666;
+  }
+  
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .accept-button {
+    background: #006B3F;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    font-weight: bold;
+  }
+  
+  .decline-button {
+    background: transparent;
+    color: #666;
+    padding: 12px;
+    border: none;
+    width: 100%;
+    font-weight: bold;
   }

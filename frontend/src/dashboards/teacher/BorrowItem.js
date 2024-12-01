@@ -18,9 +18,9 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
             if (item.itemType === 'Consumable') {
                 // Handle withdrawal for consumable items
                 const withdrawalData = {
-                    itemId: item._id,
                     borrower: borrowFormData.borrower,
-                    quantity: borrowFormData.quantity,
+                    itemId: item._id,
+                    claimDate: new Date(borrowFormData.borrowDate),
                     status: 'pending',
                     receiptData: {
                         requestId: Array(10)
@@ -28,9 +28,10 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                             .map(() => Math.random().toString(36).charAt(2))
                             .join('')
                             .toUpperCase(),
-                        borrowerType: 'Teacher',
-                        withdrawTime: new Date(),
-                        status: 'pending'
+                        category: item.category,
+                        subCategory: item.subCategory,
+                        qty: borrowFormData.quantity,
+                        approvedBy: "" // Will be filled by admin/approver
                     }
                 };
 
@@ -42,17 +43,22 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                     time: new Date().toLocaleTimeString(),
                     item: item,
                     quantity: borrowFormData.quantity,
-                    status: 'pending'
+                    status: 'pending',
+                    category: item.category,
+                    subCategory: item.subCategory
                 });
             } else {
-                // Handle regular borrowing for non-consumable items
+                // Validate dates first
+                if (!borrowFormData.borrowDate || !borrowFormData.returnDate) {
+                    throw new Error('Please select both borrow and return dates');
+                }
+
                 const borrowingData = {
                     itemId: item._id,
                     borrower: borrowFormData.borrower,
                     borrowDate: new Date(borrowFormData.borrowDate),
                     returnDate: new Date(borrowFormData.returnDate),
                     quantity: borrowFormData.quantity,
-                    status: 'pending',
                     receiptData: {
                         requestId: Array(10)
                             .fill(0)
@@ -61,12 +67,19 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                             .toUpperCase(),
                         borrowerType: 'Teacher',
                         borrowTime: new Date(),
-                        status: 'pending'
+                        status: 'pending',
+                        approvedBy: 'pending',  // This is required by the backend
+                        category: item.category,
+                        subCategory: item.subCategory,
+                        itemName: item.name
                     }
                 };
 
-                const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings', borrowingData);
+                // Debug log to see what we're sending
+                console.log('Sending borrowing request:', borrowingData);
 
+                const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings', borrowingData);
+                
                 setReceiptData({
                     requestId: response.data.receiptData?.requestId || borrowingData.receiptData.requestId,
                     date: new Date().toLocaleDateString(),
@@ -76,12 +89,18 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                     item: item,
                     status: 'pending'
                 });
-            }
 
-            setShowReceipt(true);
-            fetchItems();
+                setShowReceipt(true);
+                fetchItems();
+            }
         } catch (error) {
-            console.error(`Error ${item.itemType === 'Consumable' ? 'withdrawing' : 'borrowing'} item:`, error);
+            // More detailed error logging
+            console.error('Error details:', {
+                message: error.message,
+                response: error.response?.data,
+                data: error.response?.data?.message
+            });
+            alert(error.response?.data?.message || error.message || 'An error occurred while processing your request');
         }
     };
 
@@ -163,6 +182,16 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                             type="text" 
                             value={borrowFormData.borrower} 
                             readOnly 
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Claim Date: <span className="required">*</span></label>
+                        <input 
+                            type="date" 
+                            onChange={(e) => setBorrowFormData({ ...borrowFormData, borrowDate: e.target.value })}
+                            min={new Date().toISOString().split("T")[0]}
+                            required
                         />
                     </div>
 

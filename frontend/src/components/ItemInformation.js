@@ -21,13 +21,17 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
   const [returnDate, setReturnDate] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [showConfirmCheckInModal, setShowConfirmCheckInModal] = useState(false);
+  const [showReservedCheckoutModal, setShowReservedCheckoutModal] = useState(false);
+  const [requestId, setRequestId] = useState('');
+  const [filteredRequests, setFilteredRequests] = useState([]);
+  const [showRequestDropdown, setShowRequestDropdown] = useState(false);
 
   useEffect(() => {
     if (!propSelectedItem && itemId) {
       const fetchItem = async () => {
         setLoading(true);
         try {
-          const response = await fetch(`http://localhost:5000/api/items/find/${itemId}`);
+          const response = await fetch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`);
           if (!response.ok) throw new Error('Item not found');
           const data = await response.json();
           console.log('Fetched item:', data);
@@ -51,7 +55,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/employees');
+        const response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/employees');
         if (!response.ok) throw new Error('Failed to fetch employees');
         const data = await response.json();
         setEmployees(data);
@@ -74,7 +78,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
     if (selectedItem) {
       const category = selectedItem.category.toLowerCase().trim();
       const itemId = selectedItem.id.trim();
-      return `http://localhost:5000/staff/category/${category}/${itemId}`;
+      return `https://resource-link-main-14c755858b60.herokuapp.com/staff/category/${category}/${itemId}`;
     }
     return '';
   };
@@ -95,7 +99,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
       }
 
       try {
-        const response = await fetch(`http://localhost:5000/api/users/search?query=${encodeURIComponent(value)}`);
+        const response = await fetch(`https://resource-link-main-14c755858b60.herokuapp.com/api/users/search?query=${encodeURIComponent(value)}`);
         if (!response.ok) throw new Error('Failed to fetch employees');
         const employees = await response.json();
         setFilteredEmployees(employees);
@@ -148,7 +152,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
 
       console.log('Sending borrowing data:', borrowingData);
 
-      const borrowingResponse = await fetch('http://localhost:5000/api/borrowings', {
+      const borrowingResponse = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -175,7 +179,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
 
   const handleCheckIn = async () => {
     try {
-      const borrowingResponse = await fetch(`http://localhost:5000/api/borrowings/${selectedItem._id}/return`, {
+      const borrowingResponse = await fetch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${selectedItem._id}/return`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -189,7 +193,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
         throw new Error('Failed to update borrowing status');
       }
 
-      const itemResponse = await fetch(`http://localhost:5000/api/items/${selectedItem._id}`, {
+      const itemResponse = await fetch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${selectedItem._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -215,6 +219,99 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
     } catch (error) {
       console.error('Error during check-in:', error);
       toast.error('Failed to check in item');
+    }
+  };
+
+  const handleRequestSearch = useCallback(
+    debounce(async (value) => {
+      setRequestId(value);
+      setShowRequestDropdown(true);
+      
+      if (value.length < 1) {
+        setFilteredRequests([]);
+        return;
+      }
+
+      try {
+        const response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            'receiptData.requestId': value,
+            'receiptData.status': 'reserved'
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch requests');
+        const borrowing = await response.json();
+        
+        // Convert the single borrowing into an array format for the dropdown
+        const requests = borrowing ? [{
+          id: borrowing.receiptData.requestId,
+          borrower_name: borrowing.borrower,
+          request_date: borrowing.borrowDate,
+          return_date: borrowing.returnDate
+        }] : [];
+        
+        setFilteredRequests(requests);
+      } catch (error) {
+        console.error('Error searching requests:', error);
+        setFilteredRequests([]);
+      }
+    }, 300),
+    []
+  );
+
+  const handleReservedCheckout = async () => {
+    if (!requestId || !selectedEmployee || !returnDate) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      const userData = JSON.parse(localStorage.getItem('user'));
+      
+      if (!userData || !userData.first_name) {
+        toast.error('User session expired. Please log in again.');
+        return;
+      }
+
+      // Format the approver name
+      const approverName = userData.employee_id ? 
+        `${userData.first_name} ${userData.last_name} (${userData.employee_id})` : 
+        `${userData.first_name} ${userData.last_name}`;
+
+      // Update the borrowing status
+      const response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/updateStatus', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          requestId: requestId,
+          status: 'On-going',
+          approvedBy: approverName
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update borrowing status');
+      }
+
+      // Close modal and show success message
+      setShowReservedCheckoutModal(false);
+      toast.success('Reserved check-out completed successfully');
+      
+      // Refresh the item information if needed
+      if (onBorrowingComplete) {
+        onBorrowingComplete();
+      }
+
+    } catch (error) {
+      console.error('Error during reserved check-out:', error);
+      toast.error('Failed to complete reserved check-out');
     }
   };
 
@@ -446,6 +543,108 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
     );
   };
 
+  const renderReservedCheckoutModal = () => {
+    if (!showReservedCheckoutModal) return null;
+    
+    return (
+      <div className="modal-overlay">
+        <div className="checkout-modal">
+          <button className="modal-close" onClick={() => setShowReservedCheckoutModal(false)}>×</button>
+          <h2>Reserved Check-out</h2>
+          
+          <div className="checkout-item-preview">
+            <img 
+              src={selectedItem?.itemImage || '/dashboard-imgs/placeholder.svg'} 
+              alt="Item Preview" 
+              className="checkout-item-image"
+            />
+            <div className="checkout-item-details">
+              <h3>{selectedItem?.name}</h3>
+              <p>{selectedItem?.id}</p>
+            </div>
+          </div>
+
+          <div className="checkout-form">
+            <label>Request ID</label>
+            <div className="dropdown-container">
+              <input 
+                type="text"
+                className="checkout-input"
+                placeholder="Enter request ID"
+                value={requestId}
+                onChange={(e) => handleRequestSearch(e.target.value)}
+                onFocus={() => setShowRequestDropdown(true)}
+              />
+              {showRequestDropdown && filteredRequests.length > 0 && (
+                <div className="request-dropdown">
+                  {filteredRequests.map((request) => (
+                    <div 
+                      key={request.id}
+                      className="request-option"
+                      onClick={() => {
+                        setRequestId(request.id);
+                        setShowRequestDropdown(false);
+                        // Auto-fill the checkout fields
+                        setSearchTerm(request.borrower_name); // This will fill the "Check-out to" field
+                        setSelectedEmployee({
+                          first_name: request.borrower_name.split(' ')[0],
+                          last_name: request.borrower_name.split(' ')[1] || '',
+                        });
+                        setReturnDate(new Date(request.return_date).toISOString().split('T')[0]);
+                      }}
+                    >
+                      <span className="request-id">{request.id}</span>
+                      <span className="request-info">
+                        {request.borrower_name} • {new Date(request.request_date).toLocaleDateString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <label>Check-out to</label>
+            <input 
+              type="text"
+              className="checkout-input"
+              value={searchTerm}
+              readOnly // Make it read-only since it's auto-filled
+            />
+
+            <div className="date-group">
+              <div className="borrow-date">
+                <label>Borrow Date</label>
+                <input 
+                  type="date"
+                  className="date-input"
+                  value={getCurrentDate()}
+                  readOnly
+                />
+              </div>
+              <div className="return-date">
+                <label>Return Date</label>
+                <input 
+                  type="date"
+                  className="date-input"
+                  min={getCurrentDate()}
+                  value={returnDate}
+                  onChange={(e) => setReturnDate(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <button 
+              className="continue-button"
+              onClick={handleReservedCheckout}
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="modal-overlay">
@@ -509,6 +708,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
               disabled={selectedItem?.availability === 'Check-out'}
               style={selectedItem?.availability === 'Check-out' ? 
                 {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
+              onClick={() => setShowReservedCheckoutModal(true)}
             >
               Reserved Check-out
             </button>
@@ -517,6 +717,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
       </div>
       {renderCheckoutModal()}
       {renderCheckInModal()}
+      {renderReservedCheckoutModal()}
     </>
   );
 };

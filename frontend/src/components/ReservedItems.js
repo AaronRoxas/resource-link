@@ -17,27 +17,38 @@ const ReservedItems = () => {
   const [showItemInfo, setShowItemInfo] = useState(false);
   const [error, setError] = useState('');
   const [foundItem, setFoundItem] = useState(null);
+  const [withdrawRequests, setWithdrawRequests] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
   const userRole = localStorage.getItem('userRole');
 
   useEffect(() => {
-    const fetchReservedItems = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
-        const data = await response.json();
-        const filteredData = data.filter(item => 
-          item.receiptData?.status === 'reserved' || 
-          item.receiptData?.status === 'pending' || 
-          item.receiptData?.status === 'declined'
+        const [borrowingsRes, withdrawsRes] = await Promise.all([
+          fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings'),
+          fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/withdraws')
+        ]);
+        
+        const borrowingsData = await borrowingsRes.json();
+        const withdrawsData = await withdrawsRes.json();
+
+        const filteredBorrowings = borrowingsData.filter(item => 
+          ['reserved', 'pending', 'declined'].includes(item.receiptData?.status?.toLowerCase())
         );
-        setReservedItems(filteredData);
+        
+        const filteredWithdraws = withdrawsData.filter(request => 
+          ['pending', 'declined'].includes(request.status?.toLowerCase())
+        );
+
+        setReservedItems(filteredBorrowings);
+        setWithdrawRequests(filteredWithdraws);
       } catch (error) {
-        console.error('Error fetching reserved items:', error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchReservedItems();
+    fetchData();
   }, []);
 
   const handleBack = () => {
@@ -57,9 +68,12 @@ const ReservedItems = () => {
   };
 
   const filteredItems = activeFilter
-    ? reservedItems.filter(item => 
-        item.receiptData?.status.toLowerCase() === activeFilter.toLowerCase())
-    : reservedItems;
+    ? [...reservedItems, ...withdrawRequests].filter(item => {
+        const status = item.type === 'withdraw' ? item.status : item.receiptData?.status;
+        return status.toLowerCase() === activeFilter.toLowerCase();
+      })
+    : [...reservedItems.map(item => ({...item, type: 'borrow'})), 
+       ...withdrawRequests.map(item => ({...item, type: 'withdraw'}))];
 
   const handleStatusClick = (item) => {
     if (userRole === 'staff') {
@@ -288,44 +302,26 @@ const ReservedItems = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredItems.map((item) => (
-              <tr key={item._id}>
-                <td>{new Date(item.borrowDate).toLocaleDateString()}</td>
-                <td>{item.borrower}</td>
-                <td>{item.itemId?.name}</td>
-                <td>
-                  <span className={`status-pill status-${item.receiptData?.status?.toLowerCase()}`}>
-                    {item.receiptData?.status === 'reserved' && (
+            {filteredItems
+              .sort((a, b) => new Date(b.date) - new Date(a.date))
+              .map((item) => (
+                <tr key={item._id}>
+                  <td>{new Date(item.type === 'withdraw' ? item.requestDate : item.borrowDate).toLocaleDateString()}</td>
+                  <td>{item.borrower}</td>
+                  <td>{item.itemId?.name}</td>
+                  <td>
+                    <span className={`status-pill status-${item.type === 'withdraw' ? item.status : item.receiptData?.status?.toLowerCase()}`}>
                       <span 
-                        className="status-reserved"
+                        className={`status-${item.type === 'withdraw' ? item.status : item.receiptData?.status?.toLowerCase()}`}
                         onClick={() => userRole === 'staff' && handleStatusClick(item)}
                         style={{ cursor: userRole === 'staff' ? 'pointer' : 'default' }}
                       >
-                        Reserved
+                        {item.type === 'withdraw' ? item.status : item.receiptData?.status}
                       </span>
-                    )}
-                    {item.receiptData?.status === 'pending' && (
-                      <span 
-                        className="status-pending"
-                        onClick={() => userRole === 'staff' && handleStatusClick(item)}
-                        style={{ cursor: userRole === 'staff' ? 'pointer' : 'default' }}
-                      >
-                        Pending
-                      </span>
-                    )}
-                    {item.receiptData?.status === 'declined' && (
-                      <span 
-                        className="status-declined"
-                        onClick={() => userRole === 'staff' && handleStatusClick(item)}
-                        style={{ cursor: userRole === 'staff' ? 'pointer' : 'default' }}
-                      >
-                        Declined
-                      </span>
-                    )}
-                  </span>
-                </td>
-              </tr>
-            ))}
+                    </span>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

@@ -10,7 +10,7 @@ const Logs = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const activitiesRes = await fetch('http://localhost:5000/api/activities');
+        const activitiesRes = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/activities');
         const activities = await activitiesRes.json();
 
         // Format the activities and ensure newest first
@@ -51,7 +51,8 @@ const Logs = () => {
       'check-in': 'action-checkin',
       'removed': 'action-removed',
       'added': 'action-added',
-      'updated': 'action-updated'
+      'updated': 'action-updated',
+      'withdraw': 'action-checkout'
     };
     return styles[action.toLowerCase()] || '';
   };
@@ -79,11 +80,7 @@ const Logs = () => {
             {logs.map((log) => (
               <tr key={log._id}>
                 <td>
-                  {log.date.toLocaleDateString()} {log.date.toLocaleTimeString([], { 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    second: '2-digit'
-                  })}
+                  {log.date.toLocaleDateString()} {log.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </td>
                 <td>{log.borrower}</td>
                 <td>{log.itemName}</td>

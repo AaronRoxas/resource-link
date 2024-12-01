@@ -1,35 +1,46 @@
 const mongoose = require('mongoose');
 
 const withdrawalSchema = new mongoose.Schema({
+    borrower: {
+        type: String,
+        required: true
+    },
     itemId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Item',
         required: true
     },
-    borrower: {
-        type: String,
-        required: true
-    },
-    withdrawDate: {
+    claimDate: {
         type: Date,
-        required: true,
-        default: Date.now
-    },
-    quantity: {
-        type: Number,
-        required: true,
-        min: 1
+        required: true
     },
     status: {
         type: String,
-        enum: ['pending', 'approved', 'rejected'],
+        enum: ['pending', 'approved', 'declined'],
         default: 'pending'
     },
     receiptData: {
-        requestId: String,
-        borrowerType: String,
-        withdrawTime: Date,
-        status: String
+        requestId: {
+            type: String,
+            required: true
+        },
+        category: {
+            type: String,
+            required: true
+        },
+        subCategory: {
+            type: String,
+            required: true
+        },
+        qty: {
+            type: Number,
+            required: true,
+            min: 1
+        },
+        approvedBy: {
+            type: String,
+            default: ""
+        }
     }
 }, {
     timestamps: true

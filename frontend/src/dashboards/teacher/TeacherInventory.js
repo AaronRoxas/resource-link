@@ -89,8 +89,8 @@ const WithdrawReceipt = ({ item, onClose }) => {
 
                 <div className="receipt-footer">
                     <p><b>Withdrawal request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
-                    <p>Date: {new Date(item.receiptData?.withdrawTime).toLocaleDateString()}</p>
-                    <p>Time: {new Date(item.receiptData?.withdrawTime).toLocaleTimeString('en-US', {
+                    <p>Date: {new Date(item.withdrawDate).toLocaleDateString()}</p>
+                    <p>Time: {new Date(item.withdrawDate).toLocaleTimeString('en-US', {
                         hour: '2-digit',
                         minute: '2-digit',
                         hour12: true

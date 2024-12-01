@@ -22,7 +22,8 @@ const AdminDash = () => {
       'check-in': 'action-checkin',
       'removed': 'action-removed',
       'added': 'action-added',
-      'updated': 'action-updated'
+      'updated': 'action-updated',
+      'withdraw': 'action-checkout'
     };
     return styles[action.toLowerCase()] || '';
   };

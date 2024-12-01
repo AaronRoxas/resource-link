@@ -2,29 +2,26 @@ const express = require('express');
 const router = express.Router();
 const Withdrawal = require('../models/Withdrawal');
 const Item = require('../models/Item');
+const Activity = require('../models/Activity');
 
 // Create a new withdrawal request
 router.post('/', async (req, res) => {
     try {
-        const withdrawal = new Withdrawal(req.body);
+        const withdrawal = new Withdrawal({
+            borrower: req.body.borrower,
+            itemId: req.body.itemId,
+            claimDate: req.body.claimDate,
+            status: 'pending',
+            receiptData: {
+                requestId: req.body.receiptData.requestId,
+                category: req.body.receiptData.category,
+                subCategory: req.body.receiptData.subCategory,
+                qty: req.body.receiptData.qty,
+                approvedBy: req.body.receiptData.approvedBy || ""
+            }
+        });
+        
         await withdrawal.save();
-
-        // Update item quantity if status is approved
-        if (withdrawal.status === 'approved') {
-            const item = await Item.findById(withdrawal.itemId);
-            if (!item) {
-                return res.status(404).json({ message: 'Item not found' });
-            }
-
-            if (item.qty < withdrawal.quantity) {
-                return res.status(400).json({ message: 'Insufficient stock' });
-            }
-
-            item.qty -= withdrawal.quantity;
-            item.status = item.qty < 10 ? 'Low Stock' : 'In Stock';
-            await item.save();
-        }
-
         res.status(201).json(withdrawal);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -62,39 +59,68 @@ router.patch('/:id/status', async (req, res) => {
             return res.status(404).json({ message: 'Withdrawal not found' });
         }
 
-        const oldStatus = withdrawal.status;
-        withdrawal.status = req.body.status;
-        await withdrawal.save();
-
-        // If status changed to approved, update item quantity
-        if (oldStatus !== 'approved' && req.body.status === 'approved') {
+        if (req.body.status === 'approved') {
+            // Get the item and check stock
             const item = await Item.findById(withdrawal.itemId);
             if (!item) {
                 return res.status(404).json({ message: 'Item not found' });
             }
 
-            if (item.qty < withdrawal.quantity) {
-                return res.status(400).json({ message: 'Insufficient stock' });
+            // Check if enough stock
+            if (item.qty < withdrawal.receiptData.qty) {
+                return res.status(400).json({ 
+                    message: 'Insufficient stock',
+                    details: {
+                        available: item.qty,
+                        requested: withdrawal.receiptData.qty
+                    }
+                });
             }
 
-            item.qty -= withdrawal.quantity;
-            item.status = item.qty < 10 ? 'Low Stock' : 'In Stock';
-            await item.save();
+            // Update item quantity
+            const newQuantity = item.qty - withdrawal.receiptData.qty;
+            item.qty = newQuantity;
+            item.status = newQuantity < 10 ? 'Low Stock' : 'In Stock';
+
+            // Update withdrawal
+            withdrawal.status = req.body.status;
+            withdrawal.receiptData.approvedBy = req.body.approvedBy;
+
+            // Determine action based on itemType
+            const actionType = item.itemType === 'Consumable' ? 'Withdraw' : 'check-out';
+
+            // Create activity log with all required fields
+            const activity = new Activity({
+                borrower: withdrawal.borrower,
+                borrowerRole: 'Teacher',
+                itemId: withdrawal.itemId,
+                itemName: item.name,
+                action: actionType,
+                timestamp: new Date(),
+                approvedBy: req.body.approvedBy
+            });
+
+            // Save all documents
+            await Promise.all([
+                item.save(),
+                withdrawal.save(),
+                activity.save()
+            ]);
+
+            return res.json(withdrawal);
         }
 
-        // If status changed from approved to rejected, restore item quantity
-        if (oldStatus === 'approved' && req.body.status === 'rejected') {
-            const item = await Item.findById(withdrawal.itemId);
-            if (item) {
-                item.qty += withdrawal.quantity;
-                item.status = item.qty < 10 ? 'Low Stock' : 'In Stock';
-                await item.save();
-            }
-        }
+        // If declining, just update the status
+        withdrawal.status = req.body.status;
+        await withdrawal.save();
 
         res.json(withdrawal);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        console.error('Server error:', error);
+        res.status(400).json({ 
+            message: error.message,
+            details: error.stack
+        });
     }
 });
 

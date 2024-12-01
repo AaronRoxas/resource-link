@@ -7,6 +7,10 @@ import ItemInformation from '../../components/ItemInformation';
 import { useNavigate, useLocation } from 'react-router-dom';
 import NavBar from '../../components/NavBar';
 
+const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
+
 const StaffDash = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,6 +26,7 @@ const StaffDash = () => {
   const [activities, setActivities] = useState([]);
   const [inventoryAlerts, setInventoryAlerts] = useState([]);
   const [withdrawRequests, setWithdrawRequests] = useState([]);
+  const [claimDate, setClaimDate] = useState('');
 
   const fetchBorrowings = async () => {
     try {
@@ -43,7 +48,7 @@ const StaffDash = () => {
 
   const fetchWithdrawRequests = async () => {
     try {
-      const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals');
+        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/withdraws');
       setWithdrawRequests(response.data);
     } catch (error) {
       console.error('Error fetching withdraw requests:', error);
@@ -86,8 +91,13 @@ const StaffDash = () => {
   ];
 
   const handleStatusClick = (item) => {
-    setSelectedBorrow(item);
-    setShowModal(true);
+    if (item.receiptData?.status?.toLowerCase() === 'reserved') {
+      setSelectedBorrow(item);
+      setShowModal(true); // We'll show the same modal but with different content
+    } else {
+      setSelectedBorrow(item);
+      setShowModal(true);
+    }
   };
 
   const handleAccept = async (borrowId) => {
@@ -228,7 +238,8 @@ const StaffDash = () => {
       'check-in': 'action-checkin',
       'removed': 'action-removed',
       'added': 'action-added',
-      'updated': 'action-updated'
+      'updated': 'action-updated',
+      'withdraw': 'action-checkout'
     };
     return styles[action.toLowerCase()] || '';
   };
@@ -247,13 +258,22 @@ const StaffDash = () => {
 
   const handleWithdrawAccept = async (withdrawId) => {
     try {
-      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals/${withdrawId}/status`, {
-        status: 'approved'
-      });
-      setShowModal(false);
-      fetchWithdrawRequests();
+        // Get staff name from localStorage
+        const staffData = JSON.parse(localStorage.getItem('userData'));
+        const staffName = staffData?.name;
+
+        const response = await axios.patch(
+            `https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals/${withdrawId}/status`,
+            {
+                status: 'approved',
+                approvedBy: staffName // Make sure we're sending the staff name
+            }
+        );
+        
+        setShowModal(false);
+        fetchWithdrawRequests();
     } catch (error) {
-      console.error('Error accepting withdraw request:', error);
+        console.error('Error accepting withdrawal:', error);
     }
   };
 
@@ -339,7 +359,7 @@ const StaffDash = () => {
                   })),
                 ...withdrawRequests
                   .filter(request => 
-                    ['pending', 'approved', 'declined'].includes(request.status?.toLowerCase())
+                    ['pending', 'declined'].includes(request.status?.toLowerCase())
                   )
                   .map(request => ({
                     ...request,
@@ -360,7 +380,7 @@ const StaffDash = () => {
                           onClick={() => handleStatusClick(item)}
                           style={{ cursor: 'pointer' }}
                         >
-                          {item.type === 'withdraw' ? `Withdraw (${item.status})` : item.receiptData?.status}
+                          {capitalizeFirstLetter(item.type === 'withdraw' ? item.status : item.receiptData?.status)}
                         </span>
                       </span>
                     </td>
@@ -394,7 +414,7 @@ const StaffDash = () => {
             <tbody>
               {activities
                 .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-                .slice(0, 10) // Keep only the 10 most recent activities
+                .slice(0, 5) // Keep only the 5 most recent activities
                 .map((activity) => (
                   <tr key={activity._id}>
                     <td>
@@ -430,69 +450,159 @@ const StaffDash = () => {
       {showModal && selectedBorrow && (
         <div className="modal-overlay">
           <div className="modal-content reservation-receipt">
-            <div className="modal-header">
-              <h2>{selectedBorrow.type === 'withdraw' ? 'Withdraw Request Receipt' : 'Reservation Receipt'}</h2>
-              <span className="close-button" onClick={() => setShowModal(false)}>×</span>
-            </div>
-            
-            <div className="user-info">
-              <img src="/dashboard-imgs/profile-placeholder.svg" alt="User" className="user-avatar" />
-              <div className="user-details">
-                <h3>{selectedBorrow.borrower}</h3>
-                <p>{selectedBorrow.receiptData?.borrowerType || 'Teacher'}</p>
-              </div>
-            </div>
-
-            <p className="to-borrow-label">To Borrow</p>
-            
-            <div className="item-preview">
-               <img 
-                  src={selectedBorrow.itemId?.image || "/dashboard-imgs/placeholder.svg"} 
-                  alt={selectedBorrow.itemId?.name} 
-                />
-              <div className="item-info">
-                <h3>{selectedBorrow.itemId?.name}</h3>
-                <p>{selectedBorrow.itemId?.category}</p>
-              </div>
-            </div>
-
-            <p className="date-label">Date</p>
-            <div className="date-container">
-              <div className="date-row">
-                <span>Borrow Date:</span>
-                <span>{new Date(selectedBorrow.borrowDate).toLocaleDateString()}</span>
-              </div>
-              <div className="date-row">
-                <span>Return Date:</span>
-                <span>{new Date(selectedBorrow.returnDate).toLocaleDateString()}</span>
-              </div>
-            </div>
-
-            <div className="receipt-footer">
-              <p>Borrow request ID: {selectedBorrow.receiptData?.requestId?.slice(0, 10)}</p>
-              <p>Date: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleDateString()}</p>
-              <p>Time: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-            </div>
-
-            {selectedBorrow.receiptData?.status === 'pending' ? (
-              <div className="action-container">
-                <button 
-                  className="accept-button" 
-                  onClick={() => handleAccept(selectedBorrow._id)}
-                >
-                  Accept
-                </button>
-                <div 
-                  className="decline-text"
-                  onClick={() => handleDecline(selectedBorrow._id)}
-                >
-                  Decline
+            {selectedBorrow.receiptData?.status === 'reserved' ? (
+              // Reservation Receipt
+              <>
+                <div className="modal-header">
+                  <h2>Reservation Receipt</h2>
+                  <span className="close-button" onClick={() => setShowModal(false)}>×</span>
                 </div>
-              </div>
-            ) : selectedBorrow.receiptData?.status === 'reserved' && (
-              <button className="checkout-button" onClick={handleCheckoutClick}>
-                Checkout
-              </button>
+                
+                <div className="user-info">
+                  <img 
+                    src="/dashboard-imgs/profile-placeholder.svg"
+                    alt="User" 
+                    className="user-avatar" 
+                  />
+                  <div className="user-details">
+                    <h3>{selectedBorrow.borrower}</h3>
+                    <p>{selectedBorrow.receiptData?.borrowerType}</p>
+                  </div>
+                </div>
+
+                <p className="to-borrow-label">To Borrow</p>
+                
+                <div className="item-preview">
+                  <img 
+                    src={selectedBorrow.itemId?.itemImage || "/dashboard-imgs/placeholder.svg"} 
+                    alt={selectedBorrow.itemId?.name} 
+                  />
+                  <div className="item-info">
+                    <h3>{selectedBorrow.itemId?.name}</h3>
+                    <p>{selectedBorrow.itemId?.category}</p>
+                  </div>
+                </div>
+
+                <p className="date-label">Date</p>
+                
+                <div className="date-inputs">
+                  <div className="date-field">
+                    <label>Borrow Date:</label>
+                    <input 
+                      type="text" 
+                      value={new Date(selectedBorrow.borrowDate).toLocaleDateString()}
+                      readOnly 
+                    />
+                  </div>
+                  <div className="date-field">
+                    <label>Return Date:</label>
+                    <input 
+                      type="text" 
+                      value={new Date(selectedBorrow.returnDate).toLocaleDateString()}
+                      readOnly 
+                    />
+                  </div>
+                </div>
+
+                <div className="receipt-footer">
+                  <p>Borrow request ID: {selectedBorrow.receiptData?.requestId}</p>
+                  <p>Date: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleDateString()}</p>
+                  <p>Time: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                  })}</p>
+                </div>
+
+                <button 
+                  className="checkout-button"
+                  onClick={() => {
+                    setShowModal(false);
+                    setShowCheckoutModal(true);
+                  }}
+                >
+                  Checkout
+                </button>
+              </>
+            ) : (
+              // Original Borrow Request Receipt content
+              <>
+                <div className="modal-header">
+                  <h2>Borrow Request Receipt</h2>
+                  <span className="close-button" onClick={() => setShowModal(false)}>×</span>
+                </div>
+                
+                <div className="user-info">
+                  <img 
+                    src="/dashboard-imgs/profile-placeholder.svg"
+                    alt="User" 
+                    className="user-avatar" 
+                  />
+                  <div className="user-details">
+                    <h3>{selectedBorrow.borrower}</h3>
+                    <p>{selectedBorrow.receiptData?.borrowerType}</p>
+                  </div>
+                </div>
+
+                <p className="to-borrow-label">To Borrow</p>
+                
+                <div className="item-preview">
+                  <img 
+                    src={selectedBorrow.itemId?.itemImage || "/dashboard-imgs/placeholder.svg"} 
+                    alt={selectedBorrow.itemId?.name} 
+                  />
+                  <div className="item-info">
+                    <h3>{selectedBorrow.itemId?.name}</h3>
+                    <p>{selectedBorrow.itemId?.category}</p>
+                  </div>
+                </div>
+
+                <p className="date-label">Date</p>
+                
+                <div className="date-inputs">
+                  <div className="date-field">
+                    <label>Borrow Date:</label>
+                    <input 
+                      type="text" 
+                      value={new Date(selectedBorrow.borrowDate).toLocaleDateString()}
+                      readOnly 
+                    />
+                  </div>
+                  <div className="date-field">
+                    <label>Return Date:</label>
+                    <input 
+                      type="text" 
+                      value={new Date(selectedBorrow.returnDate).toLocaleDateString()}
+                      readOnly 
+                    />
+                  </div>
+                </div>
+
+                <div className="receipt-footer">
+                  <p>Borrow request ID: {selectedBorrow.receiptData?.requestId}</p>
+                  <p>Date: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleDateString()}</p>
+                  <p>Time: {new Date(selectedBorrow.receiptData?.borrowTime).toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                  })}</p>
+                </div>
+
+                {selectedBorrow.receiptData?.status === 'pending' && (
+                  <div className="action-buttons">
+                    <button 
+                      className="accept-button" 
+                      onClick={() => handleAccept(selectedBorrow._id)}
+                    >
+                      Accept
+                    </button>
+                    <button 
+                      className="decline-button"
+                      onClick={() => handleWithdrawDecline(selectedBorrow._id)}
+                    >
+                      Decline
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
