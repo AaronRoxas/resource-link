@@ -3,13 +3,10 @@ const router = express.Router();
 const Item = require('../models/Item'); 
 const mongoose = require('mongoose'); 
 const Borrowing = require('../models/Borrowing');
-const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
-
 
 router.get('/', async (req, res) => {
   try {
-    const items = await Item.find(); // Fetch items from the database
+    const items = await Item.find();
     res.json(items);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
@@ -99,10 +96,11 @@ router.post('/', async (req, res) => {
   try {
     const newItem = new Item(req.body);
     const savedItem = await newItem.save();
+    console.log('Saved item:', savedItem);
     res.status(201).json(savedItem);
-  } catch (error) {
-    console.error('Error creating inventory item:', error);
-    res.status(500).json({ message: 'Error creating inventory item', error: error.message });
+  } catch (err) {
+    console.error('Error adding item:', err);
+    res.status(500).json({ error: 'Internal Server Error', details: err.message });
   }
 });
 
