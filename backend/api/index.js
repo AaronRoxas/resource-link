@@ -9,6 +9,7 @@ const inventoryRoutes = require('../routes/inventory');
 const itemRoutes = require('../routes/items');
 const borrowingsRoutes = require('../routes/borrowings');
 const userRoutes = require('../routes/user');
+const categoryRoutes = require('../routes/categories');
 
 const app = express();
 
@@ -45,7 +46,8 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/borrowings', borrowingsRoutes);
 app.use('/api/users', userRoutes);
-app.use('/inventory', inventoryRoutes);
+app.use('/api/categories', categoryRoutes);
+
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -61,6 +63,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-
- 

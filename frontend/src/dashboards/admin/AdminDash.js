@@ -100,7 +100,7 @@ const AdminDash = () => {
     { path: '/adminChart', icon: 'chart', label: 'Chart' },
     { path: '/addItem', icon: 'qr', label: 'Add Item' },
     { path: '/addUser', icon: 'profile', label: 'Add User' },
-    { path: '/adminCategories', icon: 'cube', label: 'Categories' },
+    { path: '/admin/inventory', icon: 'cube', label: 'Inventory' },
   ];
 
   const handleViewAllInventoryAlerts = () => {
