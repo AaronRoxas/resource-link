@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'; 
-import Modal from '../../components/Modal'; 
 import '../../styles/AddUser.css'; 
 import BottomNav from '../../components/BottomNav';
 import * as XLSX from 'xlsx';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const AddUser = () => {
-  const [employeeId, setEmployeeId] = useState('');
+const AddUser = ({ isModal, onClose }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
   const [isActive, setIsActive] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [showSuccessModal, setShowSuccessModal] = useState(false); // State for success modal visibility
-  const [showErrorModal, setShowErrorModal] = useState(false); // State for error modal visibility
-  const [errorMessage, setErrorMessage] = useState(''); // State for error message
-  const [loading, setLoading] = useState(false); // State for loading indicator
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [importMethod, setImportMethod] = useState('single');
   const [bulkUsers, setBulkUsers] = useState([]);
   const [previewData, setPreviewData] = useState([]);
@@ -36,70 +32,66 @@ const AddUser = () => {
     setLoading(true);
 
     try {
+      // Validate required fields
+      if (!firstName || !lastName || !email || !role) {
+        toast.error('All fields are required');
+        return;
+      }
+
       const userData = {
-        employee_id: employeeId,
         first_name: firstName,
         last_name: lastName,
-        email,
-        password: '1234',
+        email: email.toLowerCase(),
+        password: '1234', // default password
         role: role.toLowerCase(),
         is_active: isActive
       };
-      
-      console.log('Sending user data:', userData);
 
+      console.log('Sending user data:', userData); // Debug log
+      
       const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/auth/register', userData);
       
-      console.log('Response:', response.data);
-      setShowSuccessModal(true);
+      if (response.data) {
+        toast.success('User created successfully!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true
+        });
 
-      // Clear form
-      setEmployeeId('');
-      setFirstName('');
-      setLastName('');
-      setEmail('');
-      setRole('');
-      setIsActive(true);
-      
+        // Clear form
+        setFirstName('');
+        setLastName('');
+        setEmail('');
+        setRole('');
+        setIsActive(true);
+        
+        if (isModal && onClose) {
+          setTimeout(onClose, 2000);
+        }
+      }
     } catch (error) {
-      console.error('Error details:', {
-        message: error.response?.data?.message,
-        status: error.response?.status,
-        data: error.response?.data,
-        error: error.message
-      });
+      console.error('Error details:', error);
       
-      setErrorMessage(error.response?.data?.message || 'Error creating user');
-      setShowErrorModal(true);
+      // More detailed error message
+      const errorMessage = error.response?.data?.message 
+        || error.response?.data?.error 
+        || error.message 
+        || 'Error creating user';
+      
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true
+      });
     } finally {
       setLoading(false);
     }
-  };
-
-  const closeSuccessModal = () => {
-    setShowSuccessModal(false);
-  };
-
-  const closeErrorModal = () => {
-    setShowErrorModal(false);
-  };
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = (event) => {
-      const workbook = XLSX.read(event.target.result, { type: 'binary' });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const data = XLSX.utils.sheet_to_json(worksheet);
-
-      // Preview the data
-      setPreviewData(data);
-      setBulkUsers(data);
-    };
-
-    reader.readAsBinaryString(file);
   };
 
   const handleBulkSubmit = async () => {
@@ -107,27 +99,43 @@ const AddUser = () => {
       const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/auth/register/bulk', 
         bulkUsers.map(user => ({
           ...user,
-          password: '1234', // Default password
+          password: '1234',
           is_active: true
         }))
       );
       
-      console.log('Bulk import response:', response.data);
+      toast.success(`Successfully imported ${bulkUsers.length} users!`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true
+      });
+
       setPreviewData([]);
       setBulkUsers([]);
-      setShowSuccessModal(true);
+      
+      if (isModal && onClose) {
+        setTimeout(onClose, 2000);
+      }
       
     } catch (error) {
       console.error('Error adding bulk users:', error);
-      setErrorMessage('Error adding users. Please check the format and try again.');
-      setShowErrorModal(true);
+      toast.error('Error adding users. Please check the format and try again.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true
+      });
     }
   };
 
   const downloadTemplate = () => {
     const template = [
       {
-        employee_id: 'EMP123',
         first_name: 'John',
         last_name: 'Doe',
         email: 'john.doe@example.com',
@@ -149,9 +157,61 @@ const AddUser = () => {
     { path: '/admin/inventory', icon: 'cube', label: 'Inventory' },
   ];
 
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        // Validate and format the data
+        const formattedData = jsonData.map(row => ({
+          first_name: row.first_name,
+          last_name: row.last_name,
+          email: row.email,
+          role: row.role?.toLowerCase()
+        }));
+
+        // Basic validation
+        const isValid = formattedData.every(user => 
+          user.first_name && 
+          user.last_name && 
+          user.email && 
+          ['admin', 'teacher', 'staff'].includes(user.role)
+        );
+
+        if (!isValid) {
+          toast.error('Invalid data format in file. Please check the template.', {
+            position: "top-right",
+            autoClose: 5000
+          });
+          return;
+        }
+
+        setPreviewData(formattedData);
+        setBulkUsers(formattedData);
+      };
+
+      reader.readAsArrayBuffer(file);
+    } catch (error) {
+      console.error('Error reading file:', error);
+      toast.error('Error reading file. Please try again.', {
+        position: "top-right",
+        autoClose: 5000
+      });
+    }
+  };
+
   return (
-    <div className="add-user-container">
-      <h2>{isMobile ? 'Create User' : 'Create New User'}</h2>
+    <div className={`add-user-container ${isModal ? 'modal-view' : ''}`}>
+      <ToastContainer />
+      {!isModal && <h2>{isMobile ? 'Create User' : 'Create New User'}</h2>}
 
       <div className="import-method-selector">
         <button 
@@ -170,15 +230,6 @@ const AddUser = () => {
 
       {importMethod === 'single' ? (
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Employee ID</label>
-            <input
-              type="text"
-              value={employeeId}
-              onChange={(e) => setEmployeeId(e.target.value)}
-              required
-            />
-          </div>
           <div className="form-group">
             <label>First Name</label>
             <input
@@ -214,9 +265,9 @@ const AddUser = () => {
               required
             >
               <option value="" disabled>Select Role</option>
-              <option value="Teacher">Teacher</option>
-              <option value="Staff">Staff</option>
-              <option value="Admin">Admin</option>
+              <option value="teacher">Teacher</option>
+              <option value="staff">Staff</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
           <div className="form-group">
@@ -261,7 +312,6 @@ const AddUser = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>Employee ID</th>
                       <th>First Name</th>
                       <th>Last Name</th>
                       <th>Email</th>
@@ -271,7 +321,6 @@ const AddUser = () => {
                   <tbody>
                     {previewData.slice(0, 5).map((user, index) => (
                       <tr key={index}>
-                        <td>{user.employee_id}</td>
                         <td>{user.first_name}</td>
                         <td>{user.last_name}</td>
                         <td>{user.email}</td>
@@ -297,13 +346,7 @@ const AddUser = () => {
         </div>
       )}
 
-      {showSuccessModal && (
-        <Modal message="User(s) created successfully!" onClose={closeSuccessModal} />
-      )}
-      {showErrorModal && (
-        <Modal message={errorMessage} onClose={closeErrorModal} />
-      )}
-      <BottomNav navItems={navItems} />
+      {!isModal && <BottomNav navItems={navItems} />}
     </div>
   );
 };

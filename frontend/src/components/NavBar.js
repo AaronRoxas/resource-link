@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import { getFormattedDate } from '../utils/dateUtils';
 const formattedDate = getFormattedDate();
-const NavBar = () => {
+const NavBar = ({ hideGreeting }) => {
   const [showDropdown, setShowDropdown] = useState(false)
   const navigate = useNavigate()
   
@@ -38,12 +38,14 @@ const NavBar = () => {
           )}
         </ProfileContainer>
       </NavContainer>
-      <MainContent>
-        <WelcomeText>
-        <h1>Hi, {localStorage.getItem('first_name')}! <br/>Welcome Back!</h1>
-        <h3>{formattedDate}</h3>
-        </WelcomeText>
-      </MainContent>
+      {!hideGreeting && (
+        <MainContent>
+          <WelcomeText>
+            <h1>Hi, {localStorage.getItem('first_name')}! <br/>Welcome Back!</h1>
+            <h3>{formattedDate}</h3>
+          </WelcomeText>
+        </MainContent>
+      )}
     </>
   )
 }

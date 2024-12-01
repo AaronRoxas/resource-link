@@ -272,6 +272,24 @@ const AdminCategoryItems = () => {
         }));
     };
 
+    const handleEditItem = (item) => {
+        setNewItem(item);
+        setShowAddItemModal(true);
+    };
+
+    const handleDeleteItem = async (item) => {
+        try {
+            await axios.delete(`https://resource-link-main-14c755858b60.herokuapp.com/api/inventory/${item._id}`, {
+                withCredentials: true
+            });
+            toast.success('Item deleted successfully!');
+            fetchCategoryItems();
+        } catch (error) {
+            console.error('Error deleting item:', error);
+            toast.error('Failed to delete item');
+        }
+    };
+
     return (
         <div className="view-category-items">
             <header>
@@ -530,8 +548,26 @@ const AdminCategoryItems = () => {
                                 </div>
                             </div>
                             <div className="form-group">
-                                <label>Type</label>
-                                <input type="text" value="Consumable" readOnly />
+                                <input type="text" value="Consumable" readOnly hidden />
+                            </div>
+                            <div className="form-group">
+                                <label>Sub-category</label>
+                                <select
+                                    value={newItem.subCategory}
+                                    onChange={(e) => setNewItem({
+                                        ...newItem,
+                                        subCategory: e.target.value
+                                    })}
+                                >
+                                    <option value="">None</option>
+                                    {category?.subCategories?.length > 0 && (
+                                        category.subCategories.map((sub, index) => (
+                                            <option key={index} value={sub.name}>
+                                                {sub.name}
+                                            </option>
+                                        ))
+                                    )}
+                                </select>
                             </div>
                             <div className="form-group">
                                 <label>ID</label>
@@ -540,11 +576,10 @@ const AdminCategoryItems = () => {
                                     value={newItem.id}
                                     onChange={handleIdChange}
                                     placeholder="Enter item ID to search"
-                                 
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Name</label>
+                                <label>Name <span className="required">*</span></label>
                                 <input
                                     type="text"
                                     value={newItem.name}
@@ -553,7 +588,7 @@ const AdminCategoryItems = () => {
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Purchase Date</label>
+                                <label>Purchase Date <span className="required">*</span></label>
                                 <input
                                     type="date"
                                     value={newItem.purchaseDate}
@@ -565,7 +600,7 @@ const AdminCategoryItems = () => {
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Purchase Cost</label>
+                                <label>Purchase Cost <span className="required">*</span></label>
                                 <input
                                     type="number"
                                     value={newItem.purchaseCost}
@@ -577,7 +612,7 @@ const AdminCategoryItems = () => {
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Qty</label>
+                                <label>Qty <span className="required">*</span></label>
                                 <input
                                     type="number"
                                     value={newItem.qty}
@@ -650,7 +685,23 @@ const AdminCategoryItems = () => {
                                 <td>{item.staffInCharge}</td>
                                 <td>{item.date}</td>
                                 <td>{item.qty}</td>
-                                <td>{item.action}</td>
+                                <td className="actions-cell">
+                                    <div className="action-buttons-container">
+                                        <img 
+                                            src="/table-imgs/edit.svg" 
+                                            alt="Edit" 
+                                            className="action-icon"
+                                            onClick={() => handleEditItem(item)}
+                                            style={{ paddingRight: '8px' }}
+                                        />
+                                        <img 
+                                            src="/table-imgs/delete.svg" 
+                                            alt="Delete" 
+                                            className="action-icon"
+                                            onClick={() => handleDeleteItem(item)}
+                                        />
+                                    </div>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

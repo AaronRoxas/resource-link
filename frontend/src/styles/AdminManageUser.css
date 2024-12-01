@@ -1,0 +1,146 @@
+.manage-user-container {
+    min-height: 100vh;
+    background-color: white;
+    padding-bottom: 60px;
+  }
+  
+  .manage-user-content {
+    padding: 16px;
+    padding-top: 80px;
+    padding-bottom: 60px;
+  }
+  
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .header-section h1 {
+    font-size: 24px;
+    font-weight: 600;
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .add-user-btn,
+  .filter-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  
+  .add-user-btn {
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .filter-btn {
+    font-size: 18px;
+  }
+  
+  .users-table-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+  }
+  
+  .users-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .users-table th,
+  .users-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .users-table th {
+    font-weight: 600;
+    color: #666;
+    background-color: #f8f8f8;
+  }
+  
+  .users-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .users-table tbody tr:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .manage-user-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .manage-user-modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  
+  .manage-user-modal-header {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    z-index: 1;
+  }
+  
+  .manage-user-modal-header button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+  }
+  
+  .manage-user-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .manage-user-form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #000;
+  }
+  
+  .manage-user-form-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+    background-color: white;
+  }
+  

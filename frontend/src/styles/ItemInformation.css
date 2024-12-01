@@ -22,6 +22,12 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.modal-overlay .item-info-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .modal-close {
@@ -94,6 +100,12 @@
 .info-content {
   flex: 1;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.info-content::-webkit-scrollbar {
+  display: none;
 }
 
 .info-row {

@@ -29,6 +29,7 @@ import ReservedItems from './components/ReservedItems';
 // import ViewItems from './dashboards/teacher/ViewItems.js';
 import AdminCategoryItems from './dashboards/admin/AdminCategoryItems.js';
 import ItemInformation from './components/ItemInformation';
+import AdminManageUser from './dashboards/admin/AdminManageUser';
 
 function App() {
   return (
@@ -246,6 +247,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['staff']}>
               <ItemInformation />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/manage-user" 
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminManageUser />
             </ProtectedRoute>
           } 
         />

@@ -98,8 +98,7 @@ const AdminDash = () => {
   const navItems = [
     { path: '/admin', icon: 'active-home', label: 'Home' },
     { path: '/adminChart', icon: 'chart', label: 'Chart' },
- 
-    { path: '/addUser', icon: 'profile', label: 'Add User' },
+    { path: '/admin/manage-user', icon: 'profile', label: 'Manage User' },
     { path: '/admin/inventory', icon: 'cube', label: 'Inventory' },
   ];
 
