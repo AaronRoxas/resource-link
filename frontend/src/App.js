@@ -28,6 +28,8 @@ import ItemInformation from './components/ItemInformation';
 import AdminManageUser from './dashboards/admin/AdminManageUser';
 import TeacherCategoryItems from './dashboards/teacher/TeacherCategoryItems';
 import MainPage from './MainPage';
+import StaffInventory from './dashboards/staff/StaffInventory';
+import StaffInventoryItems from './dashboards/staff/StaffInventoryItems';
 
 function App() {
   return (
@@ -151,6 +153,24 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        
+        <Route 
+          path="/staff/inventory" 
+          element={
+            <ProtectedRoute requiredRole="staff">
+              <StaffInventory />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/staff/inventory/:categoryName" 
+          element={
+            <ProtectedRoute requiredRole="staff">
+              <StaffInventoryItems />
+            </ProtectedRoute>
+          } 
+        />
+        
         <Route 
           path="/staff/logs" 
           element={

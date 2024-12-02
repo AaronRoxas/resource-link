@@ -408,7 +408,7 @@ const AdminCategoryItems = () => {
                             </select>
                         </div>
                         <button 
-                            className="cancel-button"
+                            className="form-cancel-btn"
                             onClick={() => setShowItemTypeModal(false)}
                         >
                             Cancel

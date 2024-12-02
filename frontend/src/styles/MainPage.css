@@ -1,3 +1,28 @@
+/* Add this to the top of your existing CSS */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888888;
+  border-radius: 10px;
+  border: 2px solid #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #275299;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #7587a7 #f1f1f1;
+}
 .main-page {
   min-height: 100vh;
   background-color: #f0f0f5;
@@ -648,8 +673,8 @@
 
 /* Learn More Section */
 .learn-more-section {
-  background: linear-gradient(135deg, #4285f4, #2962ff);
   padding: 60px 40px;
+  background: linear-gradient(180deg, #4188FF, #275299);
   position: relative;
   overflow: hidden;
   min-height: 300px;

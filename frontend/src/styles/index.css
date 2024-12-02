@@ -12,3 +12,21 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.form-cancel-btn {
+  background-color: #ff4d4d;
+  color: #ffffff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.form-cancel-btn:hover {
+  background-color: #c4c4c4;
+}
+
+.form-cancel-btn:active {
+  background-color: #b1b1b1;
+}

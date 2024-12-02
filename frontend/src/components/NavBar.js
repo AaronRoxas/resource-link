@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import { getFormattedDate } from '../utils/dateUtils';
 const formattedDate = getFormattedDate();
-const NavBar = ({ hideGreeting }) => {
+const NavBar = ({ hideWelcome }) => {
   const [showDropdown, setShowDropdown] = useState(false)
   const navigate = useNavigate()
   
@@ -12,7 +12,7 @@ const NavBar = ({ hideGreeting }) => {
     // Clear authentication tokens or user data
     localStorage.removeItem('authToken');
     // Redirect to login page
-    navigate('/login');
+    navigate('/home');
   };
 
 
@@ -38,7 +38,7 @@ const NavBar = ({ hideGreeting }) => {
           )}
         </ProfileContainer>
       </NavContainer>
-      {!hideGreeting && (
+      {!hideWelcome && (
         <MainContent>
           <WelcomeText>
             <h1>Hi, {localStorage.getItem('first_name')}! <br/>Welcome Back!</h1>

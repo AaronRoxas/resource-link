@@ -88,7 +88,7 @@ const StaffDash = () => {
   const navItems = [
     { path: '/staff', icon: 'active-home', label: 'Home' },
     { path: '/qr', icon: 'qr' },
-    { path: '/categories', icon: 'cube', label: 'Categories' },
+    { path: '/staff/inventory', icon: 'cube', label: 'Inventory' },
   ];
 
   const handleStatusClick = (item) => {

@@ -241,8 +241,8 @@ const MainPage = () => {
           © Copyright ResourceLink 2024 All Rights Reserved.
         </div>
         <div className="footer-links">
-          <a href="/privacy">Privacy Policy</a>
-          <a href="/terms">Terms & Conditions</a>
+          <a>Privacy Policy</a>
+          <a>Terms & Conditions</a>
         </div>
       </footer>
     </div>

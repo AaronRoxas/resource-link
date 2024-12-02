@@ -360,12 +360,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
             </div>
           </div>
         );
-      case 'History':
-        return (
-          <div className="history-content">
-            {/* Add history content here */}
-          </div>
-        );
+
       case 'QR Code':
         const qrUrl = getItemUrl();
         console.log('Generated QR URL:', qrUrl);
@@ -668,12 +663,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
             >
               Info
             </button>
-            <button 
-              className={`info-tab ${activeTab === 'History' ? 'active' : ''}`}
-              onClick={() => setActiveTab('History')}
-            >
-              History
-            </button>
+
             <button 
               className={`info-tab ${activeTab === 'QR Code' ? 'active' : ''}`}
               onClick={() => setActiveTab('QR Code')}
@@ -684,35 +674,37 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
 
           {renderTabContent()}
 
-          <div className="action-buttons">
-            <button 
-              className="action-button check-in"
-              disabled={selectedItem?.availability !== 'Check-out'}
-              style={selectedItem?.availability !== 'Check-out' ? 
-                {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
-              onClick={() => setShowConfirmCheckInModal(true)}
-            >
-              Check-in
-            </button>
-            <button 
-              className="action-button check-out"
-              disabled={selectedItem?.availability === 'Check-out'}
-              style={selectedItem?.availability === 'Check-out' ? 
-                {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
-              onClick={() => setShowCheckoutModal(true)}
-            >
-              Check-out
-            </button>
-            <button 
-              className="action-button reserved-checkout"
-              disabled={selectedItem?.availability === 'Check-out'}
-              style={selectedItem?.availability === 'Check-out' ? 
-                {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
-              onClick={() => setShowReservedCheckoutModal(true)}
-            >
-              Reserved Check-out
-            </button>
-          </div>
+          {activeTab !== 'QR Code' && (
+            <div className="action-buttons">
+              <button 
+                className="action-button check-in"
+                disabled={selectedItem?.availability !== 'Check-out'}
+                style={selectedItem?.availability !== 'Check-out' ? 
+                  {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
+                onClick={() => setShowConfirmCheckInModal(true)}
+              >
+                Check-in
+              </button>
+              <button 
+                className="action-button check-out"
+                disabled={selectedItem?.availability === 'Check-out'}
+                style={selectedItem?.availability === 'Check-out' ? 
+                  {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
+                onClick={() => setShowCheckoutModal(true)}
+              >
+                Check-out
+              </button>
+              <button 
+                className="action-button reserved-checkout"
+                disabled={selectedItem?.availability === 'Check-out'}
+                style={selectedItem?.availability === 'Check-out' ? 
+                  {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
+                onClick={() => setShowReservedCheckoutModal(true)}
+              >
+                Reserved Check-out
+              </button>
+            </div>
+          )}
         </div>
       </div>
       {renderCheckoutModal()}
