@@ -88,7 +88,7 @@ const OnBoarding = () => {
       <p className="onboarding-description">{steps[currentStep].description}</p>
       <div className="progress-dots">
         {steps.map((_, index) => (
-          <div key={index} className={`dot ${index === currentStep ? 'active' : ''}`} />
+          <div key={index} className={`onboarding-dot ${index === currentStep ? 'active' : ''}`} />
         ))}
       </div>
       <button className="next-button" onClick={goToNextStep}>

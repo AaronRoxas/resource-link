@@ -5,15 +5,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 75vh;
+  height: 100vh;
   padding: 20px;
   background-color: white;
   transition: transform 0.3s ease-out;
 }
 
 .onboarding-image {
-  width: 300px;
-  height: 300px;
+  width: 200px;
+  height: 170px;
   object-fit: contain;
   margin-bottom: 20px;
 }
@@ -24,7 +24,7 @@
     font-weight: 700;
     line-height: 25px;
     text-align: center;
-    color: #006C3A;
+    color: #5a5a5a;
     padding-bottom: 10px;
 }
 
@@ -44,21 +44,21 @@
   margin:10px 0;
 }
 
-.dot {
+.onboarding-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #E0E0E0;
+  background-color: #b1afaf;
   margin: 0 5px;
 
 }
 
-.dot.active {
-  background-color: #006C3A;
+.onboarding-dot.active {
+  background-color: #ACCBFF;
 }
 
 .next-button {
-  background-color: #006C3A;
+  background-color: #007bff;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -72,7 +72,7 @@
 }
 
 .next-button:hover {
-  background-color: #45a049;
+  background-color: #007bff;
 }
 
 @media (min-width: 768px) {
