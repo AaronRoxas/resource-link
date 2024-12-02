@@ -27,17 +27,21 @@ import AdminCategoryItems from './dashboards/admin/AdminCategoryItems.js';
 import ItemInformation from './components/ItemInformation';
 import AdminManageUser from './dashboards/admin/AdminManageUser';
 import TeacherCategoryItems from './dashboards/teacher/TeacherCategoryItems';
+import MainPage from './MainPage';
+
 function App() {
   return (
     <Router>
       <Routes>
+    
         <Route path="/" element={<Splash />} />
         <Route path="/onboarding" element={<OnBoarding />} />
+        
         <Route
-          path="/login"
+          path="/home"
           element={
             <PublicRoute>
-              <LoginComponent />
+              <MainPage />
             </PublicRoute>
           }
         />

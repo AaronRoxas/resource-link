@@ -39,7 +39,7 @@ const OnBoarding = () => {
       setCurrentStep(currentStep + 1);
     } else {
       // Redirect to LoginComponent
-      navigate('/login');
+      navigate('/home');
     }
   };
 
@@ -50,7 +50,7 @@ const OnBoarding = () => {
   };
 
   const skipOnboarding = () => {
-    navigate('/login'); // Redirect to LoginComponent
+    navigate('/home'); // Redirect to LoginComponent
   };
 
   const handlers = useSwipeable({
@@ -63,7 +63,7 @@ const OnBoarding = () => {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) { // Adjust the breakpoint as needed
-        navigate('/login');
+        navigate('/home');
       }
     };
 
