@@ -13,88 +13,40 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
     const [showReceipt, setShowReceipt] = useState(false);
     const [receiptData, setReceiptData] = useState(null);
 
-    const handleBorrow = async () => {
+    const handleWithdraw = async () => {
         try {
-            if (item.itemType === 'Consumable') {
-                // Handle withdrawal for consumable items
-                const withdrawalData = {
-                    borrower: borrowFormData.borrower,
-                    itemId: item._id,
-                    claimDate: new Date(borrowFormData.borrowDate),
-                    status: 'pending',
-                    receiptData: {
-                        requestId: Array(10)
-                            .fill(0)
-                            .map(() => Math.random().toString(36).charAt(2))
-                            .join('')
-                            .toUpperCase(),
-                        category: item.category,
-                        subCategory: item.subCategory,
-                        qty: borrowFormData.quantity,
-                        approvedBy: "" // Will be filled by admin/approver
-                    }
-                };
-
-                const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals', withdrawalData);
-
-                setReceiptData({
-                    requestId: response.data.receiptData?.requestId || withdrawalData.receiptData.requestId,
-                    date: new Date().toLocaleDateString(),
-                    time: new Date().toLocaleTimeString(),
-                    item: item,
-                    quantity: borrowFormData.quantity,
-                    status: 'pending',
+            const withdrawalData = {
+                borrower: borrowFormData.borrower,
+                itemId: item._id,
+                claimDate: new Date(borrowFormData.borrowDate),
+                status: 'pending',
+                receiptData: {
+                    requestId: Array(10)
+                        .fill(0)
+                        .map(() => Math.random().toString(36).charAt(2))
+                        .join('')
+                        .toUpperCase(),
                     category: item.category,
-                    subCategory: item.subCategory
-                });
-            } else {
-                // Validate dates first
-                if (!borrowFormData.borrowDate || !borrowFormData.returnDate) {
-                    throw new Error('Please select both borrow and return dates');
+                    subCategory: item.subCategory,
+                    qty: borrowFormData.quantity,
+                    approvedBy: ""
                 }
+            };
 
-                const borrowingData = {
-                    itemId: item._id,
-                    borrower: borrowFormData.borrower,
-                    borrowDate: new Date(borrowFormData.borrowDate),
-                    returnDate: new Date(borrowFormData.returnDate),
-                    quantity: borrowFormData.quantity,
-                    receiptData: {
-                        requestId: Array(10)
-                            .fill(0)
-                            .map(() => Math.random().toString(36).charAt(2))
-                            .join('')
-                            .toUpperCase(),
-                        borrowerType: 'Teacher',
-                        borrowTime: new Date(),
-                        status: 'pending',
-                        approvedBy: 'pending',  // This is required by the backend
-                        category: item.category,
-                        subCategory: item.subCategory,
-                        itemName: item.name
-                    }
-                };
+            const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals', withdrawalData);
 
-                // Debug log to see what we're sending
-                console.log('Sending borrowing request:', borrowingData);
-
-                const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings', borrowingData);
-                
-                setReceiptData({
-                    requestId: response.data.receiptData?.requestId || borrowingData.receiptData.requestId,
-                    date: new Date().toLocaleDateString(),
-                    time: new Date().toLocaleTimeString(),
-                    borrowDate: borrowFormData.borrowDate,
-                    returnDate: borrowFormData.returnDate,
-                    item: item,
-                    status: 'pending'
-                });
-
-                setShowReceipt(true);
-                fetchItems();
-            }
+            setReceiptData({
+                requestId: response.data.receiptData?.requestId || withdrawalData.receiptData.requestId,
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString(),
+                item: item,
+                quantity: borrowFormData.quantity,
+                status: 'pending',
+                category: item.category,
+                subCategory: item.subCategory
+            });
+            setShowReceipt(true);
         } catch (error) {
-            // More detailed error logging
             console.error('Error details:', {
                 message: error.message,
                 response: error.response?.data,
@@ -104,41 +56,101 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
         }
     };
 
+    const handleBorrowing = async () => {
+        try {
+            if (!borrowFormData.borrowDate || !borrowFormData.returnDate) {
+                throw new Error('Please select both borrow and return dates');
+            }
+
+            const borrowingData = {
+                itemId: item._id,
+                borrower: borrowFormData.borrower,
+                borrowDate: new Date(borrowFormData.borrowDate),
+                returnDate: new Date(borrowFormData.returnDate),
+                quantity: borrowFormData.quantity,
+                status: 'pending',
+                receiptData: {
+                    requestId: Array(10)
+                        .fill(0)
+                        .map(() => Math.random().toString(36).charAt(2))
+                        .join('')
+                        .toUpperCase(),
+                    borrowerType: 'Teacher',
+                    borrowTime: new Date(),
+                    status: 'pending',
+                    approvedBy: 'pending',
+                    category: item.category,
+                    subCategory: item.subCategory,
+                    itemName: item.name
+                }
+            };
+
+            const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings', borrowingData);
+            
+            setReceiptData({
+                requestId: response.data.receiptData?.requestId || borrowingData.receiptData.requestId,
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString(),
+                borrowDate: borrowFormData.borrowDate,
+                returnDate: borrowFormData.returnDate,
+                item: item,
+                status: 'pending'
+            });
+            setShowReceipt(true);
+            fetchItems();
+        } catch (error) {
+            console.error('Error details:', {
+                message: error.message,
+                response: error.response?.data,
+                data: error.response?.data?.message
+            });
+            alert(error.response?.data?.message || error.message || 'An error occurred while processing your request');
+        }
+    };
+
+    const handleSubmit = () => {
+        if (item.itemType === 'Consumable') {
+            handleWithdraw();
+        } else {
+            handleBorrowing();
+        }
+    };
+
     if (showReceipt) {
         const isBorrowing = item.itemType !== 'Consumable';
         
         return (
             <div className="modal-overlay">
-                <div className="receipt">
-                    <h2>{isBorrowing ? 'Borrow' : 'Withdraw'} request receipt</h2>
-                    
-                    <div className="user-info">
-                        <img 
-                            src={localStorage.getItem('profileImage') || "/dashboard-imgs/profile-placeholder.svg"} 
-                            alt="User" 
-                            className="user-avatar" 
-                        />
-                        <div className="user-details">
-                            <h3>{borrowFormData.borrower}</h3>
-                            <span>{borrowFormData.borrowerType}</span>
+                {isBorrowing ? (
+                    // Borrowing Receipt
+                    <div className="receipt">
+                        <h2>Borrow request receipt</h2>
+                        
+                        <div className="user-info">
+                            <img 
+                                src={localStorage.getItem('profileImage') || "/dashboard-imgs/profile-placeholder.svg"} 
+                                alt="User" 
+                                className="user-avatar" 
+                            />
+                            <div className="user-details">
+                                <h3>{borrowFormData.borrower}</h3>
+                                <span>Teacher</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <p>To {isBorrowing ? 'Borrow' : 'Withdraw'}</p>
-                    
-                    <div className="item-preview">
-                        <img 
-                            src={item.itemImage || "/dashboard-imgs/placeholder.svg"} 
-                            alt={item.name} 
-                        />
-                        <div>
-                            <h4>{item.name}</h4>
-                            <span>{item.category}</span>
-                            {!isBorrowing && <span>QTY: {borrowFormData.quantity}</span>}
+                        <p>To Borrow</p>
+                        
+                        <div className="item-preview">
+                            <img 
+                                src={item.itemImage || "/dashboard-imgs/placeholder.svg"} 
+                                alt={item.name} 
+                            />
+                            <div>
+                                <h4>{item.name}</h4>
+                                <span>{item.category}</span>
+                            </div>
                         </div>
-                    </div>
 
-                    {isBorrowing && (
                         <div className="dates-info">
                             <div className="info-row">
                                 <span>Borrow Date:</span>
@@ -149,20 +161,65 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                                 <span>{new Date(borrowFormData.returnDate).toLocaleDateString()}</span>
                             </div>
                         </div>
-                    )}
 
-                    <div className="request-info">
-                        <div className="info-row">
-                            {isBorrowing ? 'Borrow' : 'Withdraw'} request ID: {receiptData.requestId}
+                        <div className="request-info">
+                            <div className="info-row">Borrow request ID: {receiptData.requestId}</div>
+                            <div className="info-row">Date: {receiptData.date}</div>
+                            <div className="info-row">Time: {receiptData.time}</div>
                         </div>
-                        <div className="info-row">Date: {receiptData.date}</div>
-                        <div className="info-row">Time: {receiptData.time}</div>
-                    </div>
 
-                    <button className="receipt-close-button" onClick={onClose}>
-                        {isBorrowing ? 'Continue' : 'Close'}
-                    </button>
-                </div>
+                        <button 
+                            className="receipt-close-button"
+                            onClick={onClose}
+                        >
+                            Continue
+                        </button>
+                    </div>
+                ) : (
+                    // Withdrawal Receipt
+                    <div className="receipt">
+                        <h2>Withdraw request receipt</h2>
+                        
+                        <div className="user-info">
+                            <img 
+                                src={localStorage.getItem('profileImage') || "/dashboard-imgs/profile-placeholder.svg"} 
+                                alt="User" 
+                                className="user-avatar" 
+                            />
+                            <div className="user-details">
+                                <h3>{borrowFormData.borrower}</h3>
+                                <span>Teacher</span>
+                            </div>
+                        </div>
+
+                        <p>To Withdraw</p>
+                        
+                        <div className="item-preview">
+                            <img 
+                                src={item.itemImage || "/dashboard-imgs/placeholder.svg"} 
+                                alt={item.name} 
+                            />
+                            <div>
+                                <h4>{item.name}</h4>
+                                <span>{item.category}</span>
+                                <p>QTY: {borrowFormData.quantity}</p>
+                            </div>
+                        </div>
+
+                        <div className="request-info">
+                            <div className="info-row">Withdraw request ID: {receiptData.requestId}</div>
+                            <div className="info-row">Date: {receiptData.date}</div>
+                            <div className="info-row">Time: {receiptData.time}</div>
+                        </div>
+
+                        <button 
+                            className="receipt-close-button"
+                            onClick={onClose}
+                        >
+                            Close
+                        </button>
+                    </div>
+                )}
             </div>
         );
     }
@@ -211,7 +268,7 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
 
                     <button 
                         className="submit-button"
-                        onClick={handleBorrow}
+                        onClick={handleSubmit}
                     >
                         Continue
                     </button>
@@ -270,7 +327,7 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                     <button 
                         type="button"
                         className="borrow-btn primary"
-                        onClick={handleBorrow}
+                        onClick={handleSubmit}
                     >
                         {item.itemType === 'Consumable' ? 'Withdraw' : 'Borrow'}
                     </button>

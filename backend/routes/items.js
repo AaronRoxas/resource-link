@@ -40,16 +40,10 @@ router.get('/', async (req, res) => {
 // Update an item
 router.put('/:id', async (req, res) => {
   try {
-    const { availability, qty, status } = req.body;
-    
     const updatedItem = await Item.findByIdAndUpdate(
       req.params.id,
       {
-        availability,
-        qty,
-        status,
-        // If the item is being checked in, update stocks
-        ...(availability === 'Check-in' && { stocks: 1 })
+        $set: req.body  // This will update any fields sent in the request body
       },
       { new: true }
     );

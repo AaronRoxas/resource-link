@@ -15,7 +15,7 @@ router.post('/search', async (req, res) => {
     const borrowing = await Borrowing.findOne({
       'receiptData.requestId': { $regex: `^${requestId}`, $options: 'i' },
       'receiptData.status': status
-    }).populate('itemId');
+    }).populate('itemId', 'name category id status stocks itemImage');
 
     if (!borrowing) {
       console.log('No borrowing found with requestId:', requestId);
@@ -50,7 +50,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Item is out of stock' });
     }
 
-    // Create new borrowing with approver info
+    // Create new borrowing
     const newBorrowing = new Borrowing({
       itemId,
       borrower,
@@ -63,6 +63,12 @@ router.post('/', async (req, res) => {
     });
 
     const savedBorrowing = await newBorrowing.save();
+
+    // Update item status if borrowing status is 'reserved'
+    if (receiptData.status?.toLowerCase() === 'reserved') {
+      await Item.findByIdAndUpdate(itemId, { status: 'Reserved' });
+    }
+
     const populatedBorrowing = await savedBorrowing.populate('itemId');
 
     // Create check-out activity
@@ -105,7 +111,7 @@ router.post('/', async (req, res) => {
 router.get('/', async (req, res) => {
     try {
         const borrowings = await Borrowing.find()
-            .populate('itemId', 'name category id status stocks'); // Only populate needed fields
+            .populate('itemId', 'name category id status stocks itemImage'); // Added itemImage to populated fields
         res.status(200).json(borrowings);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -206,7 +212,7 @@ router.patch('/updateStatus', async (req, res) => {
 
     const borrowing = await Borrowing.findOne({
       'receiptData.requestId': requestId
-    }).populate('itemId');  // Add populate to get item details
+    }).populate('itemId', 'name category id status stocks itemImage');
 
     if (!borrowing) {
       console.log('No borrowing found with requestId:', requestId);
@@ -218,6 +224,11 @@ router.patch('/updateStatus', async (req, res) => {
       borrowing.receiptData.approvedBy = approvedBy;
     }
     
+    // Update the associated item's status if borrowing status is 'reserved'
+    if (status.toLowerCase() === 'reserved') {
+      await Item.findByIdAndUpdate(borrowing.itemId._id, { status: 'Reserved' });
+    }
+
     // Set availability and record activity for check-out
     if (status === 'On-going') {
       borrowing.receiptData.availability = 'Check-out';

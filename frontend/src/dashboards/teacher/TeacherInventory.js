@@ -78,7 +78,7 @@ const WithdrawReceipt = ({ item, onClose }) => {
                 <div className="to-borrow-section">
                     <p className="section-label">To Withdraw</p>
                     <div className="borrowed-item-preview">
-                        <img src={item.itemId?.image || "dashboard-imgs/placeholder.svg"} alt={item.itemId?.name} />
+                        <img src={item.itemId?.itemImage || "dashboard-imgs/placeholder.svg"} alt={item.itemId?.name} />
                         <div>
                             <h4>{item.itemId?.name}</h4>
                             <p>{item.itemId?.category}</p>
@@ -89,8 +89,8 @@ const WithdrawReceipt = ({ item, onClose }) => {
 
                 <div className="receipt-footer">
                     <p><b>Withdrawal request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
-                    <p>Date: {new Date(item.withdrawDate).toLocaleDateString()}</p>
-                    <p>Time: {new Date(item.withdrawDate).toLocaleTimeString('en-US', {
+                    <p>Date: {new Date(item.createdAt).toLocaleDateString()}</p>
+                    <p>Time: {new Date(item.createdAt).toLocaleTimeString('en-US', {
                         hour: '2-digit',
                         minute: '2-digit',
                         hour12: true
@@ -122,6 +122,9 @@ const TeacherInventory = () => {
                     axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings'),
                     axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals')
                 ]);
+                
+                console.log('Borrowed Items:', borrowingsRes.data);
+                console.log('Withdrawals:', withdrawalsRes.data);
                 
                 // Map the status from withdrawals to match the receipt data structure
                 const formattedWithdrawals = withdrawalsRes.data.map(withdrawal => ({
@@ -177,6 +180,7 @@ const TeacherInventory = () => {
             'reserved': 'Reserved',
             'overdue': 'Overdue',
             'approved': 'Approved',
+            'returned': 'Returned',
             'rejected': 'Rejected'
         };
         return statusMap[status?.toLowerCase()] || status;
@@ -211,7 +215,7 @@ const TeacherInventory = () => {
                             onClick={() => handleItemClick(item)}
                         >
                             <div className="item-image">
-                                <img src={item.itemId?.image || "dashboard-imgs/placeholder.svg"} alt={item.itemId?.name} />
+                                <img src={item.itemId?.itemImage || "dashboard-imgs/placeholder.svg"} alt={item.itemId?.name} />
                             </div>
                             <div className="item-info">
                                 <h3>{item.itemId ? item.itemId.name : 'Item not found'}</h3>
@@ -242,7 +246,7 @@ const TeacherInventory = () => {
                             onClick={() => handleItemClick({ ...item, type: 'withdrawal' })}
                         >
                             <div className="item-image">
-                                <img src={item.itemId?.image || "dashboard-imgs/placeholder.svg"} alt={item.itemId?.name} />
+                                <img src={item.itemId?.itemImage|| "dashboard-imgs/placeholder.svg"} alt={item.itemId?.name} />
                             </div>
                             <div className="item-info">
                                 <h3>{item.itemId ? item.itemId.name : 'Item not found'}</h3>
@@ -251,8 +255,8 @@ const TeacherInventory = () => {
                                 </p>
                                 <div className="borrow-details">
                                     <p><b>Withdrawal request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
-                                    <p>Withdraw Date: {new Date(item.withdrawDate).toLocaleDateString()}</p>
-                                    <p>Quantity: {item.quantity}</p>
+                                    <p>Withdraw Date: {new Date(item.createdAt).toLocaleDateString()}</p>
+                                    <p>Quantity: {item.receiptData?.qty}</p>
                                     <span className={`status-pill ${item.status.toLowerCase()}`}>
                                         {formatStatus(item.status)}
                                     </span>

@@ -27,6 +27,7 @@ const StaffDash = () => {
   const [inventoryAlerts, setInventoryAlerts] = useState([]);
   const [withdrawRequests, setWithdrawRequests] = useState([]);
   const [claimDate, setClaimDate] = useState('');
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
   const fetchBorrowings = async () => {
     try {
@@ -48,7 +49,7 @@ const StaffDash = () => {
 
   const fetchWithdrawRequests = async () => {
     try {
-        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/withdraws');
+        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals');
       setWithdrawRequests(response.data);
     } catch (error) {
       console.error('Error fetching withdraw requests:', error);
@@ -91,9 +92,22 @@ const StaffDash = () => {
   ];
 
   const handleStatusClick = (item) => {
+    if (item.type === 'withdraw') {
+      handleWithdrawClick(item);
+    } else {
+      handleBorrowClick(item);
+    }
+  };
+
+  const handleWithdrawClick = (item) => {
+    setSelectedBorrow(item);
+    setShowWithdrawModal(true);
+  };
+
+  const handleBorrowClick = (item) => {
     if (item.receiptData?.status?.toLowerCase() === 'reserved') {
       setSelectedBorrow(item);
-      setShowModal(true); // We'll show the same modal but with different content
+      setShowModal(true);
     } else {
       setSelectedBorrow(item);
       setShowModal(true);
@@ -102,13 +116,23 @@ const StaffDash = () => {
 
   const handleAccept = async (borrowId) => {
     try {
+      // Update borrowing status to 'reserved'
       await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
         status: 'reserved'
       });
       
+      // Find the borrowing to get the item ID
+      const borrowing = borrowings.find(b => b._id === borrowId);
+      if (borrowing?.itemId?._id) {
+        // Update the item's status to 'Reserved'
+        await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${borrowing.itemId._id}`, {
+          status: 'Reserved'
+        });
+      }
+      
       // Close modal and refresh data
       setShowModal(false);
-      fetchBorrowings(); // Make sure you have this function to refresh the borrowings list
+      fetchBorrowings();
     } catch (error) {
       console.error('Error accepting borrow request:', error);
     }
@@ -116,7 +140,7 @@ const StaffDash = () => {
 
   const handleDecline = async (borrowId) => {
     try {
-      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
+      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
         status: 'declined'
       });
       
@@ -279,10 +303,16 @@ const StaffDash = () => {
 
   const handleWithdrawDecline = async (withdrawId) => {
     try {
+      // Get staff name from localStorage
+      const staffData = JSON.parse(localStorage.getItem('userData'));
+      const staffName = staffData?.name;
+
       await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals/${withdrawId}/status`, {
-        status: 'rejected'
+        status: 'declined',
+        approvedBy: staffName
       });
-      setShowModal(false);
+      
+      setShowWithdrawModal(false);
       fetchWithdrawRequests();
     } catch (error) {
       console.error('Error declining withdraw request:', error);
@@ -688,6 +718,76 @@ const StaffDash = () => {
 
       {/* Add QR Scanner Modal */}
     
+      {/* Add new Withdraw Modal */}
+      {showWithdrawModal && selectedBorrow && (
+        <div className="modal-overlay">
+          <div className="modal-content reservation-receipt">
+            <div className="modal-header">
+              <h2>Withdraw Request Receipt</h2>
+              <span className="close-button" onClick={() => setShowWithdrawModal(false)}>×</span>
+            </div>
+            
+            <div className="user-info">
+              <img 
+                src="/dashboard-imgs/profile-placeholder.svg"
+                alt="User" 
+                className="user-avatar" 
+              />
+              <div className="user-details">
+                <h3>{selectedBorrow.borrower}</h3>
+              </div>
+            </div>
+
+            <p className="to-borrow-label">To Withdraw</p>
+            
+            <div className="item-preview">
+              <img 
+                src={selectedBorrow.itemId?.itemImage || "/dashboard-imgs/placeholder.svg"} 
+                alt={selectedBorrow.itemId?.name} 
+              />
+              <div className="item-info">
+                <h3>{selectedBorrow.itemId?.name}</h3>
+                <p>QTY: {selectedBorrow.receiptData?.qty}</p>
+              </div>
+            </div>
+
+            <p className="date-label">Claim on</p>
+            <div className="date-field">
+              <input 
+                type="text" 
+                value={new Date(selectedBorrow.claimDate).toLocaleDateString()}
+                readOnly 
+              />
+            </div>
+
+            <div className="receipt-footer">
+              <p>Withdraw request ID: {selectedBorrow.receiptData?.requestId}</p>
+              <p>Date requested: {new Date(selectedBorrow.createdAt).toLocaleDateString()}</p>
+              <p>Time requested: {new Date(selectedBorrow.createdAt).toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                  })}</p>
+            </div>
+
+            {selectedBorrow.status === 'pending' && (
+              <div className="action-buttons">
+                <button 
+                  className="accept-button" 
+                  onClick={() => handleWithdrawAccept(selectedBorrow._id)}
+                >
+                  Accept
+                </button>
+                <button 
+                  className="decline-button"
+                  onClick={() => handleWithdrawDecline(selectedBorrow._id)}
+                >
+                  Decline
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -53,14 +53,16 @@ borrowingSchema.pre('save', async function(next) {
             // Update item availability based on borrowing status
             item.availability = this.receiptData.availability;
             
+            // Update item status based on receipt status
+            if (this.receiptData.status?.toLowerCase() === 'reserved') {
+                item.status = 'Reserved';
+            } else if (this.receiptData.availability === 'Check-out') {
+                item.status = 'In Use';
+            }
+            
             // If it's a non-consumable item, update the quantity based on availability
             if (item.itemType === 'Non-Consumable') {
                 item.qty = this.receiptData.availability === 'Check-out' ? 0 : 1;
-            }
-            
-            // Update item status if checking out
-            if (this.receiptData.availability === 'Check-out') {
-                item.status = 'In Use';
             }
             
             await item.save();
@@ -75,23 +77,28 @@ borrowingSchema.pre('save', async function(next) {
 borrowingSchema.pre('updateOne', async function(next) {
     try {
         const update = this.getUpdate();
-        if (update.receiptData?.availability) {
+        if (update.receiptData?.availability || update.receiptData?.status) {
             const Item = mongoose.model('Item');
             const borrowing = await this.model.findOne(this.getQuery());
             
             if (borrowing) {
                 const item = await Item.findById(borrowing.itemId);
                 if (item) {
-                    item.availability = update.receiptData.availability;
-                    
-                    if (item.itemType === 'Non-Consumable') {
-                        item.qty = update.receiptData.availability === 'Check-out' ? 0 : 1;
+                    if (update.receiptData.availability) {
+                        item.availability = update.receiptData.availability;
                     }
                     
-                    if (update.receiptData.availability === 'Check-out') {
+                    // Update item status based on receipt status
+                    if (update.receiptData.status?.toLowerCase() === 'reserved') {
+                        item.status = 'Reserved';
+                    } else if (update.receiptData.availability === 'Check-out') {
                         item.status = 'In Use';
                     } else if (update.receiptData.availability === 'Check-in') {
                         item.status = 'Good Condition';
+                    }
+                    
+                    if (item.itemType === 'Non-Consumable') {
+                        item.qty = update.receiptData.availability === 'Check-out' ? 0 : 1;
                     }
                     
                     await item.save();

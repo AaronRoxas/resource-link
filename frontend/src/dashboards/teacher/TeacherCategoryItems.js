@@ -11,6 +11,7 @@ const TeacherCategoryItems = () => {
     const [items, setItems] = useState([]);
     const [categoryName, setCategoryName] = useState('');
     const [borrowItem, setBorrowItem] = useState(null);
+    const [withdrawItem, setWithdrawItem] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
     const { categoryName: urlCategoryName } = useParams();
     const navigate = useNavigate();
@@ -57,19 +58,28 @@ const TeacherCategoryItems = () => {
         setSelectedItem(null);
     };
 
-    const isItemAvailable = (item) => {
-        if (item.itemType === 'Consumable') {
-            return item.qty > 0;
-        } else {
-            return item.qty > 0 && item.status !== 'Check-out';
-        }
+    const isConsumableAvailable = (item) => {
+        return item.qty > 0;
+    };
+
+    const isBorrowableAvailable = (item) => {
+        return item.qty > 0 && item.status !== 'Check-out' && item.status !== 'Reserved';
+    };
+
+    const handleWithdrawRequest = (item) => {
+        setBorrowItem(item);
+    };
+
+    const handleBorrowRequest = (item) => {
+        setBorrowItem(item);
     };
 
     const getActionButtonText = (item) => {
-        if (!isItemAvailable(item)) {
-            return item.itemType === 'Consumable' ? 'Out of Stock' : 'Unavailable';
+        if (item.itemType === 'Consumable') {
+            return !isConsumableAvailable(item) ? 'Out of Stock' : 'Withdraw';
+        } else {
+            return !isBorrowableAvailable(item) ? 'Unavailable' : 'Borrow';
         }
-        return item.itemType === 'Consumable' ? 'Withdraw' : 'Borrow';
     };
 
     return (
@@ -98,13 +108,23 @@ const TeacherCategoryItems = () => {
                         <div className="item-info">
                             <h3>{item.name}</h3>
                             <p className="sub-category">{item.subCategory || 'Sub category here'}</p>
-                            <button 
-                                className={`action-btn ${!isItemAvailable(item) ? 'disabled' : ''}`}
-                                onClick={() => setBorrowItem(item)}
-                                disabled={!isItemAvailable(item)}
-                            >
-                                {getActionButtonText(item)}
-                            </button>
+                            {item.itemType === 'Consumable' ? (
+                                <button 
+                                    className={`action-btn ${!isConsumableAvailable(item) ? 'disabled' : ''}`}
+                                    onClick={() => handleWithdrawRequest(item)}
+                                    disabled={!isConsumableAvailable(item)}
+                                >
+                                    {getActionButtonText(item)}
+                                </button>
+                            ) : (
+                                <button 
+                                    className={`action-btn ${!isBorrowableAvailable(item) ? 'disabled' : ''}`}
+                                    onClick={() => handleBorrowRequest(item)}
+                                    disabled={!isBorrowableAvailable(item)}
+                                >
+                                    {getActionButtonText(item)}
+                                </button>
+                            )}
                         </div>
                     </div>
                 ))}
