@@ -29,8 +29,7 @@ const withdrawalSchema = new mongoose.Schema({
             required: true
         },
         subCategory: {
-            type: String,
-            required: true
+            type: String
         },
         qty: {
             type: Number,

@@ -153,7 +153,7 @@ const AddUser = ({ isModal, onClose }) => {
     { path: '/admin', icon: 'home', label: 'Home' },
     { path: '/adminChart', icon: 'chart', label: 'Chart' },
     
-    { path: '/addUser', icon: 'active-profile', label: 'Add User' },
+    { path: '/addUser', icon: 'active-profile', label: 'Manage User' },
     { path: '/admin/inventory', icon: 'cube', label: 'Inventory' },
   ];
 

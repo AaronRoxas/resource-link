@@ -55,7 +55,7 @@ const AdminManageUser = () => {
 
   return (
     <div className="manage-user-container">
-      <NavBar hideGreeting={true} />
+      <NavBar hideWelcome={true} />
       <div className="manage-user-content">
         <div className="header-section">
           <h1>Manage user</h1>

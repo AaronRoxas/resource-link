@@ -35,21 +35,6 @@ router.post('/', async (req, res) => {
   try {
     const { itemId, borrower, borrowDate, returnDate, receiptData } = req.body;
 
-    // Validate required receipt data
-    if (!receiptData.approvedBy) {
-      return res.status(400).json({ message: 'Approver information is required' });
-    }
-
-    // Check if item exists and has available stock
-    const item = await Item.findById(itemId);
-    if (!item) {
-      return res.status(404).json({ message: 'Item not found' });
-    }
-
-    if (item.stocks <= 0) {
-      return res.status(400).json({ message: 'Item is out of stock' });
-    }
-
     // Create new borrowing
     const newBorrowing = new Borrowing({
       itemId,
@@ -58,52 +43,18 @@ router.post('/', async (req, res) => {
       returnDate,
       receiptData: {
         ...receiptData,
-        approvedBy: receiptData.approvedBy
+        approvedBy: receiptData.approvedBy || ""
       }
     });
 
     const savedBorrowing = await newBorrowing.save();
 
-    // Update item status if borrowing status is 'reserved'
-    if (receiptData.status?.toLowerCase() === 'reserved') {
-      await Item.findByIdAndUpdate(itemId, { status: 'Reserved' });
-    }
-
-    const populatedBorrowing = await savedBorrowing.populate('itemId');
-
-    // Create check-out activity
-    const Activity = require('../models/Activity');
-    await new Activity({
-      action: 'check-out',
-      itemId: item._id,
-      itemName: item.name,
-      borrower: borrower,
-      borrowerRole: receiptData.borrowerType,
-      data: {
-        borrowingId: savedBorrowing._id,
-        requestId: receiptData.requestId,
-        borrowDate: borrowDate,
-        returnDate: returnDate,
-        status: receiptData.status,
-        itemDetails: {
-          name: item.name,
-          category: item.category,
-          serialNo: item.id
-        },
-        borrowerDetails: {
-          name: borrower,
-          role: receiptData.borrowerType
-        }
-      }
-    }).save();
-
-    res.status(201).json(populatedBorrowing);
+    // Remove the activity creation from here since it's handled in the frontend
+    
+    res.status(201).json(savedBorrowing);
   } catch (error) {
-    console.error('Create borrowing error:', error);
-    res.status(500).json({ 
-      message: 'Error creating borrowing',
-      error: error.message 
-    });
+    console.error('Error creating borrowing:', error);
+    res.status(500).json({ message: error.message });
   }
 });
 

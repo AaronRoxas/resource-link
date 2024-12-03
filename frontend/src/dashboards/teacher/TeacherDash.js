@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import BottomNav from '../../components/BottomNav'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-
+import Footer from '../../components/Footer'
 const TeacherDash = () => {
   const navigate = useNavigate()
   const [categories, setCategories] = useState([])
@@ -35,33 +35,47 @@ const TeacherDash = () => {
     { path: '/teacherInventory', icon: 'cube', label: 'Inventory' },
 ];
   return (
-    <div className="dashboard">
-      <div className="dashboard-content">
-      <NavBar/>
+    <div className="teacher-dash-container">
+      <div className="teacher-dash-content">
+        <NavBar/>
+        
+        <div className="teacher-dash-header">
+          <div className="teacher-dash-search-wrapper">
+            <input 
+              type="text" 
+              className="teacher-dash-search-input"
+              placeholder="Search for Category" 
+            />
+          </div>
+        </div>
 
-
-        <div className="categories-section">
-     
-          <div className="categories-grid">
-            
+        <div className="teacher-dash-categories-section">
+          <h3 className="teacher-dash-categories-title">Categories</h3>
+          <div className="teacher-dash-categories-grid">
             {categories.map((category) => (
               <div 
                 key={category._id} 
-                className="category-card" 
+                className="teacher-dash-category-card" 
                 onClick={() => handleCategoryClick(category.name)}
               >
-                <div className="image-placeholder">
-                  <img src={category.image || "dashboard-imgs/placeholder.svg"} alt={category.name} />
+                <div className="teacher-dash-image-container">
+                  <img 
+                    className="teacher-dash-category-image"
+                    src={category.image || "dashboard-imgs/placeholder.svg"} 
+                    alt={category.name} 
+                  />
                 </div>
-                <div className="category-info">
-                  <h4>{category.name}</h4>
+                <div className="teacher-dash-category-info">
+                  <h4 className="teacher-dash-category-title">{category.name}</h4>
+                  <p className="teacher-dash-category-description">{category.description}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </div>
-      <BottomNav navItems={navItems} />
+
+      <Footer />
     </div>
   )
 }

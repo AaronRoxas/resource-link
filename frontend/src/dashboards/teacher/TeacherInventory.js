@@ -3,7 +3,8 @@ import axios from 'axios';
 // import { useNavigate } from 'react-router-dom';
 import BottomNav from '../../components/BottomNav';
 import '../../styles/TeacherInventory.css';
-
+import NavBar from '../../components/NavBar';
+import Footer from '../../components/Footer';
 const BorrowReceipt = ({ item, onClose }) => {
     return (
         <div className="receipt-modal-overlay">
@@ -200,6 +201,7 @@ const TeacherInventory = () => {
 
     return (
         <div className="teacher-inventory">
+            <NavBar hideWelcome={true}/>
             <header>
                 <h1>Borrowed & Withdrawn Items</h1>
             </header>
@@ -255,7 +257,7 @@ const TeacherInventory = () => {
                                 </p>
                                 <div className="borrow-details">
                                     <p><b>Withdrawal request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
-                                    <p>Withdraw Date: {new Date(item.createdAt).toLocaleDateString()}</p>
+                                    <p>Claim Date: {new Date(item.claimDate).toLocaleDateString()}</p>
                                     <p>Quantity: {item.receiptData?.qty}</p>
                                     <span className={`status-pill ${item.status.toLowerCase()}`}>
                                         {formatStatus(item.status)}
@@ -287,8 +289,7 @@ const TeacherInventory = () => {
                     />
                 )
             )}
-            
-            <BottomNav navItems={navItems} />
+            <Footer/>
         </div>
     );
 };

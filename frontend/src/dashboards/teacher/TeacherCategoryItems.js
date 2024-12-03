@@ -6,7 +6,6 @@ import BottomNav from '../../components/BottomNav';
 import BorrowItem from './BorrowItem';
 import ItemInformation from '../../components/ItemInformation';
 import '../../styles/ViewItems.css';
-
 const TeacherCategoryItems = () => {
     const [items, setItems] = useState([]);
     const [categoryName, setCategoryName] = useState('');
@@ -84,6 +83,7 @@ const TeacherCategoryItems = () => {
 
     return (
         <div className="view-category-items">
+            <NavBar hideWelcome={true}/>
             <header>
                 <div className="back-header">
                     <img 
@@ -137,8 +137,6 @@ const TeacherCategoryItems = () => {
                     fetchItems={fetchCategoryItems}
                 />
             )}
-
-            <BottomNav navItems={navItems} />
         </div>
     );
 };

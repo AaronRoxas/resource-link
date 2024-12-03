@@ -18,7 +18,7 @@ const AdminInventory = () => {
     const navItems = [
         { path: '/admin', icon: 'home', label: 'Home' },
         { path: '/adminChart', icon: 'chart', label: 'Chart' },
-        { path: '/addUser', icon: 'profile', label: 'Add User' },
+        { path: '/admin/manage-user', icon: 'profile', label: 'Manage User' },
         { path: '/admin/inventory', icon: 'active-cube', label: 'Inventory' }
     ];
 

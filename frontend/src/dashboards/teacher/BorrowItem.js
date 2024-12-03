@@ -87,6 +87,15 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
 
             const response = await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings', borrowingData);
             
+            await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/activities', {
+                action: 'pending',
+                itemId: item._id,
+                itemName: item.name,
+                borrower: borrowFormData.borrower,
+                borrowerRole: 'Teacher',
+                approvedBy: ''
+            });
+            
             setReceiptData({
                 requestId: response.data.receiptData?.requestId || borrowingData.receiptData.requestId,
                 date: new Date().toLocaleDateString(),
@@ -295,7 +304,7 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                 </div>
 
                 <div className="form-group">
-                    <label>Borrow Date:</label>
+                    <label>Borrow Date: <span className="required">*</span></label>
                     <input 
                         type="date" 
                         onChange={(e) => setBorrowFormData({ ...borrowFormData, borrowDate: e.target.value })}
@@ -306,7 +315,7 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
 
                 {item.itemType !== 'Consumable' && (
                     <div className="form-group">
-                        <label>Return Date:</label>
+                        <label>Return Date:<span className="required">*</span></label>
                         <input 
                             type="date" 
                             onChange={(e) => setBorrowFormData({ ...borrowFormData, returnDate: e.target.value })}

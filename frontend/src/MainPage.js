@@ -61,7 +61,7 @@ const MainPage = () => {
       );
 
       localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem('userRole', response.data.role);
+      localStorage.setItem('role', response.data.role);
       localStorage.setItem('first_name', response.data.first_name);
       localStorage.setItem('last_name', response.data.last_name);
       localStorage.setItem('email', email);

@@ -6,13 +6,12 @@ const formattedDate = getFormattedDate();
 const NavBar = ({ hideWelcome }) => {
   const [showDropdown, setShowDropdown] = useState(false)
   const navigate = useNavigate()
+  const userRole = localStorage.getItem('role')
   
 
   const handleLogout = () => {
-    // Clear authentication tokens or user data
     localStorage.removeItem('authToken');
-    // Redirect to login page
-    navigate('/home');
+    navigate('/home', { replace: true });
   };
 
 
@@ -28,9 +27,17 @@ const NavBar = ({ hideWelcome }) => {
           />
           {showDropdown && (
             <DropdownMenu>
-              <MenuItem onClick={() => navigate('/changePass')}>
-                Change Password
+              <MenuItem onClick={() => navigate('/home', { replace: true })}>
+                Home
               </MenuItem>
+              {userRole === 'teacher' && (
+                <>
+                  <MenuItem onClick={() => navigate('/teacherInventory', { replace: true })}>
+                    Transactions
+                  </MenuItem>
+
+                </>
+              )}
               <MenuItem onClick={handleLogout}>
                 Logout
               </MenuItem>
@@ -92,7 +99,8 @@ const DropdownMenu = styled.div`
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   min-width: 200px;
   margin-top: 8px;
-  z-index: 1000;
+  z-index: 1001;
+  border: 1px solid #eee;
 `
 
 const MenuItem = styled.div`

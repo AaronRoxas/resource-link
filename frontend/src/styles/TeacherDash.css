@@ -1,153 +1,100 @@
-.dashboard {
-  padding: 24px;
-  background-color: #f8f9fd;
+.teacher-dash-container {
+  padding: 16px;
+  background-color: white;
   min-height: 100vh;
 }
 
-.dashboard-content {
+.teacher-dash-content {
   max-width: 1200px;
   margin: 0 auto;
 }
 
-header {
-  margin-bottom: 32px;
+.teacher-dash-header {
+  margin: 20px 0;
+  padding: 0 16px;
 }
 
-header h1 {
-  font-size: 24px;
+.teacher-dash-welcome {
+  font-size: 20px;
   font-weight: 600;
-  color: #1a1f36;
-}
-
-header h2 {
-  font-size: 14px;
-  color: #6b7280;
-}
-
-.search-section {
-  margin-bottom: 32px;
-}
-
-.search-section h3 {
-  font-size: 18px;
   color: #1a1f36;
   margin-bottom: 16px;
 }
 
-.search-container {
+.teacher-dash-search-wrapper {
   position: relative;
-  max-width: 500px;
-}
-
-.search-container input {
-  width: 100%;
-  padding: 14px 14px 14px 45px;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  font-size: 15px;
-  transition: all 0.2s ease;
-  background-color: white;
-}
-
-.search-container input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-  outline: none;
-}
-
-.search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
-  color: #6b7280;
-}
-
-.categories-section h3 {
-  font-size: 18px;
-  color: #1a1f36;
   margin-bottom: 24px;
 }
 
-.categories-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-}
-
-.category-card {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.teacher-dash-search-input {
+  width: 100%;
+  padding: 12px 16px;
   border: 1px solid #e5e7eb;
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #f8f9fd;
 }
 
-.category-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.1);
-  border-color: #6366f1;
+.teacher-dash-categories-section {
+  padding: 0 16px;
 }
 
-.image-placeholder {
-  width: 56px;
-  height: 56px;
-  background: #f3f4f6;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.image-placeholder img {
-  width: 32px;
-  height: 32px;
-  opacity: 0.7;
-}
-
-.category-info {
-  flex: 1;
-}
-
-.category-info h4 {
+.teacher-dash-categories-title {
   font-size: 16px;
   font-weight: 600;
   color: #1a1f36;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
 }
 
-.category-info p {
+.teacher-dash-categories-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 10%;
+}
+
+.teacher-dash-category-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.teacher-dash-image-container {
+  width: 100%;
+  height: 120px;
+  background: #f8f9fd;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.teacher-dash-category-image {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}
+
+.teacher-dash-category-info {
+  width: 100%;
+}
+
+.teacher-dash-category-title {
   font-size: 14px;
-  color: #6b7280;
-  line-height: 1.4;
+  font-weight: 500;
+  color: #1a1f36;
   margin: 0;
 }
 
-@media screen and (max-width: 768px) {
-  .dashboard {
-    padding: 16px;
-  }
-
-  .categories-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-
-  .category-card {
-    padding: 16px;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .image-placeholder {
-    margin-bottom: 12px;
-  }
+.teacher-dash-category-description {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
 }

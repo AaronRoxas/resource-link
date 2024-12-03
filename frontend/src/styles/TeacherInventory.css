@@ -2,6 +2,7 @@
     padding: 20px;
     background-color: #fff;
     min-height: 100vh;
+    margin-top: 60px;
 }
 
 .teacher-inventory header {
@@ -19,15 +20,18 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
+    padding: 16px;
     padding-bottom: 80px;
 }
 
 .borrowed-item-card {
     background: #fff;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     cursor: pointer;
+    border: 1px solid #eee;
+    padding: 12px;
 }
 
 .item-image {
@@ -37,12 +41,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 8px;
+    margin-bottom: 8px;
 }
 
 .item-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
 }
 
 .item-info {
@@ -51,7 +57,7 @@
 
 .item-info h3 {
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     margin: 0 0 4px 0;
     color: #333;
 }
@@ -65,6 +71,7 @@
 .borrow-details {
     font-size: 12px;
     color: #666;
+    margin-top: 8px;
 }
 
 .borrow-details p {
@@ -232,9 +239,15 @@
     display: inline-block;
     padding: 4px 12px;
     border-radius: 20px;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 500;
+    margin-top: 8px;
 }
+.status-pill.approved {
+    background-color: #D5FFE3;
+    color: #00C853;
+}
+
 
 .status-pill.on-going {
     background-color: #E8D5FF;
@@ -254,4 +267,31 @@
 .status-pill.overdue {
     background-color: #FFD5D5;
     color: #FF4747;
+}
+@media screen and (max-width: 1480px) and (min-width: 524px) {
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    
+    .teacher-inventory {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+    
+    .teacher-inventory .content {
+        flex: 1;
+    }
+    
+    .teacher-inventory .footer {
+        padding: 20px;
+        text-align: center;
+
+    }
+    .teacher-inventory .footer-copyright {
+        text-align: left;
+
+    }
+
 }

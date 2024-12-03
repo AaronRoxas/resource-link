@@ -3,20 +3,14 @@ import { Navigate } from 'react-router-dom';
 
 const PublicRoute = ({ children }) => {
   const authToken = localStorage.getItem('authToken');
-  const userRole = localStorage.getItem('userRole');
+  const userRole = localStorage.getItem('role');
 
   if (authToken) {
-    // Redirect based on user role
-    switch (userRole) {
-      case 'admin':
-        return <Navigate to="/admin" />;
-      case 'teacher':
-        return <Navigate to="/teacher" />;
-      case 'staff':
-        return <Navigate to="/staff" />;
-      default:
-        return <Navigate to="/" />;
-    }
+    // Change this to use a direct path based on role
+    const defaultPath = userRole === 'teacher' ? '/teacher' : 
+                       userRole === 'admin' ? '/admin' : 
+                       userRole === 'staff' ? '/staff' : '/home';
+    return <Navigate to={defaultPath} replace />;
   }
 
   return children;

@@ -36,7 +36,7 @@ const AdminCategoryItems = () => {
     const navItems = [
         { path: '/admin', icon: 'home', label: 'Home' },
         { path: '/admin/inventory', icon: 'chart', label: 'Chart' },
-        { path: '/addUser', icon: 'profile', label: 'Add User' },
+        { path: '/admin/manage-user', icon: 'profile', label: 'Manage User' },
         { path: '/admin/inventory', icon: 'cube', label: 'Inventory' },
     ];
 
