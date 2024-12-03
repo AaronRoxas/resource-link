@@ -78,7 +78,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
     if (selectedItem) {
       const category = selectedItem.category.toLowerCase().trim();
       const itemId = selectedItem.id.trim();
-      return `https://resource-link-main-14c755858b60.herokuapp.com/staff/category/${category}/${itemId}`;
+      return `https://resource-link.vercel.app/staff/category/${category}/${itemId}`;
     }
     return '';
   };
