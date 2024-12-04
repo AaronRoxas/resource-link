@@ -627,6 +627,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
                   min={getCurrentDate()}
                   value={returnDate}
                   onChange={(e) => setReturnDate(e.target.value)}
+                  readOnly
                 />
               </div>
             </div>
@@ -690,8 +691,8 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
               </button>
               <button 
                 className="action-button check-out"
-                disabled={selectedItem?.availability === 'Check-out'}
-                style={selectedItem?.availability === 'Check-out' ? 
+                disabled={selectedItem?.availability === 'Check-out' || selectedItem?.status === 'Reserved'}
+                style={(selectedItem?.availability === 'Check-out' || selectedItem?.status === 'Reserved') ? 
                   {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
                 onClick={() => setShowCheckoutModal(true)}
               >
@@ -699,8 +700,8 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
               </button>
               <button 
                 className="action-button reserved-checkout"
-                disabled={selectedItem?.availability === 'Check-out'}
-                style={selectedItem?.availability === 'Check-out' ? 
+                disabled={selectedItem?.availability === 'Check-out' || selectedItem?.status !== 'Reserved'}
+                style={(selectedItem?.availability === 'Check-out' || selectedItem?.status !== 'Reserved') ? 
                   {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
                 onClick={() => setShowReservedCheckoutModal(true)}
               >

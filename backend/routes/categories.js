@@ -15,10 +15,15 @@ router.get('/', async (req, res) => {
 // Create new category
 router.post('/', async (req, res) => {
     try {
+        // Check if image data already includes the prefix
+        const imageData = req.body.image.startsWith('data:') 
+            ? req.body.image 
+            : `data:image/png;base64,${req.body.image}`;
+
         const category = new Category({
             name: req.body.name,
             description: req.body.description,
-            image: req.body.image
+            image: imageData
         });
         const newCategory = await category.save();
         res.status(201).json(newCategory);

@@ -38,6 +38,16 @@ const NavBar = ({ hideWelcome }) => {
 
                 </>
               )}
+              {userRole === 'staff' && (
+                <>
+                  <MenuItem onClick={() => navigate('/qr', { replace: true })}>
+                    Find Item
+                  </MenuItem>
+                  <MenuItem onClick={() => navigate('/staff/inventory', { replace: true })}>
+                    Inventory
+                  </MenuItem>
+                </>
+              )}
               <MenuItem onClick={handleLogout}>
                 Logout
               </MenuItem>

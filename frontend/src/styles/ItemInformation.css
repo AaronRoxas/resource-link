@@ -290,7 +290,7 @@
 }
 
 .continue-button {
-  background: #006D3B;
+  background: #4188FF;
   color: white;
   padding: 12px;
   border: none;
@@ -301,7 +301,7 @@
 }
 
 .continue-button:hover {
-  background: #005730;
+  background: #649EFF;
 }
 
 label {

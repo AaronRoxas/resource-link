@@ -5,6 +5,7 @@ import NavBar from '../../components/NavBar';
 import BottomNav from '../../components/BottomNav';
 import ItemInformation from '../../components/ItemInformation';
 import '../../styles/ViewItems.css';
+import Navbar from '../../components/NavBar';
 
 const StaffInventoryItems = () => {
     const [items, setItems] = useState([]);
@@ -15,7 +16,7 @@ const StaffInventoryItems = () => {
 
     const navItems = [
         { path: '/staff', icon: 'home', label: 'Home' },
-        { path: '/staff/chart', icon: 'chart', label: 'Chart' },
+        { path: '/qr', icon: 'qr', label: '' },
         { path: '/staff/inventory', icon: 'active-cube', label: 'Inventory' }
     ];
 
@@ -62,6 +63,7 @@ const StaffInventoryItems = () => {
 
     return (
         <div className="view-category-items">
+            <Navbar hideWelcome={true}/>
             <header>
                 <div className="back-header">
                     <img 
@@ -105,7 +107,6 @@ const StaffInventoryItems = () => {
                 />
             )}
 
-            <BottomNav navItems={navItems} />
         </div>
     );
 };

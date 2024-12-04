@@ -29,6 +29,8 @@
     padding: 16px;
     margin-bottom: 20px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: relative;
+    padding-bottom: 48px;
   }
   
   /* Table styles */
@@ -89,7 +91,7 @@
     color: #00C853;
   }
   
-  .status-pill.status-pending {
+  .status-pill.status-pending,.action-badge.action-pending {
     background-color: #FFF4D5;
     color: #FFA726;
   }
@@ -114,19 +116,22 @@
   
   /* View all button */
   .view-all-button {
-    width: 100%;
-    padding: 8px;
-    background: #f5f5f5;
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    min-width: 80px;
+    padding: 8px 16px;
+    background: #4188FF;
     border: none;
     border-radius: 8px;
-    color: #666;
+    color: white;
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s;
   }
   
   .view-all-button:hover {
-    background: #eeeeee;
+    background: #649EFF;
   }
   
   /* Responsive adjustments */
@@ -145,6 +150,11 @@
     
     .section-header h2 {
       font-size: 16px;
+    }
+    .view-all-button {
+        min-width: 70px;
+        padding: 6px 12px;
+        font-size: 12px;
     }
   }
   

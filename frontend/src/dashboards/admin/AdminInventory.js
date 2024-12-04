@@ -3,7 +3,7 @@ import axios from 'axios';
 import BottomNav from '../../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/AdminInventory.css';
-
+import Navbar from '../../components/NavBar';
 const AdminInventory = () => {
     const [categories, setCategories] = useState([]);
     const [categoryItemCounts, setCategoryItemCounts] = useState({});
@@ -29,7 +29,7 @@ const AdminInventory = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/categories', {
+            const response = await axios.get('http://localhost:5000/api/categories', {
                 withCredentials: true
             });
             setCategories(response.data);
@@ -40,7 +40,7 @@ const AdminInventory = () => {
 
     const fetchItemCounts = async () => {
         try {
-            const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/items/count-by-category', {
+            const response = await axios.get('http://localhost:5000/api/items/count-by-category', {
                 withCredentials: true
             });
             setCategoryItemCounts(response.data);
@@ -68,7 +68,8 @@ const AdminInventory = () => {
             
             const reader = new FileReader();
             reader.onloadend = () => {
-                setSelectedImage(reader.result); // This is already base64
+                const base64String = reader.result.split(',')[1];
+                setSelectedImage(base64String);
                 setImagePreview(reader.result);
             };
             reader.readAsDataURL(file);
@@ -84,7 +85,7 @@ const AdminInventory = () => {
             }
 
             const response = await axios.post(
-                'https://resource-link-main-14c755858b60.herokuapp.com/api/categories',
+                'http://localhost:5000/api/categories',
                 {
                     name: newCategory.name,
                     image: selectedImage
@@ -96,7 +97,8 @@ const AdminInventory = () => {
                     }
                 }
             );
-            setCategories([...categories, response.data]);
+            
+            await fetchCategories();
             handleCloseModal();
         } catch (error) {
             console.error('Error creating category:', error);
@@ -106,6 +108,14 @@ const AdminInventory = () => {
 
     const handleCategoryClick = (categoryName) => {
         navigate(`/admin/category/${categoryName.toLowerCase().replace(/\s+/g, '-')}`);
+    };
+
+    const getImageUrl = (imageData) => {
+        if (!imageData) return "/dashboard-imgs/placeholder.svg";
+        // Check if the image data already includes the data URL prefix
+        return imageData.startsWith('data:') 
+            ? imageData 
+            : `data:image/jpeg;base64,${imageData}`;
     };
 
     return (
@@ -120,23 +130,23 @@ const AdminInventory = () => {
                         key={category._id} 
                         className="category-card"
                         onClick={() => handleCategoryClick(category.name)}
-                        style={{ cursor: 'pointer' }}
                     >
                         <div className="category-image">
                             <img 
-                                src={category.image || "/dashboard-imgs/placeholder.svg"} 
-                                alt={category.name} 
+                                src={getImageUrl(category.image)} 
+                                alt={category.name}
                             />
                         </div>
                         <div className="category-info">
                             <h3>{category.name}</h3>
-                            <p>{category.description}</p>
+
                         </div>
                     </div>
                 ))}
                 
                 <div className="category-card new-category" onClick={handleCreateCategory}>
                     <div className="create-category-content">
+                        <span>+</span>
                         <span>Create new category</span>
                     </div>
                 </div>

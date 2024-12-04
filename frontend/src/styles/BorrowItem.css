@@ -45,7 +45,7 @@
 
 .form-group input:focus {
     outline: none;
-    border-color: #2E7D32;
+    border-color: #649EFF;
     box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.1);
 }
 
@@ -67,7 +67,7 @@
 }
 
 .borrow-btn.primary {
-    background-color: #2E7D32;
+    background-color: #4188FF;
     color: white;
 }
 
@@ -185,7 +185,7 @@
 .receipt-close-button {
     width: 100%;
     padding: 12px;
-    background-color: #006B3E;
+    background-color: #4188FF;
     color: white;
     border: none;
     border-radius: 8px;
@@ -195,13 +195,13 @@
 }
 
 .close-button:hover {
-    background-color: #005632;
+    background-color: #649EFF;
 }
 
 .submit-button {
     width: 100%;
     padding: 0.75rem;
-    background: #2E7D32;
+    background: #4188FF;
     color: white;
     border: none;
     border-radius: 6px;
@@ -213,7 +213,7 @@
 }
 
 .submit-button:hover {
-    background: #1b5e20;
+    background: #649EFF;
 }
 
 .withdraw-modal {
@@ -232,7 +232,7 @@
 
 .withdraw-modal select:focus {
     outline: none;
-    border-color: #2E7D32;
+    border-color: #ACCBFF;
     box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.1);
 }
 

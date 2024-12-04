@@ -4,7 +4,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import BottomNav from './BottomNav'
 import '../styles/QRScan.css'
-
+import Navbar from './NavBar'
 const QRScan = () => {
   const navigate = useNavigate();
   const [showQRScanner, setShowQRScanner] = useState(false);
@@ -78,6 +78,7 @@ const QRScan = () => {
   
   return (
     <div className="qr-scan-container">
+      <Navbar hideWelcome={true}/>
       {!showQRScanner ? (
         <div className="find-item-modal">
           <div className="modal-header">
@@ -87,7 +88,7 @@ const QRScan = () => {
           <div className="search-container">
             <input 
               type="text" 
-              placeholder="DEV-1" 
+              placeholder="DV-0000" 
               className="search-input"
               value={searchId}
               onChange={(e) => setSearchId(e.target.value)}
@@ -150,10 +151,6 @@ const QRScan = () => {
         </div>
       )}
       
-      <BottomNav 
-        navItems={navItems} 
-        setShowQRScanner={setShowQRScanner}
-      />
     </div>
   )
 }

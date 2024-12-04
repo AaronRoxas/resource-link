@@ -87,3 +87,7 @@
     background-color: #F8F0FF;
     color: #8250C4;
   }
+  .action-badge.action-pending {
+    background-color: #F8E8C2;
+    color: #A5780F;
+  }

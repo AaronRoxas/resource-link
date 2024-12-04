@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import BottomNav from '../../components/BottomNav';
 import ItemInformation from '../../components/ItemInformation';
-
+import Navbar from '../../components/NavBar';
 const AdminCategoryItems = () => {
     const [items, setItems] = useState([]);
     const [categoryName, setCategoryName] = useState('');
@@ -32,6 +32,8 @@ const AdminCategoryItems = () => {
     const [showItemTypeModal, setShowItemTypeModal] = useState(false);
     const [showAddConsumableModal, setShowAddConsumableModal] = useState(false);
     const [borrowings, setBorrowings] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
+    const [deletingItemId, setDeletingItemId] = useState(null);
 
     const navItems = [
         { path: '/admin', icon: 'home', label: 'Home' },
@@ -234,6 +236,7 @@ const AdminCategoryItems = () => {
             }
 
             setShowAddConsumableModal(false);
+            setShowAddItemModal(false);
             setNewItem({
                 type: '',
                 name: '',
@@ -304,6 +307,7 @@ const AdminCategoryItems = () => {
     };
 
     const handleDeleteItem = async (item) => {
+        setDeletingItemId(item._id);
         try {
             await axios.delete(`https://resource-link-main-14c755858b60.herokuapp.com/api/inventory/${item._id}`, {
                 withCredentials: true
@@ -313,11 +317,14 @@ const AdminCategoryItems = () => {
         } catch (error) {
             console.error('Error deleting item:', error);
             toast.error('Failed to delete item');
+        } finally {
+            setDeletingItemId(null);
         }
     };
 
     return (
         <div className="view-category-items">
+            <Navbar hideWelcome={true}/>
             <header>
                 <div className="back-header">
                     <img 
@@ -511,6 +518,7 @@ const AdminCategoryItems = () => {
                                 <input
                                     type="number"
                                     value={newItem.purchaseCost}
+                                    min={1}
                                     onChange={(e) => setNewItem({
                                         ...newItem,
                                         purchaseCost: e.target.value
@@ -721,10 +729,15 @@ const AdminCategoryItems = () => {
                                             style={{ paddingRight: '8px' }}
                                         />
                                         <img 
-                                            src="/table-imgs/delete.svg" 
+                                            src={deletingItemId === item._id ? "/table-imgs/spinner.svg" : "/table-imgs/delete.svg"}
                                             alt="Delete" 
                                             className="action-icon"
                                             onClick={() => handleDeleteItem(item)}
+                                            style={{ 
+                                                paddingLeft: '8px',
+                                                cursor: deletingItemId === item._id ? 'not-allowed' : 'pointer',
+                                                opacity: deletingItemId === item._id ? 0.5 : 1
+                                            }}
                                         />
                                     </div>
                                 </td>

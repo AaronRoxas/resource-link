@@ -1,74 +1,94 @@
 .inventory-page {
-    padding: 20px;
-    padding-bottom: 80px;
+    padding: 16px;
+    background-color: #f5f7fa;
+    min-height: 100vh;
+    margin-top: 60px;
   }
   
   .inventory-page header {
     margin-bottom: 20px;
   }
   
+  .inventory-page header h1 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    margin-top: 16px;
+  }
+  
   .categories-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 16px;
     padding: 10px;
   }
   
+  @media (min-width: 768px) {
+    .categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+  }
+  
   .category-card {
-    background: #fff;
-    border-radius: 8px;
-    width: 100%;
-    height: 180px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
+    background: #ffffff;
+    border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+    cursor: pointer;
+  }
+  
+  .category-card:hover {
+    transform: translateY(-4px);
   }
   
   .category-image {
     width: 100%;
-    height: 100px;
-    background: #f0f0f0;
+    aspect-ratio: 1;
+    background: #ffffff;
+    padding: clamp(12px, 3vw, 20px);
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 0;
   }
   
   .category-image img {
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
   }
   
-  /* .category-image img[src="/dashboard-imgs/placeholder.svg"] {
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
-  } */
-  
   .category-info {
-    padding: 12px;
+    padding: clamp(12px, 3vw, 16px);
+    border-top: 1px solid #f0f0f0;
   }
   
   .category-info h3 {
-    font-size: 14px;
-    font-weight: 500;
     margin: 0;
+    font-size: clamp(14px, 3.5vw, 16px);
+    color: #333;
+    font-weight: 500;
     margin-bottom: 4px;
-    color: #000;
   }
   
   .category-info p {
-    font-size: 12px;
+    margin: 4px 0;
+    font-size: clamp(12px, 3vw, 14px);
     color: #666;
-    margin: 0;
-    line-height: 1.3;
+  }
+  
+  .status-label, .quantity-label {
+    font-size: clamp(12px, 3vw, 14px);
+    color: #666;
+    margin-top: 4px;
   }
   
   .new-category {
-    border: 2px dashed #ccc;
-    background: #f8f8f8;
+    border: 2px dashed #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ffffff;
+    min-height: clamp(150px, 40vw, 200px);
   }
   
   .create-category-content {
@@ -78,13 +98,7 @@
   
   .create-category-content span {
     display: block;
-    font-size: 14px;
-  }
-  
-  .item-count {
-    margin-top: 8px;
-    font-size: 0.9em;
-    color: #666;
+    font-size: clamp(14px, 3.5vw, 16px);
   }
   
   .category-modal-backdrop {
@@ -179,7 +193,7 @@
   .category-create-button {
       width: 100%;
       padding: 12px;
-      background-color: #006B3C;
+      background-color: #4188FF;
       color: white;
       border: none;
       border-radius: 4px;
@@ -189,7 +203,7 @@
   }
   
   .category-create-button:hover {
-      background-color: #005731;
+      background-color: #649EFF;
   }
   
   .category-image-preview {
@@ -350,7 +364,7 @@
   .done-button {
       width: 100%;
       padding: 10px;
-      background-color: #006400;
+      background-color: #4188FF;
       color: white;
       border: none;
       border-radius: 4px;
@@ -359,7 +373,7 @@
   }
   
   .done-button:hover {
-      background-color: #005000;
+      background-color: #649EFF;
   }
   
   .sub-categories {
@@ -480,5 +494,36 @@
   .availability-badge.check-out {
       background-color: #ffebee;
       color: #c62828;
+  }
+  
+  /* Adjust modal for mobile */
+  @media (max-width: 768px) {
+    .category-form-container {
+        width: 95%;
+        padding: 16px;
+    }
+
+    .category-form-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .category-upload-placeholder {
+        width: 80px;
+        height: 80px;
+    }
+
+    .category-form-group label {
+        font-size: 0.85rem;
+    }
+
+    .category-form-group input {
+        padding: 6px;
+        font-size: 0.85rem;
+    }
+
+    .category-create-button {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
   }
   

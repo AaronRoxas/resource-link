@@ -474,7 +474,7 @@ const StaffDash = () => {
         </button>
       </section>
 
-      <BottomNav navItems={navItems} setShowQRScanner={setShowQRScanner} /> {/* Use the BottomNav component */}
+      
 
       {/* Receipt Modal */}
       {showModal && selectedBorrow && (

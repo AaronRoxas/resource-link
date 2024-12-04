@@ -51,6 +51,7 @@ const Logs = () => {
       'check-in': 'action-checkin',
       'removed': 'action-removed',
       'added': 'action-added',
+      'pending': 'action-pending',
       'updated': 'action-updated',
       'withdraw': 'action-checkout'
     };

@@ -15,10 +15,6 @@ const TeacherCategoryItems = () => {
     const { categoryName: urlCategoryName } = useParams();
     const navigate = useNavigate();
 
-    const navItems = [
-        { path: '/teacher', icon: 'active-home', label: 'Home' },
-        { path: '/teacherInventory', icon: 'cube', label: 'Inventory' },
-    ];
 
     const fetchCategoryItems = async () => {
         try {

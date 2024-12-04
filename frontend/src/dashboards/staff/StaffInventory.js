@@ -3,7 +3,7 @@ import axios from 'axios';
 import BottomNav from '../../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/AdminInventory.css'; // You might want to create a separate StaffInventory.css
-
+import Navbar from '../../components/NavBar';
 const StaffInventory = () => {
     const [categories, setCategories] = useState([]);
     const [categoryItemCounts, setCategoryItemCounts] = useState({});
@@ -12,7 +12,7 @@ const StaffInventory = () => {
     // Modified nav items for staff
     const navItems = [
         { path: '/staff', icon: 'home', label: 'Home' },
-        { path: '/qr', icon: 'qr', label: 'Chart' },
+        { path: '/qr', icon: 'qr', label: '' },
         { path: '/staff/inventory', icon: 'active-cube', label: 'Inventory' }
     ];
 
@@ -50,6 +50,7 @@ const StaffInventory = () => {
 
     return (
         <div className="inventory-page">
+            <Navbar hideWelcome={true}/>
             <header>
                 <h1>Inventory</h1>
             </header>
@@ -76,7 +77,7 @@ const StaffInventory = () => {
                 ))}
             </div>
 
-            <BottomNav navItems={navItems} />
+
         </div>
     );
 };

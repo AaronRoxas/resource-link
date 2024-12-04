@@ -3,6 +3,8 @@
     background-color: #fff;
     min-height: 100vh;
     margin-top: 60px;
+    display: flex;
+    flex-direction: column;
 }
 
 .teacher-inventory header {
@@ -17,6 +19,7 @@
 }
 
 .borrowed-items-grid {
+    flex: 1;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
@@ -269,7 +272,7 @@
     color: #FF4747;
 }
 @media screen and (max-width: 1480px) and (min-width: 524px) {
-    html, body {
+    /* html, body {
         height: 100%;
         margin: 0;
     }
@@ -287,11 +290,8 @@
     .teacher-inventory .footer {
         padding: 20px;
         text-align: center;
-
     }
     .teacher-inventory .footer-copyright {
         text-align: left;
-
-    }
-
+    } */
 }

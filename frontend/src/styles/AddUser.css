@@ -81,7 +81,7 @@
 .create-button {
   width: 100%;
   padding: 12px;
-  background-color: #006C3A;
+  background-color: #4188FF;
   text-align: center;
   color: white;
   border: none;
@@ -92,7 +92,7 @@
 }
 
 .create-button:hover {
-  background-color: #008346;
+  background-color: #007bff;
 }
 /* Media Queries for Responsive Design */
 

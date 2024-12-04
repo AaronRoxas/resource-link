@@ -2,6 +2,17 @@ const express = require('express');
 const router = express.Router();
 const Item = require('../models/Item');
 
+const generateCategoryCode = (category) => {
+  if (!category) return 'MISC';  // Default fallback
+  
+  const firstLetter = category.charAt(0).toUpperCase();
+  const restOfWord = category.slice(1)
+    .toUpperCase()
+    .replace(/[AEIOU]/g, '');  // Only remove vowels after first letter
+  
+  return (firstLetter + restOfWord).slice(0, 4);
+};
+
 // Get the last used ID
 router.get('/last-id', async (req, res) => {
   try {
@@ -108,19 +119,6 @@ router.post('/bulk', async (req, res) => {
   try {
     const items = req.body;
     
-    // Define category code mapping
-    const categoryCodes = {
-      'devices': 'DEV',
-      'books': 'BOOK',
-      'miscellaneous': 'MISC',
-      'misc': 'MISC',
-      'lab equipment': 'LAB',
-      'lab equipments': 'LAB',
-      'Lab Equipments': 'LAB',
-      'software': 'SW'
-      // Add more categories as needed
-    };
-
     if (!Array.isArray(items)) {
       return res.status(400).json({ error: 'Invalid data format. Expected an array of items.' });
     }
@@ -147,7 +145,7 @@ router.post('/bulk', async (req, res) => {
         const categoryName = item.category.toLowerCase().trim();
         
         // Look up the category code
-        const categoryCode = categoryCodes[categoryName] || categoryName.substring(0, 4).toUpperCase();
+        const categoryCode = generateCategoryCode(categoryName);
         
         // Initialize category counter if it doesn't exist
         if (!categoryMaxIds[categoryCode]) {
