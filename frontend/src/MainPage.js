@@ -163,17 +163,17 @@ const MainPage = () => {
           </div>
           <div className="team-member">
             <img src="/dashboard-imgs/profile-placeholder.svg" alt="Team Member" />
-            <h4>Aaron Roxas</h4>
+            <h4>Aaron Joshua Roxas</h4>
             <p>Developer</p>
           </div>
           <div className="team-member">
             <img src="/dashboard-imgs/profile-placeholder.svg" alt="Team Member" />
-            <h4>Franco Nicanor</h4>
+            <h4>Franco Luis Nicanor</h4>
             <p>Designer</p>
           </div>
           <div className="team-member">
             <img src="/dashboard-imgs/profile-placeholder.svg" alt="Team Member" />
-            <h4>JC Villaganas</h4>
+            <h4>Jerome Christian Villaganas</h4>
             <p>System Analyst</p>
           </div>
         </div>
@@ -182,7 +182,12 @@ const MainPage = () => {
       <div className="learn-more-section">
         <div className="learn-more-content">
           <h2>Learn more<br />about ResourceLink</h2>
-          <button className="learn-more-button">Click here</button>
+          <button 
+            className="learn-more-button" 
+            onClick={() => window.open('https://lyceumofthephilippines.sharepoint.com/sites/ResourceLinkSoftwareEngineeringProject/SitePages/HomeForBrandCentral.aspx', '_blank')}
+          >
+            Click here
+          </button>
         </div>
         <div className="learn-more-graphics">
           <img src="/home-imgs/learnmore.svg" alt="Learn More" className="learn-more-image" />

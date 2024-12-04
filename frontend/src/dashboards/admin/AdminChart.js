@@ -1,21 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Pie } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend
-} from 'chart.js';
 import NavBar from '../../components/NavBar';
 import '../../styles/AdminChart.css';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Pie } from 'react-chartjs-2';
 
-// Register Chart.js components
-ChartJS.register(
-  ArcElement,
-  Tooltip,
-  Legend
-);
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const AdminChart = () => {
   const [stats, setStats] = useState({
@@ -24,14 +14,39 @@ const AdminChart = () => {
     consumables: 0,
     nonConsumables: 0,
   });
-  const [borrowedItems, setBorrowedItems] = useState([]);
+  const [itemStats, setItemStats] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const usersRes = await axios.get('http://localhost:5000/api/users');
-        const categoriesRes = await axios.get('http://localhost:5000/api/categories');
-        const itemsRes = await axios.get('http://localhost:5000/api/items');
+        const usersRes = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/users');
+        const categoriesRes = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/categories');
+        const itemsRes = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/items');
+        const activitiesRes = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/activities');
+        
+        // Filter activities to only include Withdraw and check-out actions
+        const relevantActivities = activitiesRes.data.filter(
+          activity => activity.action === 'Withdraw' || activity.action === 'check-out'
+        );
+
+        // Count occurrences of each item
+        const itemCounts = relevantActivities.reduce((acc, activity) => {
+          const itemName = activity.itemName;
+          acc[itemName] = (acc[itemName] || 0) + 1;
+          return acc;
+        }, {});
+
+        // Sort items by count and get top 5
+        const sortedItems = Object.entries(itemCounts)
+          .sort(([,a], [,b]) => b - a)
+          .slice(0, 5)
+          .reduce((obj, [key, value]) => ({
+            ...obj,
+            [key]: value
+          }), {});
+        
+        setItemStats(sortedItems);
+
         const items = itemsRes.data;
 
         const consumables = items.filter(item => item.itemType === 'Consumable').length;
@@ -43,10 +58,6 @@ const AdminChart = () => {
           consumables,
           nonConsumables,
         });
-
-        // Add new API call for borrowed items
-        const borrowedItemsRes = await axios.get('http://localhost:5000/api/items/most-borrowed');
-        setBorrowedItems(borrowedItemsRes.data.slice(0, 5)); // Get top 5 items
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -55,32 +66,52 @@ const AdminChart = () => {
     fetchData();
   }, []);
 
-  // Prepare data for pie chart
-  const pieChartData = {
-    labels: borrowedItems.map(item => item.name),
-    datasets: [{
-      data: borrowedItems.map(item => item.borrowCount),
-      backgroundColor: [
-        '#FF6384',
-        '#36A2EB',
-        '#FFCE56',
-        '#4BC0C0',
-        '#9966FF'
-      ],
-      borderWidth: 1
-    }]
+  const chartData = {
+    labels: Object.keys(itemStats),
+    datasets: [
+      {
+        data: Object.values(itemStats),
+        backgroundColor: [
+          '#4CAF50', // green
+          '#2196F3', // blue
+          '#F44336', // red
+          '#FF9800', // orange
+          '#E91E63', // pink
+        ],
+        borderWidth: 0,
+      },
+    ],
   };
 
-  const pieOptions = {
+  const chartOptions = {
     plugins: {
       legend: {
         position: 'right',
       },
       title: {
         display: true,
-        text: 'Most Borrowed Items'
+        text: 'Most Borrowed/Withdrew',
+        font: {
+          size: 16,
+          weight: 'bold'
+        },
+        padding: {
+          top: 10,
+          bottom: 20
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const value = context.raw;
+            const percentage = ((value / total) * 100).toFixed(0);
+            return `${context.label}: ${percentage}%`;
+          }
+        }
       }
-    }
+    },
+    cutout: '40%',
   };
 
   return (
@@ -114,10 +145,13 @@ const AdminChart = () => {
         </div>
       </div>
 
-      <div className="chart-container">
-        <div className="pie-chart">
-          <Pie data={pieChartData} options={pieOptions} />
-        </div>
+      <div className="chart-container" style={{ 
+        maxWidth: '500px', 
+        margin: '2rem', 
+        marginLeft: '2rem' 
+      }}>
+        <h2>Most Borrowed/Withdrew Items</h2>
+        <Pie data={chartData} options={chartOptions} />
       </div>
     </div>
   );
