@@ -116,7 +116,6 @@ const AdminManageUser = () => {
         </div>
       )}
 
-      <BottomNav navItems={navItems} />
     </div>
   );
 };

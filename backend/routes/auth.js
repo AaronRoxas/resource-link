@@ -194,4 +194,41 @@ router.get('/check-employee-id/:id', async (req, res) => {
   }
 });
 
+// Add this new route in auth.js
+router.post('/change-password', async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader) {
+      return res.status(401).json({ message: 'No authorization token provided' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Verify current password using the comparePassword method from User model
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Current password is incorrect' });
+    }
+
+    // Set the new password - this will trigger the pre-save middleware in User model
+    // which will automatically hash the password
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ message: 'Password updated successfully' });
+
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ message: 'Error changing password' });
+  }
+});
+
 module.exports = router;

@@ -247,7 +247,7 @@ const AdminDash = () => {
                 }))
               ]
                 .sort((a, b) => b.date - a.date) // Sort by date, newest first
-                .slice(0, 10) // Take only the first 5 items
+                .slice(0, 5) // Take only the first 5 items
                 .map((item) => (
                   <tr key={item._id}>
                     <td>{item.date.toLocaleDateString()}</td>
@@ -266,7 +266,6 @@ const AdminDash = () => {
         </div>
       </section>
 
-      <BottomNav navItems={navItems} />
     </div>
   );
 }

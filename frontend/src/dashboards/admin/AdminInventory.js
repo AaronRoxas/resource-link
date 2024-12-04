@@ -120,6 +120,7 @@ const AdminInventory = () => {
 
     return (
         <div className="inventory-page">
+            <Navbar hideWelcome={true}/>
             <header>
                 <h1>Inventory</h1>
             </header>
@@ -202,8 +203,6 @@ const AdminInventory = () => {
                     </div>
                 </div>
             )}
-
-            <BottomNav navItems={navItems} />
         </div>
     );
 };
