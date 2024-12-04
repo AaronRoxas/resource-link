@@ -29,7 +29,7 @@ const AdminInventory = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/categories', {
+            const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/categories', {
                 withCredentials: true
             });
             setCategories(response.data);
@@ -40,7 +40,7 @@ const AdminInventory = () => {
 
     const fetchItemCounts = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/items/count-by-category', {
+            const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/items/count-by-category', {
                 withCredentials: true
             });
             setCategoryItemCounts(response.data);
@@ -85,7 +85,7 @@ const AdminInventory = () => {
             }
 
             const response = await axios.post(
-                'http://localhost:5000/api/categories',
+                'https://resource-link-main-14c755858b60.herokuapp.com/api/categories',
                 {
                     name: newCategory.name,
                     image: selectedImage
