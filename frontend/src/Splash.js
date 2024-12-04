@@ -20,7 +20,7 @@ const Splash = () => {
         <div className="logo">
           {/* Logo goes here */}
           <span className="logo-placeholder"> 
-            <img src="/home-imgs/splashlogo.svg" alt="ResourceLink Logo" />
+            <img src="/home-imgs/splashlogo.png" alt="ResourceLink Logo" />
           </span>
         </div>
        

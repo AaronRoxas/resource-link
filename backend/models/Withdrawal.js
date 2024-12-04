@@ -16,7 +16,7 @@ const withdrawalSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'approved', 'declined'],
+        enum: ['pending', 'approved', 'declined', 'Withdraw'],
         default: 'pending'
     },
     receiptData: {

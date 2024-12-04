@@ -50,7 +50,7 @@ const MainPage = () => {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/login',
+        'https://resource-link-main-14c755858b60.herokuapp.com/api/auth/login',
         { email, password },
         {
           withCredentials: true,

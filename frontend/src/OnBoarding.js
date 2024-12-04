@@ -8,7 +8,7 @@ const OnBoarding = () => {
   const navigate = useNavigate();
   const steps = [
     {
-      image: 'onboard-imgs/second-logo.svg',
+      image: 'onboard-imgs/second-logo.png',
       title: 'ResourceLink',
       description: 'Digital Inventory and Asset Tracking for Public Schools',
     },

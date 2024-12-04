@@ -96,7 +96,7 @@ const NavBar = ({ hideWelcome }) => {
     <>
       <ToastContainer />
       <NavContainer>
-        <LogoImg src="/dashboard-imgs/nav-logo.svg" alt="Logo" />
+        <LogoImg src="/onboard-imgs/second-logo.png" alt="Logo" />
         <ProfileContainer>
           <ProfilePic 
             src="/dashboard-imgs/profile-placeholder.svg" 

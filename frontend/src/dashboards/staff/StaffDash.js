@@ -290,11 +290,12 @@ const StaffDash = () => {
             `https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals/${withdrawId}/status`,
             {
                 status: 'approved',
-                approvedBy: staffName // Make sure we're sending the staff name
+                approvedBy: staffName
             }
         );
         
-        setShowModal(false);
+        // Close the withdraw modal instead of the generic modal
+        setShowWithdrawModal(false);
         fetchWithdrawRequests();
     } catch (error) {
         console.error('Error accepting withdrawal:', error);
@@ -393,7 +394,7 @@ const StaffDash = () => {
                   )
                   .map(request => ({
                     ...request,
-                    date: new Date(request.requestDate),
+                    date: new Date(request.createdAt),
                     type: 'withdraw'
                   }))
               ]

@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import '../styles/ItemInformation.css';
 import { debounce } from 'lodash';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, onBorrowingComplete }) => {
   const [activeTab, setActiveTab] = useState('Info');
@@ -25,6 +26,8 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
   const [requestId, setRequestId] = useState('');
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [showRequestDropdown, setShowRequestDropdown] = useState(false);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [withdrawalQty, setWithdrawalQty] = useState(1);
 
   useEffect(() => {
     if (!propSelectedItem && itemId) {
@@ -78,7 +81,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
     if (selectedItem) {
       const category = selectedItem.category.toLowerCase().trim();
       const itemId = selectedItem.id.trim();
-      return `https://resource-link.vercel.app/staff/category/${category}/${itemId}`;
+      return `https://resource-link-main-14c755858b60.herokuapp.com/staff/category/${category}/${itemId}`;
     }
     return '';
   };
@@ -312,6 +315,84 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
     } catch (error) {
       console.error('Error during reserved check-out:', error);
       toast.error('Failed to complete reserved check-out');
+    }
+  };
+
+  const handleWithdraw = async () => {
+    if (!selectedEmployee) {
+      toast.error('Please select an employee');
+      return;
+    }
+
+    if (!withdrawalQty || withdrawalQty < 1) {
+      toast.error('Please enter a valid quantity');
+      return;
+    }
+
+    if (withdrawalQty > (selectedItem?.qty || 0)) {
+      toast.error('Requested quantity exceeds available stock');
+      return;
+    }
+
+    try {
+      const userData = JSON.parse(localStorage.getItem('user'));
+      
+      if (!userData || !userData.first_name) {
+        toast.error('User session expired. Please log in again.');
+        return;
+      }
+
+      const approverName = userData.employee_id ? 
+        `${userData.first_name} ${userData.last_name} (${userData.employee_id})` : 
+        `${userData.first_name} ${userData.last_name}`;
+
+      // Create withdrawal record
+      const withdrawalData = {
+        borrower: `${selectedEmployee.first_name} ${selectedEmployee.last_name}`,
+        itemId: selectedItem._id,
+        claimDate: getCurrentDate(),
+        status: 'Withdraw',
+        receiptData: {
+          requestId: Math.random().toString(36).substr(2, 9),
+          category: selectedItem.category,
+          subCategory: selectedItem.subCategory || '',
+          qty: withdrawalQty,
+          approvedBy: approverName
+        }
+      };
+
+      // Send the withdrawal request
+      const withdrawalResponse = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(withdrawalData)
+      });
+
+      if (!withdrawalResponse.ok) {
+        const errorData = await withdrawalResponse.json();
+        throw new Error(errorData.message || 'Failed to process withdrawal');
+      }
+
+      setShowWithdrawModal(false);
+      toast.success(`Successfully withdrew ${withdrawalQty} ${withdrawalQty === 1 ? 'pc' : 'pcs'} of ${selectedItem.name} to ${selectedEmployee.first_name} ${selectedEmployee.last_name}`, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      
+      if (onBorrowingComplete) {
+        onBorrowingComplete();
+      }
+
+    } catch (error) {
+      console.error('Error during withdrawal:', error);
+      toast.error(error.message || 'Failed to withdraw item');
     }
   };
 
@@ -644,8 +725,98 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
     );
   };
 
+  const renderWithdrawModal = () => {
+    if (!showWithdrawModal) return null;
+    
+    return (
+      <div className="modal-overlay">
+        <div className="checkout-modal">
+          <button className="modal-close" onClick={() => setShowWithdrawModal(false)}>×</button>
+          <h2>Withdraw Item</h2>
+          
+          <div className="checkout-item-preview">
+            <img 
+              src={selectedItem?.itemImage || '/dashboard-imgs/placeholder.svg'} 
+              alt="Item Preview" 
+              className="checkout-item-image"
+            />
+            <div className="checkout-item-details">
+              <h3>{selectedItem?.name}</h3>
+              <p>{selectedItem?.id}</p>
+            </div>
+          </div>
+
+          <div className="checkout-form">
+            <label>Withdraw to</label>
+            <div className="dropdown-container">
+              <input 
+                type="text" 
+                placeholder="Enter employee number or name"
+                className="checkout-input"
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                onFocus={() => setShowDropdown(true)}
+              />
+              {showDropdown && filteredEmployees.length > 0 && (
+                <div className="employee-dropdown">
+                  {filteredEmployees.map((employee) => (
+                    <div 
+                      key={employee.employee_id}
+                      className="employee-option"
+                      onClick={() => handleEmployeeSelect(employee)}
+                    >
+                      <span className="employee-id">{employee.employee_id}</span>
+                      <span className="employee-name">
+                        {employee.first_name} {employee.last_name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div className="quantity-input">
+              <label>Quantity</label>
+              <input 
+                type="number"
+                min="1"
+                max={selectedItem?.qty || 1}
+                value={withdrawalQty}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value);
+                  if (value > 0 && value <= (selectedItem?.qty || 1)) {
+                    setWithdrawalQty(value);
+                  }
+                }}
+                className="checkout-input"
+              />
+              <small className="stock-info">Available: {selectedItem?.qty || 0}</small>
+            </div>
+
+            <div className="claim-date">
+              <label>Claim Date</label>
+              <input 
+                type="date"
+                className="date-input"
+                value={getCurrentDate()}
+                readOnly
+              />
+            </div>
+            <button 
+              className="continue-button"
+              onClick={handleWithdraw}
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
+      <ToastContainer />
       <div className="modal-overlay">
         <div className="item-info-container">
           <button className="modal-close" onClick={handleClose}>×</button>
@@ -694,19 +865,21 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
                 disabled={selectedItem?.availability === 'Check-out' || selectedItem?.status === 'Reserved'}
                 style={(selectedItem?.availability === 'Check-out' || selectedItem?.status === 'Reserved') ? 
                   {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
-                onClick={() => setShowCheckoutModal(true)}
+                onClick={() => selectedItem?.itemType === 'Consumable' ? setShowWithdrawModal(true) : setShowCheckoutModal(true)}
               >
-                Check-out
+                {selectedItem?.itemType === 'Consumable' ? 'Withdraw' : 'Check-out'}
               </button>
-              <button 
-                className="action-button reserved-checkout"
-                disabled={selectedItem?.availability === 'Check-out' || selectedItem?.status !== 'Reserved'}
-                style={(selectedItem?.availability === 'Check-out' || selectedItem?.status !== 'Reserved') ? 
-                  {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
-                onClick={() => setShowReservedCheckoutModal(true)}
-              >
-                Reserved Check-out
-              </button>
+              {selectedItem?.itemType !== 'Consumable' && (
+                <button 
+                  className="action-button reserved-checkout"
+                  disabled={selectedItem?.availability === 'Check-out' || selectedItem?.status !== 'Reserved'}
+                  style={(selectedItem?.availability === 'Check-out' || selectedItem?.status !== 'Reserved') ? 
+                    {cursor: 'not-allowed', backgroundColor: '#D9D9D9'} : {}}
+                  onClick={() => setShowReservedCheckoutModal(true)}
+                >
+                  Reserved Check-out
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -714,6 +887,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
       {renderCheckoutModal()}
       {renderCheckInModal()}
       {renderReservedCheckoutModal()}
+      {renderWithdrawModal()}
     </>
   );
 };

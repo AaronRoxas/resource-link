@@ -4,6 +4,11 @@ import axios from 'axios';
 import '../styles/ReservedItems.css';
 import QrScanner from 'react-qr-scanner';
 
+const capitalizeFirstLetter = (string) => {
+  if (!string) return '';
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
+
 const ReservedItems = () => {
   const [reservedItems, setReservedItems] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
@@ -27,7 +32,7 @@ const ReservedItems = () => {
       try {
         const [borrowingsRes, withdrawsRes] = await Promise.all([
           fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings'),
-          fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/withdraws')
+          fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals')
         ]);
         
         const borrowingsData = await borrowingsRes.json();
@@ -306,7 +311,13 @@ const ReservedItems = () => {
               .sort((a, b) => new Date(b.date) - new Date(a.date))
               .map((item) => (
                 <tr key={item._id}>
-                  <td>{new Date(item.type === 'withdraw' ? item.requestDate : item.borrowDate).toLocaleDateString()}</td>
+                  <td>
+                    {new Date(
+                      item.type === 'withdraw' 
+                        ? (item.claimDate || item.createdAt) 
+                        : item.receiptData?.borrowTime
+                    ).toLocaleDateString()}
+                  </td>
                   <td>{item.borrower}</td>
                   <td>{item.itemId?.name}</td>
                   <td>
@@ -316,7 +327,7 @@ const ReservedItems = () => {
                         onClick={() => userRole === 'staff' && handleStatusClick(item)}
                         style={{ cursor: userRole === 'staff' ? 'pointer' : 'default' }}
                       >
-                        {item.type === 'withdraw' ? item.status : item.receiptData?.status}
+                        {capitalizeFirstLetter(item.type === 'withdraw' ? item.status : item.receiptData?.status)}
                       </span>
                     </span>
                   </td>

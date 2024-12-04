@@ -11,7 +11,7 @@ router.post('/', async (req, res) => {
             borrower: req.body.borrower,
             itemId: req.body.itemId,
             claimDate: req.body.claimDate,
-            status: 'pending',
+            status: 'Withdraw',
             receiptData: {
                 requestId: req.body.receiptData.requestId,
                 category: req.body.receiptData.category,
@@ -21,7 +21,44 @@ router.post('/', async (req, res) => {
             }
         });
         
-        await withdrawal.save();
+        // Get item details for activity log and quantity update
+        const item = await Item.findById(req.body.itemId);
+        if (!item) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        // Check if enough stock
+        if (item.qty < withdrawal.receiptData.qty) {
+            return res.status(400).json({ 
+                message: 'Insufficient stock',
+                details: {
+                    available: item.qty,
+                    requested: withdrawal.receiptData.qty
+                }
+            });
+        }
+
+        // Update item quantity
+        item.qty -= withdrawal.receiptData.qty;
+        
+        // Create activity log
+        const activity = new Activity({
+            borrower: withdrawal.borrower,
+            borrowerRole: 'Teacher',
+            itemId: withdrawal.itemId,
+            itemName: item.name,
+            action: 'Withdraw',
+            timestamp: new Date(),
+            approvedBy: withdrawal.receiptData.approvedBy
+        });
+
+        // Save all documents
+        await Promise.all([
+            item.save(),
+            withdrawal.save(),
+            activity.save()
+        ]);
+        
         res.status(201).json(withdrawal);
     } catch (error) {
         res.status(400).json({ message: error.message });

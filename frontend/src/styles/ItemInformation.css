@@ -564,3 +564,21 @@ label {
 .request-dropdown::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+.quantity-input {
+  margin-bottom: 15px;
+}
+
+.quantity-input input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.stock-info {
+  display: block;
+  color: #666;
+  margin-top: 5px;
+  font-size: 0.8em;
+}
