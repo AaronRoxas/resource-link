@@ -40,7 +40,11 @@ const borrowingSchema = new mongoose.Schema({
         approvedBy: {
             type: String
         }
-    }
+    },
+    activities: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Activity'
+    }]
 });
 
 // Middleware to update Item availability when a borrowing is created or updated

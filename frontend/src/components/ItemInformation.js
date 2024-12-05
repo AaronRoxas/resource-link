@@ -31,6 +31,19 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
   const [history, setHistory] = useState([]);
   const [showFlagDropdown, setShowFlagDropdown] = useState(false);
 
+  const getActionStyle = (action) => {
+    const styles = {
+      'check-out': 'action-checkout',
+      'check-in': 'action-checkin',
+      'removed': 'action-removed',
+      'added': 'action-added',
+      'pending': 'action-pending',
+      'updated': 'action-updated',
+      'withdraw': 'action-checkout'
+    };
+    return styles[action.toLowerCase()] || '';
+  };
+
   useEffect(() => {
     if (!propSelectedItem && itemId) {
       const fetchItem = async () => {
@@ -85,7 +98,30 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
         `https://resource-link-main-14c755858b60.herokuapp.com/api/activities/item/${selectedItem._id}`,
         { withCredentials: true }
       );
-      setHistory(response.data);
+      console.log('History response:', response.data);
+      
+      // Fetch additional borrower information for each record
+      const historyWithBorrowers = await Promise.all(
+        response.data.map(async (record) => {
+          try {
+            const borrowingResponse = await axios.get(
+              `https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/activity/${record._id}`,
+              { withCredentials: true }
+            );
+            return {
+              ...record,
+              borrower: borrowingResponse.data?.borrower || '-'
+            };
+          } catch (error) {
+            return {
+              ...record,
+              borrower: '-'
+            };
+          }
+        })
+      );
+      
+      setHistory(historyWithBorrowers);
     } catch (error) {
       console.error('Error fetching item history:', error);
     }
@@ -577,16 +613,20 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
                 <thead>
                   <tr>
                     <th>Date</th>
-                    <th>User</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {history.map((record, index) => (
-                    <tr key={index}>
-                      <td>{new Date(record.timestamp).toLocaleDateString()}</td>
-                      <td>{record.user}</td>
-                      <td>{record.action}</td>
+                  {history.map((record) => (
+                    <tr key={record._id}>
+                      <td>
+                        {new Date(record.timestamp).toLocaleDateString()} {new Date(record.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </td>
+                      <td>
+                        <span className={`action-badge ${getActionStyle(record.action)}`}>
+                          {record.action.toLowerCase()}
+                        </span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

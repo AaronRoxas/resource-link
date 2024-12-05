@@ -3,6 +3,7 @@ const router = express.Router();
 const Borrowing = require('../models/Borrowing');
 const Item = require('../models/Item');
 const mongoose = require('mongoose');
+const Activity = require('../models/Activity');
 
 // Search borrowings - Make sure this is at the TOP of your routes
 router.post('/search', async (req, res) => {
@@ -267,6 +268,41 @@ router.put('/:id/return', async (req, res) => {
   } catch (error) {
     console.error('Error updating borrowing:', error);
     res.status(500).json({ message: 'Error updating borrowing status' });
+  }
+});
+
+// Add this new route to your existing borrowings.js routes file
+router.get('/activity/:activityId', async (req, res) => {
+  try {
+    const { activityId } = req.params;
+    
+    // First find the activity to get itemId
+    const activity = await Activity.findById(activityId);
+    if (!activity) {
+      return res.status(404).json({ message: 'Activity not found' });
+    }
+
+    // Find the most recent borrowing for this item at the time of the activity
+    const borrowing = await Borrowing.findOne({
+      itemId: activity.itemId,
+      borrowDate: { $lte: activity.timestamp }
+    }).sort({ borrowDate: -1 });
+
+    if (!borrowing) {
+      return res.status(404).json({ message: 'No borrowing found for this activity' });
+    }
+
+    // Return the borrower information
+    return res.json({
+      borrower: borrowing.borrower,
+      borrowDate: borrowing.borrowDate,
+      returnDate: borrowing.returnDate,
+      status: borrowing.status
+    });
+
+  } catch (error) {
+    console.error('Error fetching borrowing by activity:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 });
 
