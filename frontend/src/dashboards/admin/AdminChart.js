@@ -287,32 +287,35 @@ const AdminChart = () => {
         </div>
       </div>
 
-      <div className="charts-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-        <div className="chart-container" style={{ 
-          maxWidth: '350px',
-          margin: '2rem',
-          marginLeft: '2rem' 
-        }}>
-          <h2>Most Borrowed/Withdrew Items</h2>
-          <Pie data={chartData} options={chartOptions} />
+      <div className="charts-container">
+        <div>
+          <h2 className="admin-chart-section-title">Stocks Overview</h2>
+          <div className="admin-chart-section-header">
+            <div className="admin-chart-view-more">View more</div>
+          </div>
+          <div className="chart-wrapper">
+            <Pie data={stockChartData} options={stockChartOptions} />
+          </div>
         </div>
 
-        <div className="chart-container" style={{ 
-          maxWidth: '500px',
-          margin: '2rem',
-          marginLeft: '2rem' 
-        }}>
-          <h2>Asset Conditions</h2>
-          <Pie data={conditionChartData} options={conditionChartOptions} />
+        <div>
+          <h2 className="admin-chart-section-title">Most Borrowed/Withdrew</h2>
+          <div className="admin-chart-section-header">
+            <div className="admin-chart-view-more">View more</div>
+          </div>
+          <div className="chart-wrapper">
+            <Pie data={chartData} options={chartOptions} />
+          </div>
         </div>
 
-        <div className="chart-container" style={{ 
-          maxWidth: '500px',
-          margin: '2rem',
-          marginLeft: '2rem' 
-        }}>
-          <h2>Stocks Overview</h2>
-          <Pie data={stockChartData} options={stockChartOptions} />
+        <div>
+          <h2 className="admin-chart-section-title">Asset Conditions</h2>
+          <div className="admin-chart-section-header">
+            <div className="admin-chart-view-more">View more</div>
+          </div>
+          <div className="chart-wrapper">
+            <Pie data={conditionChartData} options={conditionChartOptions} />
+          </div>
         </div>
       </div>
     </div>

@@ -68,18 +68,35 @@
   }
   
   /* Responsive Breakpoints */
+  @media screen and (max-width: 1200px) {
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
   @media screen and (max-width: 1024px) {
     .stats-grid {
       grid-template-columns: repeat(2, 1fr);
     }
+  
+  
+    .section-title {
+      font-size: 16px;
+      margin: 20px 0 8px;
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .chart-wrapper {
+      margin-bottom: 16px;
+    }
   }
   
   @media screen and (max-width: 640px) {
-    .stats-grid {
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-  
     .admin-chart {
       padding: 16px;
       padding-top: 70px;
@@ -128,19 +145,118 @@
   }
   
   .charts-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+    width: 100%;
   }
   
+  .chart-container {
+    margin: 0 !important;
+    max-width: none !important;
+  }
+  
+  .section-title {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 24px 0 12px;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: flex-end;
+    margin: -36px 0 12px 0; /* Negative top margin to pull it up next to title */
+  }
+  
+  .view-more {
+    color: #2563eb;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .chart-wrapper {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0; /* Remove bottom margin since we're using grid gap */
+    box-sizing: border-box;
+    display: block;
+    height: 400px; /* Fixed height instead of viewport units */
+    width: auto;
+    max-width: none; /* Remove max-width restriction */
+  }
+  
+  .admin-chart-section-title {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 24px 0 12px;
+    display: inline-block; /* Allow title to sit inline */
+  }
+  
+  .admin-chart-section-header {
+    display: flex;
+    justify-content: space-between; /* Keep space between title and view more */
+    align-items: center;
+    margin-bottom: 12px;
+    max-width: none; /* Remove max-width restriction */
+  }
+  
+  .admin-chart-view-more {
+    color: #2563eb;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .admin-chart-section-title,
+  .admin-chart-section-header {
+    max-width: none; /* Remove max-width restriction */
+  }
+  
+  /* Adjust responsive breakpoints for the charts grid */
   @media screen and (max-width: 1024px) {
     .charts-container {
-      flex-direction: column;
-      align-items: center;
+      grid-template-columns: 1fr;
     }
-    
-    .chart-container {
-      margin: 1rem auto !important;
+  
+    .chart-wrapper {
+      height: 350px;
+    }
+  }
+  
+  /* Responsive adjustments */
+  @media screen and (max-width: 1200px) {
+    .chart-wrapper {
+      height: 350px;
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    .charts-container {
+      grid-template-columns: 1fr;
+    }
+  
+    .chart-wrapper {
+      height: 300px;
+    }
+  
+    .admin-chart-section-title {
+      font-size: 16px;
+    }
+  
+    .admin-chart-view-more {
+      font-size: 12px;
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .chart-wrapper {
+      height: 250px;
+      padding: 10px;
+    }
+  
+    .charts-container {
+      gap: 16px;
     }
   }
