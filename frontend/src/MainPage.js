@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import './styles/MainPage.css';
 import Footer from './components/Footer';
@@ -85,6 +85,16 @@ const MainPage = () => {
     }
   };
 
+  // Add auto-swipe functionality
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prevIndex) => (prevIndex + 1) % sections.length);
+    }, 5000); // 5000ms = 5 seconds
+
+    // Cleanup function to clear interval when component unmounts
+    return () => clearInterval(timer);
+  }, []); // Empty dependency array means this runs once on mount
+
   return (
     <div className="main-page">
       <header className="main-header">
@@ -148,33 +158,33 @@ const MainPage = () => {
             <h3>ResourceLink</h3>
           </div>
           <p>
-            ResourceLink is a cloud-based platform that simplifies inventory 
-            management for schools, offering real-time tracking, resource 
-            reservations, and insightful analytics to ensure efficient and 
-            transparent asset management.
+            ResourceLink is a cloud-based inventory management system that 
+            features QR-based asset tracking, real-time borrowing and withdrawal management, automated 
+            inventory alerts, and comprehensive analytics.
           </p>
         </div>
 
         <div className="team-grid">
           <div className="team-member">
-            <img src="/dashboard-imgs/profile-placeholder.svg" alt="Team Member" />
-            <h4>Ian Lumanog</h4>
+            <img src="/home-imgs/ian.jpg" alt="Team Member" />
+            <h4><strong>Ian Lumanog</strong></h4>
             <p>Project Manager</p>
+            <p>UI/UX Designer</p>
           </div>
           <div className="team-member">
-            <img src="/dashboard-imgs/profile-placeholder.svg" alt="Team Member" />
-            <h4>Aaron Joshua Roxas</h4>
-            <p>Developer</p>
+            <img src="/home-imgs/aaron.jpg" alt="Team Member" />
+            <h4><strong>Aaron Joshua Roxas</strong></h4>
+            <p>Frontend and Backend Developer</p>
           </div>
           <div className="team-member">
-            <img src="/dashboard-imgs/profile-placeholder.svg" alt="Team Member" />
-            <h4>Franco Luis Nicanor</h4>
-            <p>Designer</p>
+            <img src="/home-imgs/franco.jpg" alt="Team Member" />
+            <h4><strong>Franco Luis Nicanor</strong></h4>
+            <p>Database and System Designer</p>
           </div>
           <div className="team-member">
-            <img src="/dashboard-imgs/profile-placeholder.svg" alt="Team Member" />
-            <h4>Jerome Christian Villaganas</h4>
-            <p>System Analyst</p>
+            <img src="/home-imgs/jc.jpg" alt="Team Member" />
+            <h4><strong>Jerome Christian Villaganas</strong></h4>
+            <p>System Analyst and Documentation</p>
           </div>
         </div>
       </div>

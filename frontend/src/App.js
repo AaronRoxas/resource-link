@@ -99,7 +99,7 @@ function App() {
         <Route
           path="/qr"
           element={
-            <ProtectedRoute allowedRoles={['staff']}>
+            <ProtectedRoute allowedRoles={['staff', 'admin']}>
               <QRScan />
             </ProtectedRoute>
           }

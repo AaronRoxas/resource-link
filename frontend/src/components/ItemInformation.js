@@ -5,7 +5,7 @@ import '../styles/ItemInformation.css';
 import { debounce } from 'lodash';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import axios from 'axios';
 const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, onBorrowingComplete }) => {
   const [activeTab, setActiveTab] = useState('Info');
   const [selectedItem, setSelectedItem] = useState(propSelectedItem);
@@ -28,6 +28,8 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
   const [showRequestDropdown, setShowRequestDropdown] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [withdrawalQty, setWithdrawalQty] = useState(1);
+  const [history, setHistory] = useState([]);
+  const [showFlagDropdown, setShowFlagDropdown] = useState(false);
 
   useEffect(() => {
     if (!propSelectedItem && itemId) {
@@ -68,6 +70,26 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
     };
     fetchEmployees();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'History' && selectedItem?._id) {
+      fetchItemHistory();
+    }
+  }, [activeTab, selectedItem?._id]);
+
+  const fetchItemHistory = async () => {
+    if (!selectedItem?._id) return;
+    
+    try {
+      const response = await axios.get(
+        `https://resource-link-main-14c755858b60.herokuapp.com/api/activities/item/${selectedItem._id}`,
+        { withCredentials: true }
+      );
+      setHistory(response.data);
+    } catch (error) {
+      console.error('Error fetching item history:', error);
+    }
+  };
 
   const handleClose = () => {
     if (handleCloseItemInfo) {
@@ -396,6 +418,48 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
     }
   };
 
+  const handleStatusUpdate = async (newStatus) => {
+    try {
+      console.log('Updating status to:', newStatus);
+      console.log('Item ID:', selectedItem._id);
+      
+      // First update the item's status
+      const itemResponse = await fetch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${selectedItem._id}`, {
+        method: 'PUT',  // Changed to PUT to match other status updates
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: newStatus,
+          availability: selectedItem.availability,  // Preserve current availability
+          qty: selectedItem.qty  // Preserve current quantity
+        })
+      });
+
+      console.log('Response status:', itemResponse.status);
+      const data = await itemResponse.json();
+      console.log('Response data:', data);
+
+      if (!itemResponse.ok) {
+        console.error('Server responded with:', data);
+        throw new Error('Failed to update status');
+      }
+      
+      // Update local state with the response data
+      setSelectedItem(data);
+      setShowFlagDropdown(false);
+      toast.success(`Status updated to ${newStatus}`);
+
+      // If there's a callback for updates, call it
+      if (onBorrowingComplete) {
+        onBorrowingComplete();
+      }
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error('Failed to update status: ' + error.message);
+    }
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'Info':
@@ -412,7 +476,12 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
             <div className="info-row">
               <div className="info-label">Status</div>
               <div className="info-value">
-                <span className="status-badge">{selectedItem?.status || 'Good Condition'}</span>
+                <span 
+                  className="status-badge" 
+                  data-status={selectedItem?.status || 'Good condition'}
+                >
+                  {selectedItem?.status || 'Good condition'}
+                </span>
               </div>
             </div>
             <div className="info-row">
@@ -496,6 +565,33 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
                 Download
               </button>
             </div>
+          </div>
+        );
+      case 'History':
+        return (
+          <div className="history-table">
+            {history.length === 0 ? (
+              <p>No history available for this item.</p>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>User</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.map((record, index) => (
+                    <tr key={index}>
+                      <td>{new Date(record.timestamp).toLocaleDateString()}</td>
+                      <td>{record.user}</td>
+                      <td>{record.action}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         );
       default:
@@ -820,6 +916,54 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
       <div className="modal-overlay">
         <div className="item-info-container">
           <button className="modal-close" onClick={handleClose}>×</button>
+          <div className="flag-button-container">
+            <button 
+              className="flag-button"
+              onClick={() => setShowFlagDropdown(!showFlagDropdown)}
+            >
+              <svg 
+                width="16" 
+                height="16" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                <line x1="4" y1="22" x2="4" y2="15"></line>
+              </svg>
+            </button>
+            {showFlagDropdown && (
+              <div className="flag-dropdown">
+                <button 
+                  className="flag-option repair"
+                  onClick={() => handleStatusUpdate('For repair')}
+                >
+                  For repair
+                </button>
+                <button 
+                  className="flag-option low-stock"
+                  onClick={() => handleStatusUpdate('Low stock')}
+                >
+                  Low stock
+                </button>
+                <button 
+                  className="flag-option maintenance"
+                  onClick={() => handleStatusUpdate('For maintenance')}
+                >
+                  For maintenance
+                </button>
+                <button 
+                  className="flag-option good"
+                  onClick={() => handleStatusUpdate('Good condition')}
+                >
+                  Good condition
+                </button>
+              </div>
+            )}
+          </div>
           
           <div className="item-preview-section">
             <div className="image-placeholder">
@@ -838,7 +982,12 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
             >
               Info
             </button>
-
+            <button 
+              className={`info-tab ${activeTab === 'History' ? 'active' : ''}`}
+              onClick={() => setActiveTab('History')}
+            >
+              History
+            </button>
             <button 
               className={`info-tab ${activeTab === 'QR Code' ? 'active' : ''}`}
               onClick={() => setActiveTab('QR Code')}
@@ -849,7 +998,7 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
 
           {renderTabContent()}
 
-          {activeTab !== 'QR Code' && (
+          {activeTab !== 'QR Code' && activeTab !== 'History' && (
             <div className="action-buttons">
               <button 
                 className="action-button check-in"

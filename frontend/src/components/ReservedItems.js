@@ -211,14 +211,18 @@ const ReservedItems = () => {
 
   const handleCheckout = async () => {
     try {
-      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${selectedItem._id}/status`, {
-        status: 'checked out'
+      // Update borrowing with check-out activity
+      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${selectedItem._id}/activity`, {
+        activity: 'Check-out',
+        timestamp: new Date()
       });
 
+      // Update item status to "In Use"
       await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${foundItem._id}/status`, {
-        status: 'In Use'
+        status: 'In Use'  // Valid statuses: "For repair", "Low Stock", "For Maintenance", "Good Condition", "In Use"
       });
 
+      // Clear modal states
       setShowCheckoutModal(false);
       setShowItemInfo(false);
       setFoundItem(null);
@@ -228,9 +232,9 @@ const ReservedItems = () => {
       const response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
       const data = await response.json();
       const filteredData = data.filter(item => 
-        item.receiptData?.status === 'reserved' || 
-        item.receiptData?.status === 'pending' || 
-        item.receiptData?.status === 'declined'
+        item.activity === 'Check-out' || 
+        item.activity === 'Check-in' || 
+        item.activity === 'Withdraw'
       );
       setReservedItems(filteredData);
       

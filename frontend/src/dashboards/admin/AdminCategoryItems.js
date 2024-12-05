@@ -649,6 +649,7 @@ const AdminCategoryItems = () => {
                                 <label>Qty <span className="required">*</span></label>
                                 <input
                                     type="number"
+                                    min={1}
                                     value={newItem.qty}
                                     onChange={(e) => setNewItem({
                                         ...newItem,
@@ -747,7 +748,6 @@ const AdminCategoryItems = () => {
                 </table>
             </div>
 
-            <BottomNav navItems={navItems} />
         </div>
     );
 };

@@ -72,8 +72,8 @@
   
   .category-info p {
     margin: 4px 0;
-    font-size: clamp(12px, 3vw, 14px);
-    color: #666;
+    font-size: 10px;
+    color: #878787;
   }
   
   .status-label, .quantity-label {

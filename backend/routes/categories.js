@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
 
         const category = new Category({
             name: req.body.name,
-            description: req.body.description,
+            description: req.body.description || '',
             image: imageData
         });
         const newCategory = await category.save();

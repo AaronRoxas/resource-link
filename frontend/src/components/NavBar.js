@@ -131,6 +131,9 @@ const NavBar = ({ hideWelcome }) => {
                   <MenuItem onClick={() => navigate('/adminChart', { replace: true })}>
                     Chart
                   </MenuItem>
+                  <MenuItem onClick={() => navigate('/qr', { replace: true })}>
+                    Find Item
+                  </MenuItem>
                   <MenuItem onClick={() => navigate('/admin/manage-user', { replace: true })}>
                     Manage User
                   </MenuItem>

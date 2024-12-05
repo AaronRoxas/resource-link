@@ -4,6 +4,7 @@ import BottomNav from '../../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/AdminInventory.css';
 import Navbar from '../../components/NavBar';
+import { toast } from 'react-hot-toast';
 const AdminInventory = () => {
     const [categories, setCategories] = useState([]);
     const [categoryItemCounts, setCategoryItemCounts] = useState({});
@@ -88,6 +89,7 @@ const AdminInventory = () => {
                 'https://resource-link-main-14c755858b60.herokuapp.com/api/categories',
                 {
                     name: newCategory.name,
+                    description: newCategory.description,
                     image: selectedImage
                 },
                 { 
@@ -140,7 +142,7 @@ const AdminInventory = () => {
                         </div>
                         <div className="category-info">
                             <h3>{category.name}</h3>
-
+                            <p>{category.description}</p>
                         </div>
                     </div>
                 ))}
@@ -186,7 +188,7 @@ const AdminInventory = () => {
                             </div>
                             
                             <div className="category-form-group">
-                                <label>Name</label>
+                                <label>Name <span className="required">*</span></label>
                                 <input
                                     type="text"
                                     value={newCategory.name}
@@ -195,6 +197,17 @@ const AdminInventory = () => {
                                         name: e.target.value
                                     })}
                                     required
+                                />
+                            </div>
+                            <div className="category-form-group">
+                                <label>Description</label>
+                                <input
+                                    type="text"
+                                    value={newCategory.description}
+                                    onChange={(e) => setNewCategory({
+                                        ...newCategory,
+                                        description: e.target.value
+                                    })}
                                 />
                             </div>
 
