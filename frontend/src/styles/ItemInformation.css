@@ -87,18 +87,9 @@
 }
 
 .info-tab.active {
-  color: #000;
+  color: #4188FF;
 }
 
-.info-tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #000;
-}
 
 .info-tab svg {
   vertical-align: middle;
@@ -155,6 +146,10 @@
 }
 
 .status-badge[data-status="Good condition"] {
+  background: #C2F8D4;
+  color: #68C458;
+}
+.status-badge[data-status="Good Condition"] {
   background: #C2F8D4;
   color: #68C458;
 }
