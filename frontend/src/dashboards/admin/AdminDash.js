@@ -15,6 +15,7 @@ const AdminDash = () => {
   const [, setShowModal] = useState(false);
   const [activities, setActivities] = useState([]);
   const [reservedItems, setReservedItems] = useState([]);
+  const [logs, setLogs] = useState([]);
 
   const getActionStyle = (action) => {
     const styles = {
@@ -23,6 +24,7 @@ const AdminDash = () => {
       'removed': 'action-removed',
       'added': 'action-added',
       'updated': 'action-updated',
+      'pending': 'action-pending',
       'withdraw': 'action-checkout'
     };
     return styles[action.toLowerCase()] || '';
@@ -65,7 +67,17 @@ const AdminDash = () => {
   const fetchActivities = async () => {
     try {
       const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/activities');
-      setActivities(response.data);
+      const formattedLogs = response.data
+        .map(activity => ({
+          date: new Date(activity.timestamp),
+          borrower: activity.borrower,
+          itemName: activity.itemName,
+          action: activity.action,
+          _id: activity._id
+        }))
+        .sort((a, b) => b.date - a.date)
+        .slice(0, 5); // Only show 5 items
+      setLogs(formattedLogs);
     } catch (error) {
       console.error('Error fetching activities:', error);
     }
@@ -226,41 +238,21 @@ const AdminDash = () => {
               </tr>
             </thead>
             <tbody>
-            {[...borrowings
-                .filter(borrowing => borrowing.receiptData?.status === 'On-going')
-                .slice(0, 5)
-                .map(borrowing => ({
-                  date: new Date(borrowing.borrowDate),
-                  borrower: borrowing.borrower,
-                  itemName: borrowing.itemId?.name,
-                  action: 'Check-out',
-                  _id: borrowing._id,
-                  type: 'borrowing'
-                })),
-                ...activities.map(activity => ({
-                  date: new Date(activity.timestamp),
-                  borrower: activity.borrower,
-                  itemName: activity.itemName,
-                  action: activity.action,
-                  _id: activity._id,
-                  type: 'activity'
-                }))
-              ]
-                .sort((a, b) => b.date - a.date) // Sort by date, newest first
-                .slice(0, 5) // Take only the first 5 items
-                .map((item) => (
-                  <tr key={item._id}>
-                    <td>{item.date.toLocaleDateString()}</td>
-                    <td>{item.borrower}</td>
-                    <td>{item.itemName}</td>
-                    <td>
-                      <span className={`action-badge ${getActionStyle(item.action)}`}>
-                        {item.action.toLowerCase()}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
+            {logs.map((log) => (
+              <tr key={log._id}>
+                <td>
+                  {log.date.toLocaleDateString()} {log.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </td>
+                <td>{log.borrower}</td>
+                <td>{log.itemName}</td>
+                <td>
+                  <span className={`action-badge ${getActionStyle(log.action)}`}>
+                    {log.action.toLowerCase()}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
           </table>
           <button className="view-all-button" onClick={handleViewAllLogs}>View all</button>
         </div>
