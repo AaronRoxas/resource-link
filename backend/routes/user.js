@@ -83,4 +83,44 @@ router.delete('/auth/users/:id', async (req, res) => {
   }
 });
 
+// Update user
+router.put('/users/:id', async (req, res) => {
+  try {
+    const { first_name, last_name, email, role } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { first_name, last_name, email, role },
+      { new: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ message: 'Error updating user' });
+  }
+});
+
+// Reset user password
+router.post('/users/:id/reset-password', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Set password to '1234'
+    user.password = '1234';
+    await user.save();
+
+    res.json({ message: 'Password reset successfully' });
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).json({ message: 'Error resetting password' });
+  }
+});
+
 module.exports = router;

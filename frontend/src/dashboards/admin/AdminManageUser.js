@@ -19,6 +19,14 @@ const AdminManageUser = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    role: ''
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(7); // Show 10 users per page
 
   // Navigation items for bottom nav
   const navItems = [
@@ -83,7 +91,38 @@ const AdminManageUser = () => {
 
   const handleEditUser = (user) => {
     setEditingUser(user);
+    setEditFormData({
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      role: user.role
+    });
     setShowEditModal(true);
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/users/${editingUser._id}`,
+        editFormData,
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      setUsers(users.map(user => 
+        user._id === editingUser._id ? { ...user, ...editFormData } : user
+      ));
+      setShowEditModal(false);
+      setEditingUser(null);
+      toast.success('User updated successfully');
+    } catch (error) {
+      console.error('Error updating user:', error);
+      toast.error(error.response?.data?.message || 'Failed to update user');
+    }
   };
 
   const handleDeleteUser = (user) => {
@@ -107,6 +146,16 @@ const AdminManageUser = () => {
       console.error('Error deleting user:', error);
       toast.error(error.response?.data?.message || 'Failed to delete user');
     }
+  };
+
+  // Get current users
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = getFilteredUsers().slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(getFilteredUsers().length / usersPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   return (
@@ -170,7 +219,7 @@ const AdminManageUser = () => {
               </tr>
             </thead>
             <tbody>
-              {getFilteredUsers().map((user) => (
+              {currentUsers.map((user) => (
                 <tr key={user._id}>
                   <td>{user.employee_id}</td>
                   <td>{`${user.first_name} ${user.last_name}`}</td>
@@ -188,6 +237,36 @@ const AdminManageUser = () => {
               ))}
             </tbody>
           </table>
+          
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button 
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="pagination-button"
+              >
+                Previous
+              </button>
+              
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index + 1}
+                  onClick={() => handlePageChange(index + 1)}
+                  className={`pagination-button ${currentPage === index + 1 ? 'active' : ''}`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+              
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="pagination-button"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -213,6 +292,84 @@ const AdminManageUser = () => {
               <div className="delete-actions">
                 <button className="cancel-button" onClick={() => setShowDeleteModal(false)}>Cancel</button>
                 <button className="delete-button" onClick={handleDeleteConfirm}>Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && (
+        <div className="manage-user-modal">
+          <div className="manage-user-modal-content">
+            <div className="manage-user-modal-header">
+              <button onClick={() => setShowEditModal(false)}>✕</button>
+            </div>
+            <div className="edit-user-form">
+              <h3>Edit User</h3>
+              <div className="form-group">
+                <label>First Name:</label>
+                <input
+                  type="text"
+                  value={editFormData.first_name}
+                  onChange={(e) => setEditFormData({...editFormData, first_name: e.target.value})}
+                />
+              </div>
+              <div className="form-group">
+                <label>Last Name:</label>
+                <input
+                  type="text"
+                  value={editFormData.last_name}
+                  onChange={(e) => setEditFormData({...editFormData, last_name: e.target.value})}
+                />
+              </div>
+              <div className="form-group">
+                <label>Email:</label>
+                <input
+                  type="email"
+                  value={editFormData.email}
+                  onChange={(e) => setEditFormData({...editFormData, email: e.target.value})}
+                />
+              </div>
+              <div className="form-group">
+                <label>Role:</label>
+                <select
+                  value={editFormData.role}
+                  onChange={(e) => setEditFormData({...editFormData, role: e.target.value})}
+                >
+                  <option value="admin">Admin</option>
+                  <option value="staff">Staff</option>
+                  <option value="teacher">Teacher</option>
+                </select>
+              </div>
+              <div className="edit-actions">
+                <button className="cancel-button" onClick={() => setShowEditModal(false)}>Cancel</button>
+                <button className="save-button" onClick={handleEditSubmit}>Save Changes</button>
+              </div>
+              <div className="reset-password-link">
+                <a 
+                  href="#"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    try {
+                      await axios.post(
+                        `http://localhost:5000/api/users/${editingUser._id}/reset-password`,
+                        {},
+                        {
+                          withCredentials: true,
+                          headers: {
+                            'Content-Type': 'application/json'
+                          }
+                        }
+                      );
+                      toast.success('Password reset to 1234');
+                    } catch (error) {
+                      console.error('Error resetting password:', error);
+                      toast.error('Failed to reset password');
+                    }
+                  }}
+                >
+                  Reset Password
+                </a>
               </div>
             </div>
           </div>

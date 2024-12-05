@@ -140,7 +140,8 @@
   }
   
   .pie-chart {
-    max-width: 600px;
+    max-width: 260px;
+    max-height: 260px;
     margin: 0 auto;
   }
   
@@ -184,8 +185,9 @@
     box-sizing: border-box;
     display: block;
     height: 400px; /* Fixed height instead of viewport units */
+    max-height: 400px;
     width: auto;
-    max-width: none; /* Remove max-width restriction */
+    max-width: auto; /* Remove max-width restriction */
   }
   
   .admin-chart-section-title {

@@ -47,7 +47,7 @@
 .submit-button {
   width: 100%;
   padding: 10px;
-  background-color: #006C3A;
+  background-color:#4188FF;
   color: white;
   border: none;
   border-radius: 5px;
@@ -100,9 +100,9 @@
 }
 
 .method-button.active {
-  background: #006B3E;
+  background: #4188FF;
   color: white;
-  border-color: #006B3E;
+  border-color: #4188FF;
 }
 
 .bulk-import-container {
@@ -118,7 +118,7 @@
 }
 
 .template-button {
-  background: #006B3E;
+  background: #4188FF;
   color: white;
   padding: 12px 24px;
   border: none;

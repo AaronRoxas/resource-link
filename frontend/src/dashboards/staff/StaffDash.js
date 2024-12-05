@@ -7,6 +7,7 @@ import ItemInformation from '../../components/ItemInformation';
 import { useNavigate, useLocation } from 'react-router-dom';
 import NavBar from '../../components/NavBar';
 
+
 const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 };
@@ -329,7 +330,7 @@ const StaffDash = () => {
         {/* Inventory Alerts Section */}
       <section className="staff-section">
         <div className="section-header">
-          <h2>Inventory Alerts</h2>
+          <h2 className='dashboard-section-title'> Inventory Alerts</h2>
         </div>
         <div className="staff-table-container">
           <table className="staff-table">
@@ -366,7 +367,7 @@ const StaffDash = () => {
 
       <section className="staff-section">
         <div className="section-header">
-          <h2>Reserved Items</h2>
+        <h2 className='dashboard-section-title'>Reserved Items</h2>
         </div>
         <div className="staff-table-container">
           <table className="staff-table">
@@ -431,7 +432,7 @@ const StaffDash = () => {
 
       <section className="staff-section">
         <div className="section-header">
-          <h2>Logs</h2>
+        <h2 className='dashboard-section-title'>Logs</h2>
         </div>
         <div className="staff-table-container">
           <table className="staff-table">

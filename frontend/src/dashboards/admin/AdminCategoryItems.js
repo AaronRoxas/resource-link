@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import BottomNav from '../../components/BottomNav';
 import ItemInformation from '../../components/ItemInformation';
 import Navbar from '../../components/NavBar';
+import '../../styles/AdminCategoryItems.css';
+
 const AdminCategoryItems = () => {
     const [items, setItems] = useState([]);
     const [categoryName, setCategoryName] = useState('');
@@ -34,7 +36,40 @@ const AdminCategoryItems = () => {
     const [borrowings, setBorrowings] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [deletingItemId, setDeletingItemId] = useState(null);
+    const [showFilterModal, setShowFilterModal] = useState(false);
+    const [filters, setFilters] = useState({
+        subCategory: '',
+        status: ''
+    });
 
+    const getFilteredItems = () => {
+        return items.filter(item => {
+            const matchSubCategory = !filters.subCategory || item.subCategory === filters.subCategory;
+            const matchStatus = !filters.status || item.status === filters.status;
+            return matchSubCategory && matchStatus;
+        });
+    };
+
+    const handleFilterChange = (filterType, value) => {
+        setFilters(prev => ({
+            ...prev,
+            [filterType]: value
+        }));
+    };
+
+    const clearFilters = () => {
+        setFilters({
+            subCategory: '',
+            status: ''
+        });
+        setShowFilterModal(false);
+    };
+
+    const handleFilterClick = () => {
+        setShowFilterModal(true);
+    };
+
+    
     const navItems = [
         { path: '/admin', icon: 'home', label: 'Home' },
         { path: '/admin/inventory', icon: 'chart', label: 'Chart' },
@@ -200,6 +235,10 @@ const AdminCategoryItems = () => {
                 }
             }
 
+            // Calculate the status based on quantity
+            const quantity = newItem.type === 'Non-Consumable' ? 1 : newItem.qty;
+            const status = quantity < 10 ? 'Low Stock' : 'Good Condition';
+
             const itemData = {
                 name: newItem.name,
                 purchaseDate: newItem.purchaseDate,
@@ -208,10 +247,10 @@ const AdminCategoryItems = () => {
                 category: categoryName,
                 subCategory: newItem.subCategory,
                 itemImage: imageBase64,
-                status: 'Good Condition',
+                status: status,
                 itemType: newItem.type,
                 id: newItem.id,
-                qty: newItem.type === 'Non-Consumable' ? 1 : newItem.qty,
+                qty: quantity,
                 serialNo: newItem.type === 'Non-Consumable' ? newItem.serialNo : undefined
             };
 
@@ -355,12 +394,71 @@ const AdminCategoryItems = () => {
                             src="/table-imgs/filter.svg" 
                             alt="Filter" 
                             className="header-icon"
-                            onClick={() => {/* Add your filter handler */}}
+                            onClick={handleFilterClick}
                         />
                     </div>
                 </div>
             </header>
 
+                      {/* Add the filter modal before the items table */}
+                      {showFilterModal && (
+    <div className="filter-items-modal-backdrop">
+        <div className="filter-items-content">
+            <div className="filter-items-header">
+                <h2>Filter Items</h2>
+                <button 
+                    className="filter-items-close"
+                    onClick={() => setShowFilterModal(false)}
+                >
+                    ×
+                </button>
+            </div>
+            <div className="filter-items-options">
+                <div className="filter-items-group">
+                    <label>Sub-category</label>
+                    <select
+                        value={filters.subCategory}
+                        onChange={(e) => handleFilterChange('subCategory', e.target.value)}
+                    >
+                        <option value="">All</option>
+                        {category?.subCategories?.map((sub, index) => (
+                            <option key={index} value={sub.name}>
+                                {sub.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="filter-items-group">
+                    <label>Status</label>
+                    <select
+                        value={filters.status}
+                        onChange={(e) => handleFilterChange('status', e.target.value)}
+                    >
+                        <option value="">All</option>
+                        <option value="Good Condition">Good Condition</option>
+                        <option value="Low Stock">Low Stock</option>
+                        <option value="For Repair">For Repair</option>
+                        <option value="Under Maintenance">Under Maintenance</option>
+                    </select>
+                </div>
+            </div>
+            <div className="filter-items-actions">
+                <button 
+                    className="filter-items-clear"
+                    onClick={clearFilters}
+                >
+                    Clear Filters
+                </button>
+                <button 
+                    className="filter-items-apply"
+                    onClick={() => setShowFilterModal(false)}
+                >
+                    Apply
+                </button>
+            </div>
+        </div>
+    </div>
+)}
             {showSubCategoryModal && (
                 <div className="modal-backdrop">
                     <div className="modal-content">
@@ -675,7 +773,6 @@ const AdminCategoryItems = () => {
                     </div>
                 </div>
             )}
-
             <div className="items-table">
                 <table>
                     <thead>
@@ -694,8 +791,9 @@ const AdminCategoryItems = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {items.map((item) => (
+                        {getFilteredItems().map((item) => (
                             <tr key={item._id}>
+                                {/* Keep the existing row content */}
                                 <td>{item.id}</td>
                                 <td 
                                     onClick={() => handleItemClick(item)}
@@ -707,7 +805,7 @@ const AdminCategoryItems = () => {
                                 <td>{item.serialNo}</td>
                                 <td>{item.subCategory || 'N/A'}</td>
                                 <td>
-                                    <span className={`status-badge ${item.status ? item.status.toLowerCase() : ''}`}>
+                                    <span className={`status-badge ${item.status ? item.status.toLowerCase().replace(' ', '-') : ''}`}>
                                         {item.status || 'Good Condition'}
                                     </span>
                                 </td>
@@ -722,20 +820,22 @@ const AdminCategoryItems = () => {
                                 <td>{item.qty}</td>
                                 <td className="actions-cell">
                                     <div className="action-buttons-container">
-                                        <img 
-                                            src="/table-imgs/edit.svg" 
-                                            alt="Edit" 
-                                            className="action-icon"
-                                            onClick={() => handleEditItem(item)}
-                                            style={{ paddingRight: '8px' }}
-                                        />
+                                        {item.itemType !== 'Consumable' && (
+                                            <img 
+                                                src="/table-imgs/edit.svg" 
+                                                alt="Edit" 
+                                                className="action-icon"
+                                                onClick={() => handleEditItem(item)}
+                                                style={{ paddingRight: '8px' }}
+                                            />
+                                        )}
                                         <img 
                                             src={deletingItemId === item._id ? "/table-imgs/spinner.svg" : "/table-imgs/delete.svg"}
                                             alt="Delete" 
                                             className="action-icon"
                                             onClick={() => handleDeleteItem(item)}
                                             style={{ 
-                                                paddingLeft: '8px',
+                                                paddingLeft: item.itemType !== 'Consumable' ? '8px' : '0',
                                                 cursor: deletingItemId === item._id ? 'not-allowed' : 'pointer',
                                                 opacity: deletingItemId === item._id ? 0.5 : 1
                                             }}

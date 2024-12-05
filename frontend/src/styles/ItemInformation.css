@@ -136,8 +136,9 @@
 }
 
 .status-badge[data-status="Low stock"] {
-  background: #FFEBEE;
-  color: #F44336;
+  background: white;
+  border: 1px solid #E0E0E0;
+  color: #000;
 }
 
 .status-badge[data-status="For maintenance"] {

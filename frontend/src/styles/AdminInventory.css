@@ -491,7 +491,7 @@
       color: #2e7d32;
   }
   
-  .availability-badge.check-out {
+  .availability-badge.check-out, .status-badge.lowstock{
       background-color: #ffebee;
       color: #c62828;
   }
