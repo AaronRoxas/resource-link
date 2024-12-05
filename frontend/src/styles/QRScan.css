@@ -50,7 +50,7 @@
   .qr-scan-container.continue-button {
     width: 100%;
     padding: 12px;
-    background-color: #14AE5C;
+    background-color: #4188FF;
     color: white;
     border: none;
     border-radius: 8px;
@@ -139,7 +139,7 @@
   .close-scanner-button {
     width: 100%;
     padding: 12px;
-    background-color: #14AE5C;
+    background-color: #4188FF;
     color: white;
     border: none;
     border-radius: 8px;

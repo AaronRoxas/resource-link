@@ -529,10 +529,7 @@
     user-select: none;  /* Prevents text selection */
   }
   
-  .close-button:hover {
-    color: #333;
-  }
-  
+ 
   .modal-top {
     position: absolute;
     top: 16px;
@@ -576,7 +573,7 @@
   .continue-button {
     width: 100%;
     padding: 14px;
-    background: #006B3E;
+    background: #4188FF;
     color: white;
     border: none;
     border-radius: 8px;

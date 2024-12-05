@@ -263,6 +263,7 @@ const StaffDash = () => {
       'removed': 'action-removed',
       'added': 'action-added',
       'updated': 'action-updated',
+      'pending': 'action-pending',
       'withdraw': 'action-checkout'
     };
     return styles[action.toLowerCase()] || '';
