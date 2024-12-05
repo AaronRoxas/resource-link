@@ -608,8 +608,7 @@
   }
   
   .divider span {
-    background: white;
-    padding: 0 10px;
+    padding: 20vh;
     color: #666;
     font-size: 14px;
   }

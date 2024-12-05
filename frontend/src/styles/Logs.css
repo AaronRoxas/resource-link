@@ -91,3 +91,28 @@
     background-color: #F8E8C2;
     color: #A5780F;
   }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 20px;
+  }
+  
+  .pagination-button {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    background-color: white;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  .pagination-button:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+  }
+  
+  .page-info {
+    font-size: 14px;
+  }

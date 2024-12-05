@@ -4,6 +4,8 @@ import '../styles/Logs.css';
 
 const Logs = () => {
   const [logs, setLogs] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [logsPerPage] = useState(14);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -58,6 +60,13 @@ const Logs = () => {
     return styles[action.toLowerCase()] || '';
   };
 
+  const indexOfLastLog = currentPage * logsPerPage;
+  const indexOfFirstLog = indexOfLastLog - logsPerPage;
+  const currentLogs = logs.slice(indexOfFirstLog, indexOfLastLog);
+  const totalPages = Math.ceil(logs.length / logsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className="logs-page">
       <div className="header">
@@ -78,7 +87,7 @@ const Logs = () => {
             </tr>
           </thead>
           <tbody>
-            {logs.map((log) => (
+            {currentLogs.map((log) => (
               <tr key={log._id}>
                 <td>
                   {log.date.toLocaleDateString()} {log.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -94,6 +103,26 @@ const Logs = () => {
             ))}
           </tbody>
         </table>
+
+        <div className="pagination">
+          <button 
+            onClick={() => paginate(currentPage - 1)} 
+            disabled={currentPage === 1}
+            className="pagination-button"
+          >
+            Previous
+          </button>
+          <span className="page-info">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button 
+            onClick={() => paginate(currentPage + 1)} 
+            disabled={currentPage === totalPages}
+            className="pagination-button"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -15,6 +15,13 @@ const AdminChart = () => {
     nonConsumables: 0,
   });
   const [itemStats, setItemStats] = useState({});
+  const [conditionStats, setConditionStats] = useState({
+    'Good Condition': 0,
+    'For Maintenance': 0,
+    'Low Stock': 0,
+    'For repair': 0
+  });
+  const [stockStats, setStockStats] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,6 +58,40 @@ const AdminChart = () => {
 
         const consumables = items.filter(item => item.itemType === 'Consumable').length;
         const nonConsumables = items.filter(item => item.itemType === 'Non-Consumable').length;
+
+        // Calculate condition statistics with normalized status names
+        const conditions = itemsRes.data.reduce((acc, item) => {
+          let status = item.status || 'Good Condition';
+          // Normalize "Good condition" to "Good Condition"
+          if (status.toLowerCase() === 'good condition') {
+            status = 'Good Condition';
+          }
+          // Skip if status is "Reserved"
+          if (status.toLowerCase() !== 'reserved') {
+            acc[status] = (acc[status] || 0) + 1;
+          }
+          return acc;
+        }, {});
+        
+        setConditionStats(conditions);
+
+        // Calculate stock statistics from actual items
+        const stockCounts = itemsRes.data.reduce((acc, item) => {
+          const itemName = item.name;
+          acc[itemName] = (acc[itemName] || 0) + (item.qty || 0);
+          return acc;
+        }, {});
+
+        // Get top items by quantity (adjust the number as needed)
+        const topStocks = Object.entries(stockCounts)
+          .sort(([,a], [,b]) => b - a)
+          .slice(0, 10) // Increase the number to show more items
+          .reduce((obj, [key, value]) => ({
+            ...obj,
+            [key]: value
+          }), {});
+
+        setStockStats(topStocks);
 
         setStats({
           users: usersRes.data.length,
@@ -114,6 +155,107 @@ const AdminChart = () => {
     cutout: '40%',
   };
 
+  // Add new chart data for conditions
+  const conditionChartData = {
+    labels: Object.keys(conditionStats),
+    datasets: [
+      {
+        data: Object.values(conditionStats),
+        backgroundColor: [
+          '#4CAF50', // Good condition - green
+          '#2196F3', // For maintenance - blue
+          '#F44336', // Low stock - red
+          '#9C27B0', // For repair - purple
+        ],
+        borderWidth: 0,
+      },
+    ],
+  };
+
+  const conditionChartOptions = {
+    plugins: {
+      legend: {
+        position: 'right',
+      },
+      title: {
+        display: true,
+        text: 'Asset Conditions',
+        font: {
+          size: 16,
+          weight: 'bold'
+        },
+        padding: {
+          top: 10,
+          bottom: 20
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const value = context.raw;
+            const percentage = ((value / total) * 100).toFixed(0);
+            return `${context.label}: ${percentage}%`;
+          }
+        }
+      }
+    },
+    cutout: '40%',
+  };
+
+  // Add new chart data for stocks
+  const stockChartData = {
+    labels: Object.keys(stockStats),
+    datasets: [
+      {
+        data: Object.values(stockStats),
+        backgroundColor: [
+          '#4CAF50', 
+          '#2196F3',
+          '#F44336',  
+          '#FF9800', 
+          '#E91E63', // pink - for any additional items
+        ],
+        borderWidth: 0,
+      },
+    ],
+  };
+
+  const stockChartOptions = {
+    plugins: {
+      legend: {
+        position: 'right',
+        labels: {
+          padding: 20,
+          usePointStyle: true,
+        }
+      },
+      title: {
+        display: true,
+        text: 'Stocks Overview',
+        font: {
+          size: 16,
+          weight: 'bold'
+        },
+        padding: {
+          top: 10,
+          bottom: 20
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const value = context.raw;
+            const percentage = ((value / total) * 100).toFixed(0);
+            return `${context.label}: ${value} (${percentage}%)`;
+          }
+        }
+      }
+    },
+    cutout: '40%',
+  };
+
   return (
     <div className="admin-chart">
       <NavBar hideWelcome={true} />
@@ -145,13 +287,33 @@ const AdminChart = () => {
         </div>
       </div>
 
-      <div className="chart-container" style={{ 
-        maxWidth: '500px', 
-        margin: '2rem', 
-        marginLeft: '2rem' 
-      }}>
-        <h2>Most Borrowed/Withdrew Items</h2>
-        <Pie data={chartData} options={chartOptions} />
+      <div className="charts-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+        <div className="chart-container" style={{ 
+          maxWidth: '350px',
+          margin: '2rem',
+          marginLeft: '2rem' 
+        }}>
+          <h2>Most Borrowed/Withdrew Items</h2>
+          <Pie data={chartData} options={chartOptions} />
+        </div>
+
+        <div className="chart-container" style={{ 
+          maxWidth: '500px',
+          margin: '2rem',
+          marginLeft: '2rem' 
+        }}>
+          <h2>Asset Conditions</h2>
+          <Pie data={conditionChartData} options={conditionChartOptions} />
+        </div>
+
+        <div className="chart-container" style={{ 
+          maxWidth: '500px',
+          margin: '2rem',
+          marginLeft: '2rem' 
+        }}>
+          <h2>Stocks Overview</h2>
+          <Pie data={stockChartData} options={stockChartOptions} />
+        </div>
       </div>
     </div>
   );

@@ -251,7 +251,7 @@ const AdminDash = () => {
                   </span>
                 </td>
               </tr>
-            ))}
+            )).slice(0, 3)}
           </tbody>
           </table>
           <button className="view-all-button" onClick={handleViewAllLogs}>View all</button>
