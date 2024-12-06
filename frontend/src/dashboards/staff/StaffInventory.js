@@ -2,14 +2,23 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import BottomNav from '../../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
-import '../../styles/AdminInventory.css'; // You might want to create a separate StaffInventory.css
+import { toast } from 'react-toastify';
+import '../../styles/AdminInventory.css';
 import Navbar from '../../components/NavBar';
+
 const StaffInventory = () => {
     const [categories, setCategories] = useState([]);
     const [categoryItemCounts, setCategoryItemCounts] = useState({});
+    const [showModal, setShowModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [newCategory, setNewCategory] = useState({
+        name: ''
+    });
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
     const navigate = useNavigate();
 
-    // Modified nav items for staff
     const navItems = [
         { path: '/staff', icon: 'home', label: 'Home' },
         { path: '/qr', icon: 'qr', label: '' },
@@ -21,7 +30,6 @@ const StaffInventory = () => {
         fetchItemCounts();
     }, []);
 
-    // ... keeping the fetch functions the same ...
     const fetchCategories = async () => {
         try {
             const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/categories', {
@@ -44,8 +52,121 @@ const StaffInventory = () => {
         }
     };
 
+    const handleCreateCategory = () => {
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setNewCategory({ name: '' });
+        setSelectedImage(null);
+        setImagePreview(null);
+    };
+
+    const handleImageSelect = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 5000000) {
+                alert('File is too large. Please choose an image under 5MB.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result.split(',')[1];
+                setSelectedImage(base64String);
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleSubmitCategory = async (e) => {
+        e.preventDefault();
+        try {
+            if (!selectedImage) {
+                alert('Please select an image');
+                return;
+            }
+
+            const response = await axios.post(
+                'https://resource-link-main-14c755858b60.herokuapp.com/api/categories',
+                {
+                    name: newCategory.name,
+                    description: newCategory.description,
+                    image: selectedImage
+                },
+                { 
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            
+            await fetchCategories();
+            handleCloseModal();
+        } catch (error) {
+            console.error('Error creating category:', error);
+            alert('Failed to create category. Please try again.');
+        }
+    };
+
     const handleCategoryClick = (categoryName) => {
         navigate(`/staff/inventory/${categoryName.toLowerCase().replace(/[&\s]+/g, '-')}`);
+    };
+
+    const handleDeleteClick = (e, category) => {
+        e.stopPropagation();
+        setSelectedCategory(category);
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteCategory = async () => {
+        try {
+            console.log('Attempting to delete category:', {
+                id: selectedCategory._id,
+                name: selectedCategory.name
+            });
+
+            const categoryExists = categories.some(cat => cat._id === selectedCategory._id);
+            if (!categoryExists) {
+                toast.error('Category not found in current list');
+                setShowDeleteModal(false);
+                setSelectedCategory(null);
+                return;
+            }
+
+            const response = await axios.delete(
+                `https://resource-link-main-14c755858b60.herokuapp.com/api/categories/${selectedCategory._id}`,
+                { 
+                    withCredentials: true,
+                    validateStatus: function (status) {
+                        return status < 500;
+                    }
+                }
+            );
+
+            if (response.status === 404) {
+                toast.error('Category not found on server. It may have been already deleted.');
+                setShowDeleteModal(false);
+                setSelectedCategory(null);
+                await fetchCategories();
+                return;
+            }
+
+            if (response.status !== 200) {
+                throw new Error(`Failed to delete category: ${response.data.message || 'Unknown error'}`);
+            }
+            
+            await fetchCategories();
+            setShowDeleteModal(false);
+            setSelectedCategory(null);
+            toast.success('Category deleted successfully');
+        } catch (error) {
+            console.error('Error deleting category:', error);
+            toast.error(error.response?.data?.message || 'Failed to delete category');
+        }
     };
 
     return (
@@ -61,23 +182,128 @@ const StaffInventory = () => {
                         key={category._id} 
                         className="category-card"
                         onClick={() => handleCategoryClick(category.name)}
-                        style={{ cursor: 'pointer' }}
                     >
                         <div className="category-image">
                             <img 
                                 src={category.image || "/dashboard-imgs/placeholder.svg"} 
-                                alt={category.name} 
+                                alt={category.name}
                             />
                         </div>
                         <div className="category-info">
                             <h3>{category.name}</h3>
                             <p>{category.description}</p>
+                            <button 
+                                className="delete-category-btn"
+                                onClick={(e) => handleDeleteClick(e, category)}
+                            >
+                                Delete
+                            </button>
                         </div>
                     </div>
                 ))}
+                
+                <div className="category-card new-category" onClick={handleCreateCategory}>
+                    <div className="create-category-content">
+                        <span>+</span>
+                        <span>Create new category</span>
+                    </div>
+                </div>
             </div>
 
+            {showModal && (
+                <div className="category-modal-backdrop">
+                    <div className="category-form-container">
+                        <div className="category-form-header">
+                            <h2>Create new category</h2>
+                            <button className="category-close-button" onClick={handleCloseModal}>×</button>
+                        </div>
+                        <form onSubmit={handleSubmitCategory}>
+                            <div className="category-image-upload">
+                                <input
+                                    type="file"
+                                    id="categoryImage"
+                                    accept="image/*"
+                                    onChange={handleImageSelect}
+                                    style={{ display: 'none' }}
+                                />
+                                <label htmlFor="categoryImage" className="category-upload-placeholder">
+                                    {imagePreview ? (
+                                        <img 
+                                            src={imagePreview} 
+                                            alt="Category preview" 
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                    ) : (
+                                        <>
+                                            <span className="category-plus-icon">+</span>
+                                        </>
+                                    )}
+                                </label>
+                            </div>
+                            
+                            <div className="category-form-group">
+                                <label>Name <span className="required">*</span></label>
+                                <input
+                                    type="text"
+                                    value={newCategory.name}
+                                    onChange={(e) => setNewCategory({
+                                        ...newCategory,
+                                        name: e.target.value
+                                    })}
+                                    required
+                                />
+                            </div>
+                            <div className="category-form-group">
+                                <label>Description</label>
+                                <input
+                                    type="text"
+                                    value={newCategory.description}
+                                    onChange={(e) => setNewCategory({
+                                        ...newCategory,
+                                        description: e.target.value
+                                    })}
+                                />
+                            </div>
 
+                            <button type="submit" className="category-create-button">Create</button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {showDeleteModal && (
+                <div className="category-modal-backdrop">
+                    <div className="category-form-container">
+                        <div className="category-form-header">
+                            <h2>Delete Category</h2>
+                            <button 
+                                className="category-close-button" 
+                                onClick={() => setShowDeleteModal(false)}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <div className="delete-confirmation">
+                            <p>Are you sure you want to delete "{selectedCategory?.name}"?</p>
+                            <p className="warning">This action cannot be undone.</p>
+                            <div className="delete-actions">
+                                <button 
+                                    className="cancel-button"
+                                    onClick={() => setShowDeleteModal(false)}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    className="delete-button"
+                                    onClick={handleDeleteCategory}
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

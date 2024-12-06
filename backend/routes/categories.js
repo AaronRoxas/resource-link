@@ -72,6 +72,22 @@ router.patch('/:id/subcategories', async (req, res) => {
     }
 });
 
+// Add this after the patch route and before the count-by-category route
+router.delete('/:id', async (req, res) => {
+    try {
+        const category = await Category.findByIdAndDelete(req.params.id);
+        
+        if (!category) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+
+        res.json({ message: 'Category deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting category:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
 // Get count of items by category
 router.get('/count-by-category', async (req, res) => {
     try {
