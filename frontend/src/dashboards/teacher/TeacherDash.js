@@ -9,6 +9,7 @@ import Footer from '../../components/Footer'
 const TeacherDash = () => {
   const navigate = useNavigate()
   const [categories, setCategories] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -30,6 +31,10 @@ const TeacherDash = () => {
     navigate(`/teacher/category/${formattedName}`);
   };
 
+  const filteredCategories = categories.filter(category =>
+    category.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   const navItems = [
     { path: '/teacher', icon: 'active-home', label: 'Home' },
     { path: '/teacherInventory', icon: 'cube', label: 'Inventory' },
@@ -45,6 +50,8 @@ const TeacherDash = () => {
               type="text" 
               className="teacher-dash-search-input"
               placeholder="Search for Category" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
@@ -52,7 +59,7 @@ const TeacherDash = () => {
         <div className="teacher-dash-categories-section">
           <h3 className="teacher-dash-categories-title">Categories</h3>
           <div className="teacher-dash-categories-grid">
-            {categories.map((category) => (
+            {filteredCategories.map((category) => (
               <div 
                 key={category._id} 
                 className="teacher-dash-category-card" 

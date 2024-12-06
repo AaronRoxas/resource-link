@@ -114,6 +114,9 @@ const TeacherInventory = () => {
     const [borrowedItems, setBorrowedItems] = useState([]);
     const [withdrawals, setWithdrawals] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(6); // Adjust this number as needed
     // const navigate = useNavigate();
 
     useEffect(() => {
@@ -199,73 +202,110 @@ const TeacherInventory = () => {
         return item.receiptData?.status?.toLowerCase();
     };
 
+    const filterItems = (items, type) => {
+        // First filter based on status if filter is active
+        let filteredItems = statusFilter === 'all' 
+            ? items 
+            : items.filter(item => {
+                const status = type === 'withdrawal' 
+                    ? item.status?.toLowerCase()
+                    : item.receiptData?.status?.toLowerCase();
+                return status === statusFilter.toLowerCase();
+            });
+
+        // Then sort based on status priority
+        return filteredItems.sort((a, b) => {
+            const getStatusPriority = (item, type) => {
+                const status = type === 'withdrawal' 
+                    ? item.status?.toLowerCase()
+                    : item.receiptData?.status?.toLowerCase();
+                
+                // Define priority order (lower number = higher priority)
+                switch(status) {
+                    case 'overdue': return 1;
+                    case 'on-going': return 2;
+                    case 'pending': return 3;
+                    case 'reserved': return 4;
+                    case 'approved': return 5;
+                    case 'declined': return 6;
+                    case 'returned': return 7;
+                    default: return 8;
+                }
+            };
+
+            const priorityA = getStatusPriority(a, type);
+            const priorityB = getStatusPriority(b, type);
+
+            return priorityA - priorityB;
+        });
+    };
+
+    const paginate = (items) => {
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        return items.slice(indexOfFirstItem, indexOfLastItem);
+    };
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        window.scrollTo(0, 0); // Scroll to top when page changes
+    };
+
     return (
         <div className="teacher-inventory">
             <NavBar hideWelcome={true}/>
             <header>
-                <h1>Borrowed & Withdrawn Items</h1>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h1>Borrowed & Withdrawn Items</h1>
+                    <select 
+                        value={statusFilter} 
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="status-filter"
+                    >
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="reserved">Reserved</option>
+                        <option value="on-going">On-going</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="returned">Returned</option>
+                        <option value="approved">Approved</option>
+                        <option value="declined">Declined</option>
+                    </select>
+                </div>
             </header>
 
             <div className="borrowed-items-grid">
                 {/* Show borrowed items */}
-                {borrowedItems
-                    .filter(item => item.borrower === currentUser)
-                    .map(item => (
-                        <div 
-                            className="borrowed-item-card" 
-                            key={item._id}
-                            onClick={() => handleItemClick(item)}
-                        >
-                            <div className="item-image">
-                                <img src={item.itemId?.itemImage || "dashboard-imgs/placeholder.svg"} alt={item.itemId?.name} />
-                            </div>
-                            <div className="item-info">
-                                <h3>{item.itemId ? item.itemId.name : 'Item not found'}</h3>
-                                <p className="category">
-                                    {item.itemId ? item.itemId.category : 'Category not found'}
-                                </p>
-                                <div className="borrow-details">
-                                    <p><b>Borrow request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
-                                    <p>{item.receiptData?.status?.toLowerCase() === 'on-going' 
-                                        ? 'Borrowed On: ' 
-                                        : 'Borrow On: '}{new Date(item.borrowDate).toLocaleDateString()}</p>
-                                    <p>Return On: {new Date(item.returnDate).toLocaleDateString()}</p>
-                                    <span className={`status-pill ${getStatus(item)}`}>
-                                        {formatStatus(getStatus(item))}
-                                    </span>
-                                </div>
+                {paginate([
+                    ...filterItems(borrowedItems.filter(item => item.borrower === currentUser), 'borrowing'),
+                    ...filterItems(withdrawals.filter(item => item.borrower === currentUser), 'withdrawal')
+                ]).map(item => (
+                    <div 
+                        className="borrowed-item-card" 
+                        key={item._id}
+                        onClick={() => handleItemClick(item)}
+                    >
+                        <div className="item-image">
+                            <img src={item.itemId?.itemImage || "dashboard-imgs/placeholder.svg"} alt={item.itemId?.name} />
+                        </div>
+                        <div className="item-info">
+                            <h3>{item.itemId ? item.itemId.name : 'Item not found'}</h3>
+                            <p className="category">
+                                {item.itemId ? item.itemId.category : 'Category not found'}
+                            </p>
+                            <div className="borrow-details">
+                                <p><b>Borrow request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
+                                <p>{item.receiptData?.status?.toLowerCase() === 'on-going' 
+                                    ? 'Borrowed On: ' 
+                                    : 'Borrow On: '}{new Date(item.borrowDate).toLocaleDateString()}</p>
+                                <p>Return On: {new Date(item.returnDate).toLocaleDateString()}</p>
+                                <span className={`status-pill ${getStatus(item)}`}>
+                                    {formatStatus(getStatus(item))}
+                                </span>
                             </div>
                         </div>
-                    ))}
-
-                {/* Show withdrawals */}
-                {withdrawals
-                    .filter(item => item.borrower === currentUser)
-                    .map(item => (
-                        <div 
-                            className="borrowed-item-card" 
-                            key={item._id}
-                            onClick={() => handleItemClick({ ...item, type: 'withdrawal' })}
-                        >
-                            <div className="item-image">
-                                <img src={item.itemId?.itemImage|| "dashboard-imgs/placeholder.svg"} alt={item.itemId?.name} />
-                            </div>
-                            <div className="item-info">
-                                <h3>{item.itemId ? item.itemId.name : 'Item not found'}</h3>
-                                <p className="category">
-                                    {item.itemId ? item.itemId.category : 'Category not found'}
-                                </p>
-                                <div className="borrow-details">
-                                    <p><b>Withdrawal request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
-                                    <p>Claim Date: {new Date(item.claimDate).toLocaleDateString()}</p>
-                                    <p>Quantity: {item.receiptData?.qty}</p>
-                                    <span className={`status-pill ${item.status.toLowerCase()}`}>
-                                        {formatStatus(item.status)}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                    </div>
+                ))}
 
                 {/* Show no items message if both arrays are empty */}
                 {borrowedItems.filter(item => item.borrower === currentUser).length === 0 && 
@@ -274,6 +314,23 @@ const TeacherInventory = () => {
                         <p>No items borrowed or withdrawn.</p>
                     </div>
                 )}
+            </div>
+
+            {/* Add pagination controls */}
+            <div className="pagination">
+                {Array.from({ length: Math.ceil(
+                    (filterItems(borrowedItems.filter(item => item.borrower === currentUser), 'borrowing').length +
+                    filterItems(withdrawals.filter(item => item.borrower === currentUser), 'withdrawal').length) 
+                    / itemsPerPage
+                )}).map((_, index) => (
+                    <button
+                        key={index + 1}
+                        onClick={() => handlePageChange(index + 1)}
+                        className={`pagination-button ${currentPage === index + 1 ? 'active' : ''}`}
+                    >
+                        {index + 1}
+                    </button>
+                ))}
             </div>
             
             {selectedItem && (

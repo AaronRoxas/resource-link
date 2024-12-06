@@ -165,23 +165,23 @@ const MainPage = () => {
         </div>
 
         <div className="team-grid">
-          <div className="team-member">
+          <div className="team-member hover-effect">
             <img src="/home-imgs/ian.jpg" alt="Team Member" />
             <h4><strong>Ian Lumanog</strong></h4>
             <p>Project Manager</p>
             <p>UI/UX Designer</p>
           </div>
-          <div className="team-member">
+          <div className="team-member hover-effect">
             <img src="/home-imgs/aaron.jpg" alt="Team Member" />
             <h4><strong>Aaron Joshua Roxas</strong></h4>
-            <p>Frontend and Backend Developer</p>
+            <p>Lead Programmer</p>
           </div>
-          <div className="team-member">
+          <div className="team-member hover-effect">
             <img src="/home-imgs/franco.jpg" alt="Team Member" />
             <h4><strong>Franco Luis Nicanor</strong></h4>
             <p>Database and System Designer</p>
           </div>
-          <div className="team-member">
+          <div className="team-member hover-effect">
             <img src="/home-imgs/jc.jpg" alt="Team Member" />
             <h4><strong>Jerome Christian Villaganas</strong></h4>
             <p>System Analyst and Documentation</p>

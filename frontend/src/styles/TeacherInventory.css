@@ -9,6 +9,7 @@
 
 .teacher-inventory header {
     margin-bottom: 24px;
+    padding: 0 1rem;
 }
 
 .teacher-inventoryheader h1 {
@@ -294,4 +295,25 @@
     .teacher-inventory .footer-copyright {
         text-align: left;
     } */
+}
+
+.filter-section {
+    margin: 1rem 0;
+    padding: 0 1rem;
+}
+
+.status-filter {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: white;
+    cursor: pointer;
+    min-width: 200px;
+}
+
+.status-filter:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
