@@ -20,15 +20,26 @@ const QRScan = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${searchId}`);
-      if (response.data) {
-        navigate(`/staff/category/${response.data.category.toLowerCase()}/${searchId}`, { replace: true });
-      } else {
-        alert('Item not found');
-      }
+        const response = await axios.get(
+            `https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${searchId}`,
+            { withCredentials: true }
+        );
+        
+        if (response.data) {
+            // Check if current path includes 'admin' or 'staff'
+            const currentPath = window.location.pathname;
+            const isAdmin = currentPath.includes('/admin');
+            
+            // Redirect based on user role
+            const basePath = isAdmin ? '/admin' : '/staff';
+            const category = response.data.category.toLowerCase();
+            navigate(`${basePath}/category/${category}/${searchId}`, { replace: true });
+        } else {
+            alert('Item not found');
+        }
     } catch (error) {
-      console.error('Error finding item:', error);
-      alert('Error searching for item');
+        console.error('Error finding item:', error);
+        alert('Error searching for item');
     }
   };
   
@@ -55,9 +66,19 @@ const QRScan = () => {
           setShowQRScanner(false);
           
           try {
-            const response = await axios.get(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`);
+            const response = await axios.get(
+              `https://resource-link-main-14c755858b60.herokuapp.com/api/items/find/${itemId}`,
+              { withCredentials: true }
+            );
+            
             if (response.data) {
-              navigate(`/staff/category/${category}/${itemId}`, { replace: true });
+              // Check if current path includes 'admin' or 'staff'
+              const currentPath = window.location.pathname;
+              const isAdmin = currentPath.includes('/admin');
+              
+              // Redirect based on user role
+              const basePath = isAdmin ? '/admin' : '/staff';
+              navigate(`${basePath}/category/${category}/${itemId}`, { replace: true });
             } else {
               alert('Item not found');
             }
