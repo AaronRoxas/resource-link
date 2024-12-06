@@ -136,12 +136,11 @@ const ItemInformation = ({ selectedItem: propSelectedItem, handleCloseItemInfo, 
   };
 
   const getItemUrl = () => {
-    if (selectedItem) {
-      const category = selectedItem.category.toLowerCase().trim();
-      const itemId = selectedItem.id.trim();
-      return `https://resource-link-main-14c755858b60.herokuapp.com/staff/category/${category}/${itemId}`;
-    }
-    return '';
+    const currentPath = window.location.pathname;
+    const isAdmin = currentPath.includes('/admin');
+    const basePath = isAdmin ? '/admin' : '/staff';
+    const category = selectedItem.category.toLowerCase().replace(/[&\s]+/g, '-');
+    return `https://resource-link.vercel.app${basePath}/category/${category}/${selectedItem.id}`;
   };
 
   const getCurrentDate = () => {
