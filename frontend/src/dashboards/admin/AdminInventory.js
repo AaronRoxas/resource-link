@@ -4,11 +4,13 @@ import BottomNav from '../../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/AdminInventory.css';
 import Navbar from '../../components/NavBar';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 const AdminInventory = () => {
     const [categories, setCategories] = useState([]);
     const [categoryItemCounts, setCategoryItemCounts] = useState({});
     const [showModal, setShowModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState(null);
     const [newCategory, setNewCategory] = useState({
         name: ''
     });
@@ -80,18 +82,15 @@ const AdminInventory = () => {
     const handleSubmitCategory = async (e) => {
         e.preventDefault();
         try {
-            if (!selectedImage) {
-                alert('Please select an image');
-                return;
-            }
+            const categoryData = {
+                name: newCategory.name,
+                description: newCategory.description || '',
+                image: selectedImage || ''
+            };
 
             const response = await axios.post(
                 'https://resource-link-main-14c755858b60.herokuapp.com/api/categories',
-                {
-                    name: newCategory.name,
-                    description: newCategory.description,
-                    image: selectedImage
-                },
+                categoryData,
                 { 
                     withCredentials: true,
                     headers: {
@@ -102,22 +101,49 @@ const AdminInventory = () => {
             
             await fetchCategories();
             handleCloseModal();
+            toast.success('Category created successfully');
         } catch (error) {
-            console.error('Error creating category:', error);
-            alert('Failed to create category. Please try again.');
+            console.error('Error creating category:', error.response?.data || error);
+            toast.error(error.response?.data?.message || 'Failed to create category. Please try again.');
         }
     };
+
 
     const handleCategoryClick = (categoryName) => {
         navigate(`/admin/category/${categoryName.toLowerCase().replace(/\s+/g, '-')}`);
     };
 
     const getImageUrl = (imageData) => {
-        if (!imageData) return "/dashboard-imgs/placeholder.svg";
+        if (!imageData || imageData === 'null' || imageData === null) {
+            return process.env.PUBLIC_URL + "/dashboard-imgs/placeholder.svg";
+        }
         // Check if the image data already includes the data URL prefix
         return imageData.startsWith('data:') 
             ? imageData 
             : `data:image/jpeg;base64,${imageData}`;
+    };
+
+    const handleDeleteClick = (e, category) => {
+        e.stopPropagation();
+        setSelectedCategory(category);
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteCategory = async () => {
+        try {
+            const response = await axios.delete(
+                `https://resource-link-main-14c755858b60.herokuapp.com/api/categories/${selectedCategory._id}`,
+                { withCredentials: true }
+            );
+            
+            await fetchCategories();
+            setShowDeleteModal(false);
+            setSelectedCategory(null);
+            toast.success('Category deleted successfully');
+        } catch (error) {
+            console.error('Error deleting category:', error);
+            toast.error('Failed to delete category');
+        }
     };
 
     return (
@@ -138,11 +164,21 @@ const AdminInventory = () => {
                             <img 
                                 src={getImageUrl(category.image)} 
                                 alt={category.name}
+                                onError={(e) => {
+                                    e.target.onerror = null; // Prevent infinite loop
+                                    e.target.src = process.env.PUBLIC_URL + "/dashboard-imgs/placeholder.svg";
+                                }}
                             />
                         </div>
                         <div className="category-info">
                             <h3>{category.name}</h3>
                             <p>{category.description}</p>
+                            <button 
+                                className="delete-category-btn"
+                                onClick={(e) => handleDeleteClick(e, category)}
+                            >
+                                Delete
+                            </button>
                         </div>
                     </div>
                 ))}
@@ -213,6 +249,40 @@ const AdminInventory = () => {
 
                             <button type="submit" className="category-create-button">Create</button>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {showDeleteModal && (
+                <div className="category-modal-backdrop">
+                    <div className="category-form-container">
+                        <div className="category-form-header">
+                            <h2>Delete Category</h2>
+                            <button 
+                                className="category-close-button" 
+                                onClick={() => setShowDeleteModal(false)}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <div className="delete-confirmation">
+                            <p>Are you sure you want to delete "{selectedCategory?.name}"?</p>
+                            <p className="warning">This action cannot be undone.</p>
+                            <div className="delete-actions">
+                                <button 
+                                    className="cancel-button"
+                                    onClick={() => setShowDeleteModal(false)}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    className="delete-button"
+                                    onClick={handleDeleteCategory}
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

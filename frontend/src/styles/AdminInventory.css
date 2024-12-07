@@ -572,3 +572,46 @@
     }
   }
   
+  .delete-confirmation {
+      padding: 20px;
+      text-align: center;
+  }
+  
+  .warning {
+      color: #ff4444;
+      margin: 10px 0;
+      font-size: 14px;
+  }
+  
+  .delete-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+  }
+  
+  .cancel-button {
+      padding: 8px 16px;
+      background-color: #f5f5f5;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+  }
+  
+  .delete-button {
+      padding: 8px 16px;
+      background-color: #ff4444;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+  }
+  
+  .delete-button:hover {
+      background-color: #cc0000;
+  }
+  
+  .cancel-button:hover {
+      background-color: #e0e0e0;
+  }
+  

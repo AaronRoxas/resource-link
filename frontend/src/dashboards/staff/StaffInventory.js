@@ -84,18 +84,15 @@ const StaffInventory = () => {
     const handleSubmitCategory = async (e) => {
         e.preventDefault();
         try {
-            if (!selectedImage) {
-                alert('Please select an image');
-                return;
-            }
+            const categoryData = {
+                name: newCategory.name,
+                description: newCategory.description || '',
+                image: selectedImage || ''
+            };
 
             const response = await axios.post(
                 'https://resource-link-main-14c755858b60.herokuapp.com/api/categories',
-                {
-                    name: newCategory.name,
-                    description: newCategory.description,
-                    image: selectedImage
-                },
+                categoryData,
                 { 
                     withCredentials: true,
                     headers: {
@@ -106,9 +103,10 @@ const StaffInventory = () => {
             
             await fetchCategories();
             handleCloseModal();
+            toast.success('Category created successfully');
         } catch (error) {
-            console.error('Error creating category:', error);
-            alert('Failed to create category. Please try again.');
+            console.error('Error creating category:', error.response?.data || error);
+            toast.error(error.response?.data?.message || 'Failed to create category. Please try again.');
         }
     };
 
@@ -169,6 +167,16 @@ const StaffInventory = () => {
         }
     };
 
+    const getImageUrl = (imageData) => {
+        if (!imageData || imageData === 'null' || imageData === null) {
+            return "/dashboard-imgs/placeholder.svg";
+        }
+        // Check if the image data already includes the data URL prefix
+        return imageData.startsWith('data:') 
+            ? imageData 
+            : `data:image/jpeg;base64,${imageData}`;
+    };
+
     return (
         <div className="inventory-page">
             <Navbar hideWelcome={true}/>
@@ -185,8 +193,14 @@ const StaffInventory = () => {
                     >
                         <div className="category-image">
                             <img 
-                                src={category.image || "/dashboard-imgs/placeholder.svg"} 
+                                src={category.image ? 
+                                    category.image : 
+                                    process.env.PUBLIC_URL + "/dashboard-imgs/placeholder.svg"} 
                                 alt={category.name}
+                                onError={(e) => {
+                                    e.target.onerror = null; // Prevent infinite loop
+                                    e.target.src = process.env.PUBLIC_URL + "/dashboard-imgs/placeholder.svg";
+                                }}
                             />
                         </div>
                         <div className="category-info">
