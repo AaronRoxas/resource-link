@@ -594,33 +594,9 @@
     cursor: pointer;
     margin: 16px 0;
   }
-  
-  .divider {
-    text-align: center;
-    margin: 4px 0;
-    position: relative;
-  }
-  
-  .divider::before,
-  .divider::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 45%;
-    height: 1px;
-    background: #ddd;
-  }
-  
-  .divider::before {
-    left: 0;
-  }
-  
-  .divider::after {
-    right: 0;
-  }
+
   
   .divider span {
-    padding: 20vh;
     color: #666;
     font-size: 14px;
   }
