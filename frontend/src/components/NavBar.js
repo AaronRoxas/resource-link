@@ -96,12 +96,12 @@ const NavBar = ({ hideWelcome }) => {
     <>
       <ToastContainer />
       <NavContainer>
-        <LogoImg src="/onboard-imgs/second-logo.png" alt="Logo" />
+        <LogoImg src="/onboard-imgs/second-logo.png" alt="Logo"  onClick={() => setShowDropdown(!showDropdown)} />
         <ProfileContainer>
           <ProfilePic 
             src="/dashboard-imgs/profile-placeholder.svg" 
             alt="Profile" 
-            onClick={() => setShowDropdown(!showDropdown)}
+           
           />
           {showDropdown && (
             <DropdownMenu>
@@ -237,6 +237,7 @@ const NavContainer = styled.nav`
 const LogoImg = styled.img`
   height: 30px;
   width: auto;
+  cursor: pointer;
 `
 
 const ProfileContainer = styled.div`
@@ -252,9 +253,9 @@ const ProfilePic = styled.img`
 `
 
 const DropdownMenu = styled.div`
-  position: absolute;
-  top: 100%;
-  right: 0;
+  position: fixed;
+  top: 60px; /* Adjust based on NavBar height */
+  left: 0;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -272,7 +273,7 @@ const MenuItem = styled.div`
   font-weight: 500;
 
   &:hover {
-    background: #f5f5f5;
+    background:rgb(231, 231, 231);
   }
 
   &:first-child {
