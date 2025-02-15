@@ -41,12 +41,18 @@ const AdminCategoryItems = () => {
         subCategory: '',
         status: ''
     });
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchExpanded, setSearchExpanded] = useState(false);
 
     const getFilteredItems = () => {
         return items.filter(item => {
             const matchSubCategory = !filters.subCategory || item.subCategory === filters.subCategory;
             const matchStatus = !filters.status || item.status === filters.status;
-            return matchSubCategory && matchStatus;
+            const matchSearch =
+                !searchTerm ||
+                (item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.id && item.id.toLowerCase().includes(searchTerm.toLowerCase()));
+            return matchSubCategory && matchStatus && matchSearch;
         });
     };
 
@@ -69,7 +75,6 @@ const AdminCategoryItems = () => {
         setShowFilterModal(true);
     };
 
-    
     const navItems = [
         { path: '/admin', icon: 'home', label: 'Home' },
         { path: '/admin/inventory', icon: 'chart', label: 'Chart' },
@@ -374,91 +379,118 @@ const AdminCategoryItems = () => {
                     />
                     <h1>{categoryName}</h1>
                     <div className="header-actions">
-                        <div className="dropdown-container">
-                            <img 
-                                src="/table-imgs/plus.svg" 
-                                alt="Add" 
-                                className="header-icon"
-                                onClick={handlePlusClick}
-                            />
-                            {showDropdown && (
-                                <div className="dropdown-menu">
-                                    <button onClick={handleCreateSubCategory}>
-                                        Create new sub-category
-                                    </button>
-                                    <button onClick={handleAddItem}>Add new Item</button>
+                        {searchExpanded ? (
+                            <div className="expanded-search">
+                                <input
+                                    type="text"
+                                    placeholder="Search items..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    autoFocus
+                                />
+                           <span className='filter-items-close' onClick={() => {
+                                setSearchExpanded(false);
+                                setSearchTerm("");
+                            }}>X 
+                            </span>
+                                
+                            </div>
+                        ) : (
+                            <>
+                                <div className="dropdown-container">
+                                    <img 
+                                        src="/table-imgs/plus.svg" 
+                                        alt="Add" 
+                                        className="header-icon"
+                                        onClick={handlePlusClick}
+                                    />
+                                    {showDropdown && (
+                                        <div className="dropdown-menu">
+                                            <button onClick={handleCreateSubCategory}>
+                                                Create new sub-category
+                                            </button>
+                                            <button onClick={handleAddItem}>
+                                                Add new Item
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                        <img 
-                            src="/table-imgs/filter.svg" 
-                            alt="Filter" 
-                            className="header-icon"
-                            onClick={handleFilterClick}
-                        />
+                                <img 
+                                    src="/table-imgs/filter.svg" 
+                                    alt="Filter" 
+                                    className="header-icon"
+                                    onClick={handleFilterClick}
+                                />
+                                <img 
+                                    src="/table-imgs/search.svg" 
+                                    alt="Search" 
+                                    className="header-icon"
+                                    onClick={() => setSearchExpanded(true)}
+                                />
+                            </>
+                        )}
                     </div>
                 </div>
             </header>
 
-                      {/* Add the filter modal before the items table */}
-                      {showFilterModal && (
-    <div className="filter-items-modal-backdrop">
-        <div className="filter-items-content">
-            <div className="filter-items-header">
-                <h2>Filter Items</h2>
-                <button 
-                    className="filter-items-close"
-                    onClick={() => setShowFilterModal(false)}
-                >
-                    ×
-                </button>
-            </div>
-            <div className="filter-items-options">
-                <div className="filter-items-group">
-                    <label>Sub-category</label>
-                    <select
-                        value={filters.subCategory}
-                        onChange={(e) => handleFilterChange('subCategory', e.target.value)}
-                    >
-                        <option value="">All</option>
-                        {category?.subCategories?.map((sub, index) => (
-                            <option key={index} value={sub.name}>
-                                {sub.name}
-                            </option>
-                        ))}
-                    </select>
+            {showFilterModal && (
+                <div className="filter-items-modal-backdrop">
+                    <div className="filter-items-content">
+                        <div className="filter-items-header">
+                            <h2>Filter Items</h2>
+                            <button 
+                                className="filter-items-close"
+                                onClick={() => setShowFilterModal(false)}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <div className="filter-items-options">
+                            <div className="filter-items-group">
+                                <label>Sub-category</label>
+                                <select
+                                    value={filters.subCategory}
+                                    onChange={(e) => handleFilterChange('subCategory', e.target.value)}
+                                >
+                                    <option value="">All</option>
+                                    {category?.subCategories?.map((sub, index) => (
+                                        <option key={index} value={sub.name}>
+                                            {sub.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="filter-items-group">
+                                <label>Status</label>
+                                <select
+                                    value={filters.status}
+                                    onChange={(e) => handleFilterChange('status', e.target.value)}
+                                >
+                                    <option value="">All</option>
+                                    <option value="Good Condition">Good Condition</option>
+                                    <option value="Low Stock">Low Stock</option>
+                                    <option value="For Repair">For Repair</option>
+                                    <option value="Under Maintenance">Under Maintenance</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="filter-items-actions">
+                            <button 
+                                className="filter-items-clear"
+                                onClick={clearFilters}
+                            >
+                                Clear Filters
+                            </button>
+                            <button 
+                                className="filter-items-apply"
+                                onClick={() => setShowFilterModal(false)}
+                            >
+                                Apply
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div className="filter-items-group">
-                    <label>Status</label>
-                    <select
-                        value={filters.status}
-                        onChange={(e) => handleFilterChange('status', e.target.value)}
-                    >
-                        <option value="">All</option>
-                        <option value="Good Condition">Good Condition</option>
-                        <option value="Low Stock">Low Stock</option>
-                        <option value="For Repair">For Repair</option>
-                        <option value="Under Maintenance">Under Maintenance</option>
-                    </select>
-                </div>
-            </div>
-            <div className="filter-items-actions">
-                <button 
-                    className="filter-items-clear"
-                    onClick={clearFilters}
-                >
-                    Clear Filters
-                </button>
-                <button 
-                    className="filter-items-apply"
-                    onClick={() => setShowFilterModal(false)}
-                >
-                    Apply
-                </button>
-            </div>
-        </div>
-    </div>
-)}
+            )}
             {showSubCategoryModal && (
                 <div className="modal-backdrop">
                     <div className="modal-content">
@@ -793,7 +825,6 @@ const AdminCategoryItems = () => {
                     <tbody>
                         {getFilteredItems().map((item) => (
                             <tr key={item._id}>
-                                {/* Keep the existing row content */}
                                 <td>{item.id}</td>
                                 <td 
                                     onClick={() => handleItemClick(item)}

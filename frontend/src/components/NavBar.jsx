@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { getFormattedDate } from '../utils/dateUtils';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AutoUpdatingTime from './AutoUpdatingTime';
 const formattedDate = getFormattedDate();
 const NavBar = ({ hideWelcome }) => {
   const [showDropdown, setShowDropdown] = useState(false)
@@ -96,12 +97,12 @@ const NavBar = ({ hideWelcome }) => {
     <>
       <ToastContainer />
       <NavContainer>
-        <LogoImg src="/onboard-imgs/second-logo.png" alt="Logo"  onClick={() => setShowDropdown(!showDropdown)} />
+        <LogoImg src="/onboard-imgs/second-logo.png" alt="Logo"   />
         <ProfileContainer>
           <ProfilePic 
             src="/dashboard-imgs/profile-placeholder.svg" 
             alt="Profile" 
-           
+            onClick={() => setShowDropdown(!showDropdown)}
           />
           {showDropdown && (
             <DropdownMenu>
@@ -210,7 +211,7 @@ const NavBar = ({ hideWelcome }) => {
         <MainContent>
           <WelcomeText>
             <h1>Hi, {localStorage.getItem('first_name')}! <br/>Welcome Back!</h1>
-            <h3>{formattedDate}</h3>
+            <h3><AutoUpdatingTime /></h3>
           </WelcomeText>
         </MainContent>
       )}
@@ -255,7 +256,7 @@ const ProfilePic = styled.img`
 const DropdownMenu = styled.div`
   position: fixed;
   top: 60px; /* Adjust based on NavBar height */
-  left: 0;
+  right: 0;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);

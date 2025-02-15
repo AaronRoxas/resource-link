@@ -61,7 +61,10 @@
   font-weight: 500;
   cursor: pointer;
 }
-
+.main-login-button:hover{
+  background-color: #007bff ;
+  color: white;
+}
 .carousel {
   position: relative;
   height: 60vh;
@@ -786,11 +789,11 @@
 }
 
 /* Footer */
-.footer {
+/* .footer {
   padding: 20px 40px;
   background-color: white;
   border-top: 1px solid #eee;
-}
+} */
 
 .footer-logo {
   display: flex;

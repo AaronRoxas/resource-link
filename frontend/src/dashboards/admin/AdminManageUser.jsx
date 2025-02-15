@@ -26,7 +26,11 @@ const AdminManageUser = () => {
     role: ''
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const [usersPerPage] = useState(7); // Show 10 users per page
+  const [usersPerPage] = useState(7); // Show 7 users per page
+
+  // New states for search functionality
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Navigation items for bottom nav
   const navItems = [
@@ -61,7 +65,7 @@ const AdminManageUser = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Add this new useEffect for filter dropdown
+  // Close filter dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (filterRef.current && !filterRef.current.contains(event.target)) {
@@ -82,11 +86,22 @@ const AdminManageUser = () => {
     setShowAddUserModal(false);
   };
 
-  // Simplified filter function
+  // Update getFilteredUsers to include search functionality alongside role filtering
   const getFilteredUsers = () => {
-    if (filterType === 'all') return users;
-    
-    return users.filter(user => user.role === filterType);
+    let filtered = users;
+    if (filterType !== 'all') {
+      filtered = filtered.filter(user => user.role === filterType);
+    }
+    if (searchTerm.trim() !== "") {
+      const lowerSearch = searchTerm.toLowerCase();
+      filtered = filtered.filter(user =>
+        (user.first_name && user.first_name.toLowerCase().includes(lowerSearch)) ||
+        (user.last_name && user.last_name.toLowerCase().includes(lowerSearch)) ||
+        (user.email && user.email.toLowerCase().includes(lowerSearch)) ||
+        (user.employee_id && user.employee_id.toLowerCase().includes(lowerSearch))
+      );
+    }
+    return filtered;
   };
 
   const handleEditUser = (user) => {
@@ -148,7 +163,7 @@ const AdminManageUser = () => {
     }
   };
 
-  // Get current users
+  // Get current users for pagination based on the filtered data
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = getFilteredUsers().slice(indexOfFirstUser, indexOfLastUser);
@@ -165,45 +180,70 @@ const AdminManageUser = () => {
         <div className="header-section">
           <h1>Manage user</h1>
           <div className="header-actions">
-            <div className="dropdown-container" ref={dropdownRef}>
-              <button 
-                className="add-user-btn"
-                onClick={() => setShowDropdown(!showDropdown)}
-              >
-                <img src="/table-imgs/plus.svg" alt="Add" />
-              </button>
-              {showDropdown && (
-                <div className="dropdown-menu">
-                  <button onClick={handleCreateNewUser}>Create new user</button>
+            {searchExpanded ? (
+              <div className="expanded-search">
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  autoFocus
+                />
+                <span className='filter-items-close' onClick={() => {
+                  setSearchExpanded(false);
+                  setSearchTerm("");
+                  }}>X </span>
+
+              </div>
+            ) : (
+              <>
+                <div className="dropdown-container" ref={dropdownRef}>
+                  <button 
+                    className="add-user-btn"
+                    onClick={() => setShowDropdown(!showDropdown)}
+                  >
+                    <img src="/table-imgs/plus.svg" alt="Add" />
+                  </button>
+                  {showDropdown && (
+                    <div className="dropdown-menu">
+                      <button onClick={handleCreateNewUser}>Create new user</button>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div className="dropdown-container" ref={filterRef}>
-              <button 
-                className="filter-btn"
-                onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-              >
-                <img src="/table-imgs/filter.svg" alt="Filter" />
-              </button>
-              {showFilterDropdown && (
-                <div className="dropdown-menu">
-                  <div className="filter-options">
-                    <select 
-                      value={filterType} 
-                      onChange={(e) => {
-                        setFilterType(e.target.value);
-                        setShowFilterDropdown(false);
-                      }}
-                    >
-                      <option value="all">All Users</option>
-                      <option value="admin">Admin</option>
-                      <option value="staff">Staff</option>
-                      <option value="teacher">Teacher</option>
-                    </select>
-                  </div>
+                <div className="dropdown-container" ref={filterRef}>
+                  <button 
+                    className="filter-btn"
+                    onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                  >
+                    <img src="/table-imgs/filter.svg" alt="Filter" />
+                  </button>
+                  {showFilterDropdown && (
+                    <div className="dropdown-menu">
+                      <div className="filter-options">
+                        <select 
+                          value={filterType} 
+                          onChange={(e) => {
+                            setFilterType(e.target.value);
+                            setShowFilterDropdown(false);
+                          }}
+                        >
+                          <option value="all">All Users</option>
+                          <option value="admin">Admin</option>
+                          <option value="staff">Staff</option>
+                          <option value="teacher">Teacher</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+                <img 
+                  src="/table-imgs/search.svg" 
+                  alt="Search" 
+                  className="header-icon"
+                  onClick={() => setSearchExpanded(true)}
+                />
+              </>
+            )}
           </div>
         </div>
 
@@ -288,7 +328,7 @@ const AdminManageUser = () => {
               <button onClick={() => setShowDeleteModal(false)}>✕</button>
             </div>
             <div className="delete-confirmation">
-              <h3>Are you sure you want to delete <u> {userToDelete?.first_name} {userToDelete?.last_name}</u>?</h3>
+              <h3>Are you sure you want to delete <u>{userToDelete?.first_name} {userToDelete?.last_name}</u>?</h3>
               <div className="delete-actions">
                 <button className="cancel-button" onClick={() => setShowDeleteModal(false)}>Cancel</button>
                 <button className="delete-button" onClick={handleDeleteConfirm}>Delete</button>
@@ -352,7 +392,7 @@ const AdminManageUser = () => {
                     e.preventDefault();
                     try {
                       await axios.post(
-                        `http://localhost:5000/api/users/${editingUser._id}/reset-password`,
+                        `https://resource-link-main-14c755858b60.herokuapp.com/api/users/${editingUser._id}/reset-password`,
                         {},
                         {
                           withCredentials: true,

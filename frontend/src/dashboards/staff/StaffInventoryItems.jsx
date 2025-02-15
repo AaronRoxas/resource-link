@@ -38,6 +38,10 @@ const StaffInventoryItems = () => {
         id: ''
     });
 
+    // New states for search functionality
+    const [searchExpanded, setSearchExpanded] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+
     const navItems = [
         { path: '/staff', icon: 'home', label: 'Home' },
         { path: '/qr', icon: 'qr', label: '' },
@@ -73,6 +77,18 @@ const StaffInventoryItems = () => {
     useEffect(() => {
         fetchCategoryItems();
     }, [urlCategoryName]);
+
+    // Filter items based on the search term
+    const getFilteredItems = () => {
+        if (!searchTerm) return items;
+        return items.filter((item) => {
+            const matchName =
+                item.name?.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchId =
+                item.id?.toLowerCase().includes(searchTerm.toLowerCase());
+            return matchName || matchId;
+        });
+    };
 
     const handleBack = () => {
         navigate('/staff/inventory');
@@ -258,30 +274,53 @@ const StaffInventoryItems = () => {
                     />
                     <h1>{categoryName}</h1>
                     <div className="header-actions">
-                        <div className="dropdown-container">
-                            <img 
-                                src="/table-imgs/plus.svg" 
-                                alt="Add" 
-                                className="header-icon"
-                                onClick={handlePlusClick}
-                            />
-                            {showDropdown && (
-                                <div className="dropdown-menu">
-                                    <button onClick={handleCreateSubCategory}>
-                                        Create new sub-category
-                                    </button>
-                                    <button onClick={handleAddItem}>
-                                        Add new Item
-                                    </button>
-                                </div>
+                        {searchExpanded && (
+                            <div className="expanded-search">
+                                <input
+                                    type="text"
+                                    placeholder="Search items..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    autoFocus
+                                />
+                                <span className='filter-items-close' onClick={() => setSearchExpanded(false)}>X </span>
+                            </div>
+                        )}
+                        <div className="icon-group">
+                        {!searchExpanded && (
+                                <img
+                                    src="/table-imgs/search.svg"
+                                    alt="Search"
+                                    className="header-icon"
+                                    onClick={() => setSearchExpanded(true)}
+                                />
                             )}
+                            <div className="dropdown-container">
+                                <img 
+                                    src="/table-imgs/plus.svg" 
+                                    alt="Add" 
+                                    className="header-icon"
+                                    onClick={handlePlusClick}
+                                />
+                                {showDropdown && (
+                                    <div className="dropdown-menu">
+                                        <button onClick={handleCreateSubCategory}>
+                                            Create new sub-category
+                                        </button>
+                                        <button onClick={handleAddItem}>
+                                            Add new Item
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
                         </div>
                     </div>
                 </div>
             </header>
 
             <div className="items-grid">
-                {items.map((item) => (
+                {getFilteredItems().map((item) => (
                     <div 
                         key={item._id} 
                         className="item-card"

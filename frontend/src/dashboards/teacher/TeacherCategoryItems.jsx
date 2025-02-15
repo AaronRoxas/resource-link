@@ -6,6 +6,7 @@ import BottomNav from '../../components/BottomNav';
 import BorrowItem from './BorrowItem';
 import ItemInformation from '../../components/ItemInformation';
 import '../../styles/ViewItems.css';
+
 const TeacherCategoryItems = () => {
     const [items, setItems] = useState([]);
     const [categoryName, setCategoryName] = useState('');
@@ -15,6 +16,9 @@ const TeacherCategoryItems = () => {
     const { categoryName: urlCategoryName } = useParams();
     const navigate = useNavigate();
 
+    // --- Added search bar states ---
+    const [searchExpanded, setSearchExpanded] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const fetchCategoryItems = async () => {
         try {
@@ -77,9 +81,14 @@ const TeacherCategoryItems = () => {
         }
     };
 
+    // --- Filter items based on the search term ---
+    const filteredItems = items.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div className="view-category-items">
-            <NavBar hideWelcome={true}/>
+            <NavBar hideWelcome={true} />
             <header>
                 <div className="back-header">
                     <img 
@@ -89,11 +98,40 @@ const TeacherCategoryItems = () => {
                         onClick={handleBack}
                     />
                     <h1>{categoryName}</h1>
+                    <div className="header-actions">
+                        {searchExpanded ? (
+                            <div className="expanded-search">
+                                <input
+                                    type="text"
+                                    placeholder="Search items..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    autoFocus
+                                />
+                                <span 
+                                    className="filter-items-close" 
+                                    onClick={() => {
+                                        setSearchTerm("");
+                                        setSearchExpanded(false);
+                                    }}
+                                >
+                                    X
+                                </span>
+                            </div>
+                        ) : (
+                            <img 
+                                src="/table-imgs/search.svg" 
+                                alt="Search" 
+                                className="header-icon"
+                                onClick={() => setSearchExpanded(true)}
+                            />
+                        )}
+                    </div>
                 </div>
             </header>
 
             <div className="items-grid">
-                {items.map((item) => (
+                {filteredItems.map((item) => (
                     <div key={item._id} className="item-card">
                         <div className="item-image">
                             <img 

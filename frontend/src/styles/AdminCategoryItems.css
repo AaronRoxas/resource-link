@@ -49,14 +49,16 @@
 
 .header-actions {
     display: flex;
-    align-items: center;
+    align-items: center;   
     gap: 10px;
 }
+
 
 .header-icon {
     width: 24px;
     height: 24px;
     cursor: pointer;
+    margin-right: 1em;
     transition: transform 0.2s;
 }
 
@@ -66,8 +68,8 @@
 
 @media (max-width: 768px) {
     .header-icon {
-        width: 16px;
-        height: 16px;
+        width: 13px;
+        height: 13px;
     }
 
     .header-actions {
@@ -229,4 +231,86 @@
         padding: 6px 12px;
         font-size: 12px;
     }
+}
+
+.search-bar {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.search-bar input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-bar input:focus {
+    border-color: #4188FF;
+    box-shadow: 0 0 5px rgba(65, 136, 255, 0.5);
+}
+
+/* New styles for search bar inline with header actions */
+.search-bar-inline {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.search-bar-inline input {
+    width: 100%;
+    max-width: 300px;
+    height: 32px;
+    padding: 0 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-bar-inline input:focus {
+    border-color: #4188FF;
+    box-shadow: 0 0 5px rgba(65, 136, 255, 0.5);
+}
+
+/* New styles for the expanded search bar in header actions */
+.expanded-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: auto; /* Pushes the icon-group to the right */
+}
+
+.expanded-search input {
+    width: 200px;
+    height: 32px;
+    padding: 0 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: width 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.expanded-search input:focus {
+    border-color: #4188FF;
+    box-shadow: 0 0 5px rgba(65, 136, 255, 0.5);
+}
+
+@media (max-width: 768px) {
+    .expanded-search input {
+       width: 150px;
+    }
+}
+
+/* Style for the icon group (plus, (search), filter) */
+.icon-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
