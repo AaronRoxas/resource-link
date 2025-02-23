@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import QrScanner from 'react-qr-scanner'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import BottomNav from './BottomNav'
+ 
 import '../styles/QRScan.css'
 import Navbar from './NavBar'
 const QRScan = () => {

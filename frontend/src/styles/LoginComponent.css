@@ -12,28 +12,11 @@
   margin-bottom: 10px;
 }
 
-.login-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  padding: 0px 40px 150px; /* Reduced top padding by 10px, increased bottom padding by 10px */
-  background-color: #ffffff; /* Light mode background */
-  transition: background-color 0.3s ease; /* Smooth transition for background color change */
-}
-
 .logo {
   margin-bottom: 10px;
 }
 
 
-
-.app-name {
-  color: #006400;
-  font-size: 44px;
-  margin-bottom: 30px;
-}
 
 .login-form {
   width: 100%;
@@ -72,64 +55,8 @@
   margin-right: 5px;
 }
 
-.forgot-password {
-  color: #006400;
-  text-decoration: none;
-  margin-left: 10px;
-}
-
-.login-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #006400;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-top: 10px;
-  text-align: center;
-}
 
 .login-button:hover {
   background-color: #005000;
 }
 
-.theme-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: #006400;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  font-size: 24px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s;
-}
-
-.theme-toggle:hover {
-  background-color: #005000;
-}
-
-.dark-mode {
-  background-color: #1a1a1a;
-  color: #ffffff;
-}
-
-.dark-mode .login-container {
-  background-color: #1a1a1a; /* Dark mode background */
-}
-
-.dark-mode .logo svg path:first-child {
-  fill: #1a1a1a; /* Dark mode background color */
-}
-
-.dark-mode .logo svg path:last-child {
-  fill: #4CAF50; /* Dark mode logo color */
-}

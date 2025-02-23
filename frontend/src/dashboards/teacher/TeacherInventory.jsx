@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 // import { useNavigate } from 'react-router-dom';
-import BottomNav from '../../components/BottomNav';
 import '../../styles/TeacherInventory.css';
 import NavBar from '../../components/NavBar';
 import Footer from '../../components/Footer';

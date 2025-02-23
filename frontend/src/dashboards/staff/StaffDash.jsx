@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../../styles/StaffDash.css'
-import BottomNav from '../../components/BottomNav'; // Import the BottomNav component
+import '../../styles/new/staff.css'
 import QrScanner from 'react-qr-scanner';
 import ItemInformation from '../../components/ItemInformation';
 import { useNavigate, useLocation } from 'react-router-dom';

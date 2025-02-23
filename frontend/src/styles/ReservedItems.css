@@ -68,7 +68,7 @@
     color: #027A48;
   }
   
-  .filter-modal {
+  /* .filter-modal {
     position: absolute;
     top: 60px;
     right: 16px;
@@ -78,7 +78,7 @@
     z-index: 1000;
     width: 200px;
   }
-  
+   */
   .filter-content {
     padding: 16px;
   }

@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'; 
-import '../../styles/AddUser.css'; 
-import BottomNav from '../../components/BottomNav';
 import * as XLSX from 'xlsx';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import '../../styles/new/admin.css';
 const AddUser = ({ isModal, onClose }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -209,145 +207,146 @@ const AddUser = ({ isModal, onClose }) => {
   };
 
   return (
-    <div className={`add-user-container ${isModal ? 'modal-view' : ''}`}>
-      <ToastContainer />
-      {!isModal && <h2>{isMobile ? 'Create User' : 'Create New User'}</h2>}
-
-      <div className="import-method-selector">
-        <button 
-          className={`method-button ${importMethod === 'single' ? 'active' : ''}`}
-          onClick={() => setImportMethod('single')}
-        >
-          Single User
-        </button>
-        <button 
-          className={`method-button ${importMethod === 'bulk' ? 'active' : ''}`}
-          onClick={() => setImportMethod('bulk')}
-        >
-          Bulk Import
-        </button>
-      </div>
-
-      {importMethod === 'single' ? (
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>First Name</label>
-            <input
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Last Name</label>
-            <input
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Role</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              required
-            >
-              <option value="" disabled>Select Role</option>
-              <option value="teacher">Teacher</option>
-              <option value="staff">Staff</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label>
-              <input
-                type="checkbox"
-                checked={isActive}
-                onChange={(e) => setIsActive(e.target.checked)}
-                hidden
-              />
-
-            </label>
-          </div>
-          <button type="submit" className="create-button" disabled={loading}>
-            {loading ? 'Creating...' : (isMobile ? 'Create' : 'Create User')}
+    <>
+      <div className="modal-backdrop" onClick={onClose} />
+      <div className="add-user-modal">
+        <button className="close-button" onClick={onClose}>&times;</button>
+        
+        <div className="import-type">
+          <button 
+            className={importMethod === 'single' ? 'active' : ''}
+            onClick={() => setImportMethod('single')}
+          >
+            Single User
           </button>
-        </form>
-      ) : (
-        <div className="bulk-import-container">
-          <div className="template-section">
-            <button onClick={downloadTemplate} className="template-button">
-              Download Template
-            </button>
-            <p className="template-info">
-              Download and fill the template with user data, then upload it below.
-            </p>
-          </div>
-
-          <div className="upload-section">
-            <input
-              type="file"
-              accept=".xlsx,.xls,.csv"
-              onChange={handleFileUpload}
-              className="file-input"
-            />
-          </div>
-
-          {previewData.length > 0 && (
-            <div className="preview-section">
-              <h3>Preview ({previewData.length} users)</h3>
-              <div className="preview-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>First Name</th>
-                      <th>Last Name</th>
-                      <th>Email</th>
-                      <th>Role</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {previewData.slice(0, 5).map((user, index) => (
-                      <tr key={index}>
-                        <td>{user.first_name}</td>
-                        <td>{user.last_name}</td>
-                        <td>{user.email}</td>
-                        <td>{user.role}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {previewData.length > 5 && (
-                  <p className="preview-more">
-                    And {previewData.length - 5} more users...
-                  </p>
-                )}
-              </div>
-              <button 
-                onClick={handleBulkSubmit}
-                className="submit-button"
-              >
-                Import {previewData.length} Users
-              </button>
-            </div>
-          )}
+          <button 
+            className={importMethod === 'bulk' ? 'active' : ''}
+            onClick={() => setImportMethod('bulk')}
+          >
+            Bulk Import
+          </button>
         </div>
-      )}
 
-      {!isModal && <BottomNav navItems={navItems} />}
-    </div>
+        {importMethod === 'single' ? (
+          <form onSubmit={handleSubmit}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>First Name</label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Last Name</label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Role</label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                required
+              >
+                <option value="" disabled>Select Role</option>
+                <option value="teacher">Teacher</option>
+                <option value="staff">Staff</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+
+            <input
+              type="checkbox"
+              checked={isActive}
+              onChange={(e) => setIsActive(e.target.checked)}
+              hidden
+            />
+
+            <button type="submit" className="create-button" disabled={loading}>
+              {loading ? 'Creating...' : 'Create User'}
+            </button>
+          </form>
+        ) : (
+          <div className="bulk-import-container">
+            <div className="template-section">
+              <button onClick={downloadTemplate} className="template-button">
+                Download Template
+              </button>
+              <p className="template-info">
+                Download and fill the template with user data, then upload it below.
+              </p>
+            </div>
+
+            <div className="upload-section">
+              <input
+                type="file"
+                accept=".xlsx,.xls,.csv"
+                onChange={handleFileUpload}
+                className="file-input"
+              />
+            </div>
+
+            {previewData.length > 0 && (
+              <div className="preview-section">
+                <h3>Preview ({previewData.length} users)</h3>
+                <div className="preview-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {previewData.slice(0, 5).map((user, index) => (
+                        <tr key={index}>
+                          <td>{user.first_name}</td>
+                          <td>{user.last_name}</td>
+                          <td>{user.email}</td>
+                          <td>{user.role}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {previewData.length > 5 && (
+                    <p className="preview-more">
+                      And {previewData.length - 5} more users...
+                    </p>
+                  )}
+                </div>
+                <button 
+                  onClick={handleBulkSubmit}
+                  className="submit-button"
+                >
+                  Import {previewData.length} Users
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import BottomNav from '../../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
-import '../../styles/AdminInventory.css';
+import '../../styles/new/admin.css';
 import Navbar from '../../components/NavBar';
 import { toast } from 'react-toastify';
+
 const AdminInventory = () => {
     const [categories, setCategories] = useState([]);
     const [categoryItemCounts, setCategoryItemCounts] = useState({});
@@ -12,18 +12,12 @@ const AdminInventory = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [newCategory, setNewCategory] = useState({
-        name: ''
+        name: '',
+        description: ''
     });
     const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const navigate = useNavigate();
-
-    const navItems = [
-        { path: '/admin', icon: 'home', label: 'Home' },
-        { path: '/adminChart', icon: 'chart', label: 'Chart' },
-        { path: '/admin/manage-user', icon: 'profile', label: 'Manage User' },
-        { path: '/admin/inventory', icon: 'active-cube', label: 'Inventory' }
-    ];
 
     useEffect(() => {
         fetchCategories();
@@ -38,6 +32,7 @@ const AdminInventory = () => {
             setCategories(response.data);
         } catch (error) {
             console.error('Error fetching categories:', error);
+            toast.error('Failed to fetch categories');
         }
     };
 
@@ -52,20 +47,11 @@ const AdminInventory = () => {
         }
     };
 
-    const handleCreateCategory = () => {
-        setShowModal(true);
-    };
-
-    const handleCloseModal = () => {
-        setShowModal(false);
-        setNewCategory({ name: '' });
-    };
-
     const handleImageSelect = (e) => {
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 5000000) { // 5MB limit
-                alert('File is too large. Please choose an image under 5MB.');
+            if (file.size > 5000000) {
+                toast.error('File is too large. Please choose an image under 5MB.');
                 return;
             }
             
@@ -81,14 +67,19 @@ const AdminInventory = () => {
 
     const handleSubmitCategory = async (e) => {
         e.preventDefault();
+        if (!newCategory.name.trim()) {
+            toast.error('Category name is required');
+            return;
+        }
+
         try {
             const categoryData = {
-                name: newCategory.name,
-                description: newCategory.description || '',
+                name: newCategory.name.trim(),
+                description: newCategory.description?.trim() || '',
                 image: selectedImage || ''
             };
 
-            const response = await axios.post(
+            await axios.post(
                 'https://resource-link-main-14c755858b60.herokuapp.com/api/categories',
                 categoryData,
                 { 
@@ -100,14 +91,16 @@ const AdminInventory = () => {
             );
             
             await fetchCategories();
-            handleCloseModal();
+            setShowModal(false);
+            setNewCategory({ name: '', description: '' });
+            setSelectedImage(null);
+            setImagePreview(null);
             toast.success('Category created successfully');
         } catch (error) {
-            console.error('Error creating category:', error.response?.data || error);
-            toast.error(error.response?.data?.message || 'Failed to create category. Please try again.');
+            console.error('Error creating category:', error);
+            toast.error(error.response?.data?.message || 'Failed to create category');
         }
     };
-
 
     const handleCategoryClick = (categoryName) => {
         navigate(`/admin/category/${categoryName.toLowerCase().replace(/\s+/g, '-')}`);
@@ -117,10 +110,7 @@ const AdminInventory = () => {
         if (!imageData || imageData === 'null' || imageData === null) {
             return process.env.PUBLIC_URL + "/dashboard-imgs/placeholder.svg";
         }
-        // Check if the image data already includes the data URL prefix
-        return imageData.startsWith('data:') 
-            ? imageData 
-            : `data:image/jpeg;base64,${imageData}`;
+        return imageData.startsWith('data:') ? imageData : `data:image/jpeg;base64,${imageData}`;
     };
 
     const handleDeleteClick = (e, category) => {
@@ -130,8 +120,10 @@ const AdminInventory = () => {
     };
 
     const handleDeleteCategory = async () => {
+        if (!selectedCategory) return;
+
         try {
-            const response = await axios.delete(
+            await axios.delete(
                 `https://resource-link-main-14c755858b60.herokuapp.com/api/categories/${selectedCategory._id}`,
                 { withCredentials: true }
             );
@@ -146,142 +138,164 @@ const AdminInventory = () => {
         }
     };
 
-    return (
-        <div className="inventory-page">
-            <Navbar hideWelcome={true}/>
-            <header>
-                <h1>Inventory</h1>
-            </header>
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setNewCategory({ name: '', description: '' });
+        setSelectedImage(null);
+        setImagePreview(null);
+    };
 
-            <div className="categories-grid">
-                {categories.map((category) => (
-                    <div 
-                        key={category._id} 
-                        className="category-card"
-                        onClick={() => handleCategoryClick(category.name)}
-                    >
-                        <div className="category-image">
-                            <img 
-                                src={getImageUrl(category.image)} 
-                                alt={category.name}
-                                onError={(e) => {
-                                    e.target.onerror = null; // Prevent infinite loop
-                                    e.target.src = process.env.PUBLIC_URL + "/dashboard-imgs/placeholder.svg";
-                                }}
-                            />
-                        </div>
-                        <div className="category-info">
-                            <h3>{category.name}</h3>
-                            <p>{category.description}</p>
-                            <button 
-                                className="delete-category-btn"
-                                onClick={(e) => handleDeleteClick(e, category)}
-                            >
-                                Delete
-                            </button>
-                        </div>
+    return (
+        <div className="admin-page">
+            <div className="admin-container">
+                <div className="welcome-section">
+                    <Navbar hideWelcome={true}/>
+                </div>
+
+                <header className="inventory-header">
+                    <h1>Inventory</h1>
+                </header>
+
+                <div className="admin-section">
+                    <div className="section-header">
+                        <h2>Categories</h2>
                     </div>
-                ))}
-                
-                <div className="category-card new-category" onClick={handleCreateCategory}>
-                    <div className="create-category-content">
-                        <span>+</span>
-                        <span>Create new category</span>
+
+                    <div className="categories-grid">
+                        {categories.map((category) => (
+                            <div 
+                                key={category._id} 
+                                className="category-card"
+                                onClick={() => handleCategoryClick(category.name)}
+                            >
+                                <div className="category-image">
+                                    <img 
+                                        src={getImageUrl(category.image)} 
+                                        alt={category.name}
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = process.env.PUBLIC_URL + "/dashboard-imgs/placeholder.svg";
+                                        }}
+                                    />
+                                </div>
+                                <div className="category-info">
+                                    <h3>{category.name}</h3>
+                                    <p className="category-description">{category.description}</p>
+                                </div>
+                                <button 
+                                    className="edit-button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        // TODO: Add edit functionality
+                                    }}
+                                >
+                                    Edit
+                                </button>
+                                <button 
+                                    className="delete-button"
+                                    onClick={(e) => handleDeleteClick(e, category)}
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        ))}
+
+                        <div className="category-card new-category" onClick={() => setShowModal(true)}>
+                            <div className="new-category-content">
+                                <span className="plus-icon">+</span>
+                                <span>Create new category</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            {/* Create Category Modal */}
             {showModal && (
-                <div className="category-modal-backdrop">
-                    <div className="category-form-container">
-                        <div className="category-form-header">
+                <div className="modal-backdrop">
+                    <div className="modal-container">
+                        <div className="modal-header">
                             <h2>Create new category</h2>
-                            <button className="category-close-button" onClick={handleCloseModal}>×</button>
                         </div>
-                        <form onSubmit={handleSubmitCategory}>
-                            <div className="category-image-upload">
+                        <form onSubmit={handleSubmitCategory} className="modal-form">
+                            <div className="image-upload-container">
+                                <label htmlFor="categoryImage" className="image-upload-label">
+                                    {imagePreview ? (
+                                        <img src={imagePreview} alt="Category preview" />
+                                    ) : (
+                                        <span className="plus-icon">+</span>
+                                    )}
+                                </label>
                                 <input
-                                    type="file"
                                     id="categoryImage"
+                                    type="file"
                                     accept="image/*"
                                     onChange={handleImageSelect}
                                     style={{ display: 'none' }}
                                 />
-                                <label htmlFor="categoryImage" className="category-upload-placeholder">
-                                    {imagePreview ? (
-                                        <img 
-                                            src={imagePreview} 
-                                            alt="Category preview" 
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        />
-                                    ) : (
-                                        <>
-                                            <span className="category-plus-icon">+</span>
-                                           
-                                        </>
-                                    )}
-                                </label>
                             </div>
-                            
-                            <div className="category-form-group">
-                                <label>Name <span className="required">*</span></label>
+                            <div className="form-group">
+                                <label htmlFor="categoryName">Name <span className="required">*</span></label>
                                 <input
+                                    id="categoryName"
                                     type="text"
                                     value={newCategory.name}
-                                    onChange={(e) => setNewCategory({
-                                        ...newCategory,
-                                        name: e.target.value
-                                    })}
+                                    onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
                                     required
                                 />
                             </div>
-                            <div className="category-form-group">
-                                <label>Description</label>
+                            <div className="form-group">
+                                <label htmlFor="categoryDescription">Description</label>
                                 <input
+                                    id="categoryDescription"
                                     type="text"
                                     value={newCategory.description}
-                                    onChange={(e) => setNewCategory({
-                                        ...newCategory,
-                                        description: e.target.value
-                                    })}
+                                    onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
                                 />
                             </div>
-
-                            <button type="submit" className="category-create-button">Create</button>
+                            <button type="submit" className="create-button">Create</button>
+                            <button type="button" className="cancel-button" onClick={handleCloseModal}>Cancel</button>
                         </form>
                     </div>
                 </div>
             )}
 
+            {/* Delete Confirmation Modal */}
             {showDeleteModal && (
-                <div className="category-modal-backdrop">
-                    <div className="category-form-container">
-                        <div className="category-form-header">
+                <div className="modal-backdrop">
+                    <div className="modal-container delete-modal">
+                        <div className="modal-header">
                             <h2>Delete Category</h2>
                             <button 
-                                className="category-close-button" 
-                                onClick={() => setShowDeleteModal(false)}
+                                className="close-button"
+                                onClick={() => {
+                                    setShowDeleteModal(false);
+                                    setSelectedCategory(null);
+                                }}
                             >
-                                ×
+                                &times;
                             </button>
                         </div>
-                        <div className="delete-confirmation">
+                        <div className="modal-content">
                             <p>Are you sure you want to delete "{selectedCategory?.name}"?</p>
-                            <p className="warning">This action cannot be undone.</p>
-                            <div className="delete-actions">
-                                <button 
-                                    className="cancel-button"
-                                    onClick={() => setShowDeleteModal(false)}
-                                >
-                                    Cancel
-                                </button>
-                                <button 
-                                    className="delete-button"
-                                    onClick={handleDeleteCategory}
-                                >
-                                    Delete
-                                </button>
-                            </div>
+                            <p className="warning-text">This action cannot be undone.</p>
+                        </div>
+                        <div className="modal-actions">
+                            <button 
+                                className="cancel-button"
+                                onClick={() => {
+                                    setShowDeleteModal(false);
+                                    setSelectedCategory(null);
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                className="delete-button"
+                                onClick={handleDeleteCategory}
+                            >
+                                Delete
+                            </button>
                         </div>
                     </div>
                 </div>

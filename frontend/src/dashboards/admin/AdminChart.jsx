@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import NavBar from '../../components/NavBar';
-import '../../styles/AdminChart.css';
+import '../../styles/new/admin.css';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 
@@ -62,11 +62,9 @@ const AdminChart = () => {
         // Calculate condition statistics with normalized status names
         const conditions = itemsRes.data.reduce((acc, item) => {
           let status = item.status || 'Good Condition';
-          // Normalize "Good condition" to "Good Condition"
           if (status.toLowerCase() === 'good condition') {
             status = 'Good Condition';
           }
-          // Skip if status is "Reserved"
           if (status.toLowerCase() !== 'reserved') {
             acc[status] = (acc[status] || 0) + 1;
           }
@@ -82,10 +80,10 @@ const AdminChart = () => {
           return acc;
         }, {});
 
-        // Get top items by quantity (adjust the number as needed)
+        // Get top items by quantity
         const topStocks = Object.entries(stockCounts)
           .sort(([,a], [,b]) => b - a)
-          .slice(0, 10) // Increase the number to show more items
+          .slice(0, 10)
           .reduce((obj, [key, value]) => ({
             ...obj,
             [key]: value
@@ -113,11 +111,11 @@ const AdminChart = () => {
       {
         data: Object.values(itemStats),
         backgroundColor: [
-          '#4CAF50', // green
-          '#2196F3', // blue
-          '#F44336', // red
-          '#FF9800', // orange
-          '#E91E63', // pink
+          '#4CAF50',
+          '#2196F3',
+          '#F44336',
+          '#FF9800',
+          '#E91E63',
         ],
         borderWidth: 0,
       },
@@ -129,18 +127,6 @@ const AdminChart = () => {
       legend: {
         position: 'right',
       },
-      title: {
-        display: true,
-        text: 'Most Borrowed/Withdrew',
-        font: {
-          size: 16,
-          weight: 'bold'
-        },
-        padding: {
-          top: 10,
-          bottom: 20
-        }
-      },
       tooltip: {
         callbacks: {
           label: function(context) {
@@ -155,55 +141,22 @@ const AdminChart = () => {
     cutout: '40%',
   };
 
-  // Add new chart data for conditions
   const conditionChartData = {
     labels: Object.keys(conditionStats),
     datasets: [
       {
         data: Object.values(conditionStats),
         backgroundColor: [
-          '#4CAF50', // Good condition - green
-          '#2196F3', // For maintenance - blue
-          '#F44336', // Low stock - red
-          '#9C27B0', // For repair - purple
+          '#4CAF50',
+          '#2196F3',
+          '#F44336',
+          '#9C27B0',
         ],
         borderWidth: 0,
       },
     ],
   };
 
-  const conditionChartOptions = {
-    plugins: {
-      legend: {
-        position: 'right',
-      },
-      title: {
-        display: true,
-        text: 'Asset Conditions',
-        font: {
-          size: 16,
-          weight: 'bold'
-        },
-        padding: {
-          top: 10,
-          bottom: 20
-        }
-      },
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-            const value = context.raw;
-            const percentage = ((value / total) * 100).toFixed(0);
-            return `${context.label}: ${percentage}%`;
-          }
-        }
-      }
-    },
-    cutout: '40%',
-  };
-
-  // Add new chart data for stocks
   const stockChartData = {
     labels: Object.keys(stockStats),
     datasets: [
@@ -214,107 +167,87 @@ const AdminChart = () => {
           '#2196F3',
           '#F44336',  
           '#FF9800', 
-          '#E91E63', // pink - for any additional items
+          '#E91E63',
+          '#9C27B0',
+          '#00BCD4',
+          '#FF5722',
+          '#795548',
+          '#607D8B',
         ],
         borderWidth: 0,
       },
     ],
   };
 
-  const stockChartOptions = {
-    plugins: {
-      legend: {
-        position: 'right',
-        labels: {
-          padding: 20,
-          usePointStyle: true,
-        }
-      },
-      title: {
-        display: true,
-        text: 'Stocks Overview',
-        font: {
-          size: 16,
-          weight: 'bold'
-        },
-        padding: {
-          top: 10,
-          bottom: 20
-        }
-      },
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-            const value = context.raw;
-            const percentage = ((value / total) * 100).toFixed(0);
-            return `${context.label}: ${value} (${percentage}%)`;
-          }
-        }
-      }
-    },
-    cutout: '40%',
-  };
-
   return (
     <div className="admin-chart">
       <NavBar hideWelcome={true} />
-      <h1 className="dashboard-title">Dashboard</h1>
-      
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="icon bg-purple"><img src="/charts-imgs/users.svg" alt="Users" /></div>
-          <div className="stat-number">{stats.users}</div>
-          <div className="stat-label">Users</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="icon bg-orange"><img src="/charts-imgs/categories.svg" alt="Categories" /></div>
-          <div className="stat-number">{stats.categories}</div>
-          <div className="stat-label">Categories</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="icon bg-blue"><img src="/charts-imgs/non-consumables.svg" alt="Non-Consumables" /></div>
-          <div className="stat-number">{stats.nonConsumables}</div>
-          <div className="stat-label">Non-Consumables</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="icon bg-green"><img src="/charts-imgs/consumables.svg" alt="Consumables" /></div>
-          <div className="stat-number">{stats.consumables}</div>
-          <div className="stat-label">Consumables</div>
-        </div>
-      </div>
-
-      <div className="charts-container">
-        <div>
-          <h2 className="admin-chart-section-title">Stocks Overview</h2>
-          <div className="admin-chart-section-header">
-            <div className="admin-chart-view-more">View more</div>
+      <div className="admin-chart-container">
+        <h1>Dashboard Overview</h1>
+        
+        <div className="stats-cards">
+          <div className="stat-card" style={{ background: '#F3E5F5' }}>
+            <div className="stat-icon" style={{ background: '#9C27B0' }}>👤</div>
+            <div className="stat-content">
+              <div className="stat-value">{stats.users}</div>
+              <div className="stat-title">Users</div>
+            </div>
           </div>
-          <div className="chart-wrapper">
-            <Pie data={stockChartData} options={stockChartOptions} />
+          
+          <div className="stat-card" style={{ background: '#FFF3E0' }}>
+            <div className="stat-icon" style={{ background: '#FF9800' }}>📁</div>
+            <div className="stat-content">
+              <div className="stat-value">{stats.categories}</div>
+              <div className="stat-title">Categories</div>
+            </div>
+          </div>
+          
+          <div className="stat-card" style={{ background: '#E3F2FD' }}>
+            <div className="stat-icon" style={{ background: '#2196F3' }}>🔧</div>
+            <div className="stat-content">
+              <div className="stat-value">{stats.nonConsumables}</div>
+              <div className="stat-title">Non-Consumables</div>
+            </div>
+          </div>
+          
+          <div className="stat-card" style={{ background: '#E8F5E9' }}>
+            <div className="stat-icon" style={{ background: '#4CAF50' }}>📦</div>
+            <div className="stat-content">
+              <div className="stat-value">{stats.consumables}</div>
+              <div className="stat-title">Consumables</div>
+            </div>
           </div>
         </div>
 
-        <div>
-          <h2 className="admin-chart-section-title">Most Borrowed/Withdrew</h2>
-          <div className="admin-chart-section-header">
-            <div className="admin-chart-view-more">View more</div>
+        <div className="charts-grid">
+          <div className="chart-section">
+            <div className="chart-header">
+              <h2>Stocks Overview</h2>
+              <a href="#" className="view-more">View More</a>
+            </div>
+            <div className="chart-container">
+              <Pie data={stockChartData} options={chartOptions} />
+            </div>
           </div>
-          <div className="chart-wrapper">
-            <Pie data={chartData} options={chartOptions} />
-          </div>
-        </div>
 
-        <div>
-          <h2 className="admin-chart-section-title">Asset Conditions</h2>
-          <div className="admin-chart-section-header">
-            <div className="admin-chart-view-more">View more</div>
+          <div className="chart-section">
+            <div className="chart-header">
+              <h2>Most Borrowed/Withdrew</h2>
+              <a href="#" className="view-more">View More</a>
+            </div>
+            <div className="chart-container">
+              <Pie data={chartData} options={chartOptions} />
+            </div>
           </div>
-          <div className="chart-wrapper">
-            <Pie data={conditionChartData} options={conditionChartOptions} />
+
+          <div className="chart-section">
+            <div className="chart-header">
+              <h2>Asset Conditions</h2>
+              <a href="#" className="view-more">View More</a>
+            </div>
+            <div className="chart-container">
+              <Pie data={conditionChartData} options={chartOptions} />
+            </div>
           </div>
         </div>
       </div>

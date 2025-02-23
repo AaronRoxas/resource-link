@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import NavBar from '../../components/NavBar';
-import BottomNav from '../../components/BottomNav';
 import AddUser from './AddUser';
 import axios from 'axios';
-import '../../styles/AdminManageUser.css';
+import '../../styles/new/admin.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -31,14 +30,6 @@ const AdminManageUser = () => {
   // New states for search functionality
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
-  // Navigation items for bottom nav
-  const navItems = [
-    { path: '/admin', icon: 'home', label: 'Home' },
-    { path: '/adminChart', icon: 'chart', label: 'Chart' },
-    { path: '/admin/manage-user', icon: 'active-profile', label: 'Manage User' },
-    { path: '/admin/inventory', icon: 'cube', label: 'Inventory' },
-  ];
 
   // Fetch users on component mount
   useEffect(() => {
@@ -84,6 +75,16 @@ const AdminManageUser = () => {
 
   const handleCloseModal = () => {
     setShowAddUserModal(false);
+    // Refresh users list after adding a new user
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/users');
+        setUsers(response.data);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+    fetchUsers();
   };
 
   // Update getFilteredUsers to include search functionality alongside role filtering
@@ -189,14 +190,24 @@ const AdminManageUser = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   autoFocus
                 />
-                <span className='filter-items-close' onClick={() => {
+                <button className='filter-items-close search-btn' onClick={() => {
                   setSearchExpanded(false);
                   setSearchTerm("");
-                  }}>X </span>
+                  }}>X </button>
 
               </div>
             ) : (
               <>
+              <div className="dropdown-container">
+              <button className="search-btn" onClick={() => setSearchExpanded(true)}>
+              <img 
+                  src="/table-imgs/search.svg" 
+                  alt="Search" 
+                />
+              </button>
+                
+              </div>
+    
                 <div className="dropdown-container" ref={dropdownRef}>
                   <button 
                     className="add-user-btn"
@@ -236,12 +247,7 @@ const AdminManageUser = () => {
                     </div>
                   )}
                 </div>
-                <img 
-                  src="/table-imgs/search.svg" 
-                  alt="Search" 
-                  className="header-icon"
-                  onClick={() => setSearchExpanded(true)}
-                />
+
               </>
             )}
           </div>
@@ -311,14 +317,10 @@ const AdminManageUser = () => {
       </div>
 
       {showAddUserModal && (
-        <div className="manage-user-modal">
-          <div className="manage-user-modal-content">
-            <div className="manage-user-modal-header">
-              <button onClick={handleCloseModal}>✕</button>
-            </div>
-            <AddUser isModal={true} onClose={handleCloseModal} />
-          </div>
-        </div>
+        <AddUser
+          isModal={true}
+          onClose={handleCloseModal}
+        />
       )}
 
       {showDeleteModal && (

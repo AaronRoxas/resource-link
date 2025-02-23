@@ -2,7 +2,6 @@ import React from 'react'
 import '../../styles/TeacherDash.css'
 import NavBar from '../../components/NavBar';
 import { useNavigate } from 'react-router-dom'
-import BottomNav from '../../components/BottomNav'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Footer from '../../components/Footer'

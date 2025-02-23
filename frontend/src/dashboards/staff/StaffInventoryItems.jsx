@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import NavBar from '../../components/NavBar';
-import BottomNav from '../../components/BottomNav';
 import ItemInformation from '../../components/ItemInformation';
 import '../../styles/ViewItems.css';
 import Navbar from '../../components/NavBar';
@@ -529,6 +528,9 @@ const StaffInventoryItems = () => {
                                 </div>
                             </div>
                             <div className="form-group">
+                                <input type="text" value="Consumable" readOnly hidden />
+                            </div>
+                            <div className="form-group">
                                 <label>Sub-category <span className="required">*</span></label>
                                 <select
                                     value={newItem.subCategory}
@@ -626,7 +628,10 @@ const StaffInventoryItems = () => {
                         <form onSubmit={handleSubmitItem}>
                             <div className="form-group">
                                 <label>Add Image</label>
-                                <div className="image-upload-box">
+                                <div 
+                                    className="image-upload-box"
+                                    onClick={() => document.querySelector('input[type="file"]').click()}
+                                >
                                     {newItem.image ? (
                                         <img 
                                             src={typeof newItem.image === 'string' ? newItem.image : URL.createObjectURL(newItem.image)} 
@@ -645,11 +650,9 @@ const StaffInventoryItems = () => {
                                             ...newItem,
                                             image: e.target.files[0]
                                         })}
+                                        style={{ display: 'none' }}
                                     />
                                 </div>
-                            </div>
-                            <div className="form-group">
-                                <input type="text" value="Consumable" readOnly hidden />
                             </div>
                             <div className="form-group">
                                 <label>Sub-category</label>
@@ -733,11 +736,14 @@ const StaffInventoryItems = () => {
                                         ...newItem,
                                         notes: e.target.value
                                     })}
+                                    placeholder="Add any additional notes here..."
                                 />
                             </div>
-                            <button type="submit" className="done-button">
-                                Done
-                            </button>
+                            <div className="form-group">
+                                <button type="submit" className="done-button">
+                                    Done
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>

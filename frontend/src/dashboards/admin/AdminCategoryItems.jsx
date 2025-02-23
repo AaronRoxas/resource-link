@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import BottomNav from '../../components/BottomNav';
-import ItemInformation from '../../components/ItemInformation';
 import Navbar from '../../components/NavBar';
-import '../../styles/AdminCategoryItems.css';
+import '../../styles/new/admin.css';
 
 const AdminCategoryItems = () => {
     const [items, setItems] = useState([]);
@@ -369,516 +367,511 @@ const AdminCategoryItems = () => {
     return (
         <div className="view-category-items">
             <Navbar hideWelcome={true}/>
-            <header>
-                <div className="back-header">
-                    <img 
-                        src="/back-arrow.svg" 
-                        alt="Back" 
-                        className="back-arrow" 
-                        onClick={handleBack}
-                    />
-                    <h1>{categoryName}</h1>
-                    <div className="header-actions">
-                        {searchExpanded ? (
-                            <div className="expanded-search">
-                                <input
-                                    type="text"
-                                    placeholder="Search items..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    autoFocus
-                                />
-                           <span className='filter-items-close' onClick={() => {
-                                setSearchExpanded(false);
-                                setSearchTerm("");
-                            }}>X 
-                            </span>
-                                
-                            </div>
-                        ) : (
-                            <>
-                                <div className="dropdown-container">
-                                    <img 
-                                        src="/table-imgs/plus.svg" 
-                                        alt="Add" 
-                                        className="header-icon"
-                                        onClick={handlePlusClick}
+            <div style={{ position: 'relative', minHeight: 'calc(100vh - 60px)' }}>
+                <header>
+                    <div className="back-header">
+                        <img 
+                            src="/back-arrow.svg" 
+                            alt="Back" 
+                            className="back-arrow" 
+                            onClick={handleBack}
+                        />
+                        <h1>{categoryName}</h1>
+                        <div className="header-actions">
+                            {searchExpanded ? (
+                                <div className="expanded-search">
+                                    <input
+                                        type="text"
+                                        placeholder="Search items..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        autoFocus
                                     />
-                                    {showDropdown && (
-                                        <div className="dropdown-menu">
-                                            <button onClick={handleCreateSubCategory}>
-                                                Create new sub-category
-                                            </button>
-                                            <button onClick={handleAddItem}>
-                                                Add new Item
-                                            </button>
-                                        </div>
-                                    )}
+                                    <span className='filter-items-close' onClick={() => {
+                                        setSearchExpanded(false);
+                                        setSearchTerm("");
+                                    }}>X 
+                                    </span>
                                 </div>
-                                <img 
-                                    src="/table-imgs/filter.svg" 
-                                    alt="Filter" 
-                                    className="header-icon"
-                                    onClick={handleFilterClick}
-                                />
-                                <img 
-                                    src="/table-imgs/search.svg" 
-                                    alt="Search" 
-                                    className="header-icon"
-                                    onClick={() => setSearchExpanded(true)}
-                                />
-                            </>
-                        )}
+                            ) : (
+                                <>
+                                    <div className="dropdown-container">
+                                        <img 
+                                            src="/table-imgs/plus.svg" 
+                                            alt="Add" 
+                                            className="header-icon"
+                                            onClick={handlePlusClick}
+                                        />
+                                        {showDropdown && (
+                                            <div className="dropdown-menu">
+                                                <button onClick={handleCreateSubCategory}>
+                                                    Create new sub-category
+                                                </button>
+                                                <button onClick={handleAddItem}>
+                                                    Add new Item
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <img 
+                                        src="/table-imgs/filter.svg" 
+                                        alt="Filter" 
+                                        className="header-icon"
+                                        onClick={handleFilterClick}
+                                    />
+                                    <img 
+                                        src="/table-imgs/search.svg" 
+                                        alt="Search" 
+                                        className="header-icon"
+                                        onClick={() => setSearchExpanded(true)}
+                                    />
+                                </>
+                            )}
+                        </div>
                     </div>
-                </div>
-            </header>
+                </header>
 
-            {showFilterModal && (
-                <div className="filter-items-modal-backdrop">
-                    <div className="filter-items-content">
-                        <div className="filter-items-header">
-                            <h2>Filter Items</h2>
-                            <button 
-                                className="filter-items-close"
-                                onClick={() => setShowFilterModal(false)}
+                {showFilterModal && (
+                    <div className="filter-modal">
+                        <h2>Filter Items</h2>
+                        <button 
+                            className="close-btn"
+                            onClick={() => setShowFilterModal(false)}
+                        >
+                            ×
+                        </button>
+                        <div className="form-group">
+                            <label>Sub-category</label>
+                            <select
+                                value={filters.subCategory}
+                                onChange={(e) => handleFilterChange('subCategory', e.target.value)}
                             >
-                                ×
-                            </button>
+                                <option value="">All</option>
+                                {category?.subCategories?.map((sub, index) => (
+                                    <option key={index} value={sub.name}>
+                                        {sub.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
-                        <div className="filter-items-options">
-                            <div className="filter-items-group">
-                                <label>Sub-category</label>
-                                <select
-                                    value={filters.subCategory}
-                                    onChange={(e) => handleFilterChange('subCategory', e.target.value)}
-                                >
-                                    <option value="">All</option>
-                                    {category?.subCategories?.map((sub, index) => (
-                                        <option key={index} value={sub.name}>
-                                            {sub.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="filter-items-group">
-                                <label>Status</label>
-                                <select
-                                    value={filters.status}
-                                    onChange={(e) => handleFilterChange('status', e.target.value)}
-                                >
-                                    <option value="">All</option>
-                                    <option value="Good Condition">Good Condition</option>
-                                    <option value="Low Stock">Low Stock</option>
-                                    <option value="For Repair">For Repair</option>
-                                    <option value="Under Maintenance">Under Maintenance</option>
-                                </select>
-                            </div>
+                        <div className="form-group">
+                            <label>Status</label>
+                            <select
+                                value={filters.status}
+                                onChange={(e) => handleFilterChange('status', e.target.value)}
+                            >
+                                <option value="">All</option>
+                                <option value="Good Condition">Good Condition</option>
+                                <option value="Low Stock">Low Stock</option>
+                                <option value="For Repair">For Repair</option>
+                                <option value="Under Maintenance">Under Maintenance</option>
+                            </select>
                         </div>
-                        <div className="filter-items-actions">
+                        <div className="actions">
                             <button 
-                                className="filter-items-clear"
+                                className="clear-btn"
                                 onClick={clearFilters}
                             >
                                 Clear Filters
                             </button>
                             <button 
-                                className="filter-items-apply"
+                                className="apply-btn"
                                 onClick={() => setShowFilterModal(false)}
                             >
                                 Apply
                             </button>
                         </div>
                     </div>
-                </div>
-            )}
-            {showSubCategoryModal && (
-                <div className="modal-backdrop">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h2>Create new sub-category</h2>
-                            <button 
-                                className="close-button"
-                                onClick={() => setShowSubCategoryModal(false)}
-                            >
-                                ×
-                            </button>
-                        </div>
-                        <form onSubmit={handleSubmitSubCategory}>
-                            <div className="form-group">
-                                <label>Name</label>
-                                <input
-                                    type="text"
-                                    value={newSubCategory}
-                                    onChange={(e) => setNewSubCategory(e.target.value)}
-                                    required
-                                />
+                )}
+                {showSubCategoryModal && (
+                    <div className="modal-backdrop">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2>Create new sub-category</h2>
+                                <button 
+                                    className="close-button"
+                                    onClick={() => setShowSubCategoryModal(false)}
+                                >
+                                    ×
+                                </button>
                             </div>
-                            <button type="submit" className="create-button">
-                                Create
-                            </button>
-                        </form>
+                            <form onSubmit={handleSubmitSubCategory}>
+                                <div className="form-group">
+                                    <label>Name</label>
+                                    <input
+                                        type="text"
+                                        value={newSubCategory}
+                                        onChange={(e) => setNewSubCategory(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <button type="submit" className="create-button">
+                                    Create
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {showItemTypeModal && (
-                <div className="modal-backdrop">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h2>Add new Item</h2>
+                {showItemTypeModal && (
+                    <div className="modal-backdrop">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2>Add new Item</h2>
+                                <button 
+                                    className="close-button"
+                                    onClick={() => setShowItemTypeModal(false)}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            <div className="form-group">
+                                <label>Type</label>
+                                <select
+                                    onChange={(e) => handleItemTypeSelect(e.target.value)}
+                                    defaultValue=""
+                                >
+                                    <option value="" disabled>Select type</option>
+                                    <option value="Consumable">Consumable</option>
+                                    <option value="Non-Consumable">Non-Consumable</option>
+                                </select>
+                            </div>
                             <button 
-                                className="close-button"
+                                className="form-cancel-btn"
                                 onClick={() => setShowItemTypeModal(false)}
                             >
-                                ×
+                                Cancel
                             </button>
                         </div>
-                        <div className="form-group">
-                            <label>Type</label>
-                            <select
-                                onChange={(e) => handleItemTypeSelect(e.target.value)}
-                                defaultValue=""
-                            >
-                                <option value="" disabled>Select type</option>
-                                <option value="Consumable">Consumable</option>
-                                <option value="Non-Consumable">Non-Consumable</option>
-                            </select>
-                        </div>
-                        <button 
-                            className="form-cancel-btn"
-                            onClick={() => setShowItemTypeModal(false)}
-                        >
-                            Cancel
-                        </button>
                     </div>
-                </div>
-            )}
+                )}
 
-            {showAddItemModal && (
-                <div className="modal-backdrop">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h2>Add new Item</h2>
-                            <button 
-                                className="close-button"
-                                onClick={() => setShowAddItemModal(false)}
-                            >
-                                ×
-                            </button>
-                        </div>
-                        <form onSubmit={handleSubmitItem}>
-                            <div className="form-group">
-                                <label>Add Image</label>
-                                <div className="image-upload-box">
-                                    {newItem.image ? (
-                                        <img 
-                                            src={URL.createObjectURL(newItem.image)} 
-                                            alt="Preview" 
-                                            className="image-preview"
-                                        />
-                                    ) : (
-                                        <div className="upload-placeholder">
-                                            <span>+</span>
-                                        </div>
-                                    )}
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => setNewItem({
-                                            ...newItem,
-                                            image: e.target.files[0]
-                                        })}
-                                    />
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <label>Sub-category <span className="required">*</span></label>
-                                <select
-                                    value={newItem.subCategory}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        subCategory: e.target.value
-                                    })}
-                                    required
+                {showAddItemModal && (
+                    <div className="modal-backdrop">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2>Add new Item</h2>
+                                <button 
+                                    className="close-button"
+                                    onClick={() => setShowAddItemModal(false)}
                                 >
-                                    {category?.subCategories?.length > 0 ? (
-                                        category.subCategories.map((sub, index) => (
-                                            <option key={index} value={sub.name}>{sub.name}</option>
-                                        ))
-                                    ) : (
-                                        <option value="">No subcategories available</option>
-                                    )}
-                                </select>
+                                    ×
+                                </button>
                             </div>
-                            <div className="form-group">
-                                <label>Name <span className="required">*</span></label>
-                                <input
-                                    type="text"
-                                    value={newItem.name}
-                                    onChange={handleNameChange}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Serial No <span className="required">*</span>.</label>
-                                <input
-                                    type="text"
-                                    value={newItem.serialNo}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        serialNo: e.target.value
-                                    })}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Purchase Date <span className="required">*</span></label>
-                                <input
-                                    type="date"
-                                    value={newItem.purchaseDate}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        purchaseDate: e.target.value
-                                    })}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Purchase Cost <span className="required">*</span></label>
-                                <input
-                                    type="number"
-                                    value={newItem.purchaseCost}
-                                    min={1}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        purchaseCost: e.target.value
-                                    })}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Notes</label>
-                                <textarea
-                                    value={newItem.notes}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        notes: e.target.value
-                                    })}
-                                />
-                            </div>
-                            <button type="submit" className="done-button">
-                                Done
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {showAddConsumableModal && (
-                <div className="modal-backdrop">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h2>Add new Consumable Item</h2>
-                            <button 
-                                className="close-button"
-                                onClick={() => setShowAddConsumableModal(false)}
-                            >
-                                ×
-                            </button>
-                        </div>
-                        <form onSubmit={handleSubmitItem}>
-                            <div className="form-group">
-                                <label>Add Image</label>
-                                <div className="image-upload-box">
-                                    {newItem.image ? (
-                                        <img 
-                                            src={typeof newItem.image === 'string' ? newItem.image : URL.createObjectURL(newItem.image)} 
-                                            alt="Preview" 
-                                            className="image-preview"
-                                        />
-                                    ) : (
-                                        <div className="upload-placeholder">
-                                            <span>+</span>
-                                        </div>
-                                    )}
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => setNewItem({
-                                            ...newItem,
-                                            image: e.target.files[0]
-                                        })}
-                                    />
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <input type="text" value="Consumable" readOnly hidden />
-                            </div>
-                            <div className="form-group">
-                                <label>Sub-category</label>
-                                <select
-                                    value={newItem.subCategory}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        subCategory: e.target.value
-                                    })}
-                                >
-                                    <option value="">None</option>
-                                    {category?.subCategories?.length > 0 && (
-                                        category.subCategories.map((sub, index) => (
-                                            <option key={index} value={sub.name}>
-                                                {sub.name}
-                                            </option>
-                                        ))
-                                    )}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label>ID</label>
-                                <input
-                                    type="text"
-                                    value={newItem.id}
-                                    onChange={handleIdChange}
-                                    placeholder="Enter item ID to search"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Name <span className="required">*</span></label>
-                                <input
-                                    type="text"
-                                    value={newItem.name}
-                                    onChange={handleNameChange}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Purchase Date <span className="required">*</span></label>
-                                <input
-                                    type="date"
-                                    value={newItem.purchaseDate}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        purchaseDate: e.target.value
-                                    })}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Purchase Cost <span className="required">*</span></label>
-                                <input
-                                    type="number"
-                                    value={newItem.purchaseCost}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        purchaseCost: e.target.value
-                                    })}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Qty <span className="required">*</span></label>
-                                <input
-                                    type="number"
-                                    min={1}
-                                    value={newItem.qty}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        qty: e.target.value
-                                    })}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Notes</label>
-                                <textarea
-                                    value={newItem.notes}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        notes: e.target.value
-                                    })}
-                                />
-                            </div>
-                            <button type="submit" className="done-button">
-                                Done
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
-            <div className="items-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Item</th>
-                            <th>Serial No.</th>
-                            <th>Sub-category</th>
-                            <th>Status</th>
-                            <th>Check-in/Check-out</th>
-                            <th>Assigned To</th>
-                            <th>Approved By</th>
-                            <th>Date</th>
-                            <th>Stock</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {getFilteredItems().map((item) => (
-                            <tr key={item._id}>
-                                <td>{item.id}</td>
-                                <td 
-                                    onClick={() => handleItemClick(item)}
-                                    style={{ cursor: 'pointer' }}
-                                    className="item-name-cell"
-                                >
-                                    {item.name}
-                                </td>
-                                <td>{item.serialNo}</td>
-                                <td>{item.subCategory || 'N/A'}</td>
-                                <td>
-                                    <span className={`status-badge ${item.status ? item.status.toLowerCase().replace(' ', '-') : ''}`}>
-                                        {item.status || 'Good Condition'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span className={`availability-badge ${item.availability === 'Check-in' ? 'check-in' : 'check-out'}`}>
-                                        {item.availability}
-                                    </span>
-                                </td>
-                                <td>{borrowings[item._id]?.borrower || '-'}</td>
-                                <td>{borrowings[item._id]?.receiptData?.approvedBy || '-'}</td>
-                                <td>{borrowings[item._id]?.borrowDate ? new Date(borrowings[item._id].borrowDate).toLocaleDateString() : '-'}</td>
-                                <td>{item.qty}</td>
-                                <td className="actions-cell">
-                                    <div className="action-buttons-container">
-                                        {item.itemType !== 'Consumable' && (
+                            <form onSubmit={handleSubmitItem}>
+                                <div className="form-group">
+                                    <label>Add Image</label>
+                                    <div className="image-upload-box">
+                                        {newItem.image ? (
                                             <img 
-                                                src="/table-imgs/edit.svg" 
-                                                alt="Edit" 
-                                                className="action-icon"
-                                                onClick={() => handleEditItem(item)}
-                                                style={{ paddingRight: '8px' }}
+                                                src={URL.createObjectURL(newItem.image)} 
+                                                alt="Preview" 
+                                                className="image-preview"
                                             />
+                                        ) : (
+                                            <div className="upload-placeholder">
+                                                <span>+</span>
+                                            </div>
                                         )}
-                                        <img 
-                                            src={deletingItemId === item._id ? "/table-imgs/spinner.svg" : "/table-imgs/delete.svg"}
-                                            alt="Delete" 
-                                            className="action-icon"
-                                            onClick={() => handleDeleteItem(item)}
-                                            style={{ 
-                                                paddingLeft: item.itemType !== 'Consumable' ? '8px' : '0',
-                                                cursor: deletingItemId === item._id ? 'not-allowed' : 'pointer',
-                                                opacity: deletingItemId === item._id ? 0.5 : 1
-                                            }}
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => setNewItem({
+                                                ...newItem,
+                                                image: e.target.files[0]
+                                            })}
                                         />
                                     </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                                </div>
+                                <div className="form-group">
+                                    <label>Sub-category <span className="required">*</span></label>
+                                    <select
+                                        value={newItem.subCategory}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            subCategory: e.target.value
+                                        })}
+                                        required
+                                    >
+                                        {category?.subCategories?.length > 0 ? (
+                                            category.subCategories.map((sub, index) => (
+                                                <option key={index} value={sub.name}>{sub.name}</option>
+                                            ))
+                                        ) : (
+                                            <option value="">No subcategories available</option>
+                                        )}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Name <span className="required">*</span></label>
+                                    <input
+                                        type="text"
+                                        value={newItem.name}
+                                        onChange={handleNameChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Serial No <span className="required">*</span>.</label>
+                                    <input
+                                        type="text"
+                                        value={newItem.serialNo}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            serialNo: e.target.value
+                                        })}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Purchase Date <span className="required">*</span></label>
+                                    <input
+                                        type="date"
+                                        value={newItem.purchaseDate}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            purchaseDate: e.target.value
+                                        })}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Purchase Cost <span className="required">*</span></label>
+                                    <input
+                                        type="number"
+                                        value={newItem.purchaseCost}
+                                        min={1}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            purchaseCost: e.target.value
+                                        })}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Notes</label>
+                                    <textarea
+                                        value={newItem.notes}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            notes: e.target.value
+                                        })}
+                                    />
+                                </div>
+                                <button type="submit" className="done-button">
+                                    Done
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                )}
 
+                {showAddConsumableModal && (
+                    <div className="modal-backdrop">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2>Add new Consumable Item</h2>
+                                <button 
+                                    className="close-button"
+                                    onClick={() => setShowAddConsumableModal(false)}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            <form onSubmit={handleSubmitItem}>
+                                <div className="form-group">
+                                    <label>Add Image</label>
+                                    <div className="image-upload-box">
+                                        {newItem.image ? (
+                                            <img 
+                                                src={typeof newItem.image === 'string' ? newItem.image : URL.createObjectURL(newItem.image)} 
+                                                alt="Preview" 
+                                                className="image-preview"
+                                            />
+                                        ) : (
+                                            <div className="upload-placeholder">
+                                                <span>+</span>
+                                            </div>
+                                        )}
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => setNewItem({
+                                                ...newItem,
+                                                image: e.target.files[0]
+                                            })}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <input type="text" value="Consumable" readOnly hidden />
+                                </div>
+                                <div className="form-group">
+                                    <label>Sub-category</label>
+                                    <select
+                                        value={newItem.subCategory}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            subCategory: e.target.value
+                                        })}
+                                    >
+                                        <option value="">None</option>
+                                        {category?.subCategories?.length > 0 && (
+                                            category.subCategories.map((sub, index) => (
+                                                <option key={index} value={sub.name}>
+                                                    {sub.name}
+                                                </option>
+                                            ))
+                                        )}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>ID</label>
+                                    <input
+                                        type="text"
+                                        value={newItem.id}
+                                        onChange={handleIdChange}
+                                        placeholder="Enter item ID to search"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Name <span className="required">*</span></label>
+                                    <input
+                                        type="text"
+                                        value={newItem.name}
+                                        onChange={handleNameChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Purchase Date <span className="required">*</span></label>
+                                    <input
+                                        type="date"
+                                        value={newItem.purchaseDate}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            purchaseDate: e.target.value
+                                        })}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Purchase Cost <span className="required">*</span></label>
+                                    <input
+                                        type="number"
+                                        value={newItem.purchaseCost}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            purchaseCost: e.target.value
+                                        })}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Qty <span className="required">*</span></label>
+                                    <input
+                                        type="number"
+                                        min={1}
+                                        value={newItem.qty}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            qty: e.target.value
+                                        })}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Notes</label>
+                                    <textarea
+                                        value={newItem.notes}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            notes: e.target.value
+                                        })}
+                                    />
+                                </div>
+                                <button type="submit" className="done-button">
+                                    Done
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                )}
+                <div className="items-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Item</th>
+                                <th>Serial No.</th>
+                                <th>Sub-category</th>
+                                <th>Status</th>
+                                <th>Check-in/Check-out</th>
+                                <th>Assigned To</th>
+                                <th>Approved By</th>
+                                <th>Date</th>
+                                <th>Stock</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {getFilteredItems().map((item) => (
+                                <tr key={item._id}>
+                                    <td>{item.id}</td>
+                                    <td 
+                                        onClick={() => handleItemClick(item)}
+                                        style={{ cursor: 'pointer' }}
+                                        className="item-name-cell"
+                                    >
+                                        {item.name}
+                                    </td>
+                                    <td>{item.serialNo}</td>
+                                    <td>{item.subCategory || 'N/A'}</td>
+                                    <td>
+                                        <span className={`status-badge ${item.status ? item.status.toLowerCase().replace(' ', '-') : ''}`}>
+                                            {item.status || 'Good Condition'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span className={`availability-badge ${item.availability === 'Check-in' ? 'check-in' : 'check-out'}`}>
+                                            {item.availability}
+                                        </span>
+                                    </td>
+                                    <td>{borrowings[item._id]?.borrower || '-'}</td>
+                                    <td>{borrowings[item._id]?.receiptData?.approvedBy || '-'}</td>
+                                    <td>{borrowings[item._id]?.borrowDate ? new Date(borrowings[item._id].borrowDate).toLocaleDateString() : '-'}</td>
+                                    <td>{item.qty}</td>
+                                    <td className="actions-cell">
+                                        <div className="action-buttons-container">
+                                            {item.itemType !== 'Consumable' && (
+                                                <img 
+                                                    src="/table-imgs/edit.svg" 
+                                                    alt="Edit" 
+                                                    className="action-icon"
+                                                    onClick={() => handleEditItem(item)}
+                                                    style={{ paddingRight: '8px' }}
+                                                />
+                                            )}
+                                            <img 
+                                                src={deletingItemId === item._id ? "/table-imgs/spinner.svg" : "/table-imgs/delete.svg"}
+                                                alt="Delete" 
+                                                className="action-icon"
+                                                onClick={() => handleDeleteItem(item)}
+                                                style={{ 
+                                                    paddingLeft: item.itemType !== 'Consumable' ? '8px' : '0',
+                                                    cursor: deletingItemId === item._id ? 'not-allowed' : 'pointer',
+                                                    opacity: deletingItemId === item._id ? 0.5 : 1
+                                                }}
+                                            />
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
         </div>
     );
 };

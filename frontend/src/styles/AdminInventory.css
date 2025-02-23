@@ -550,6 +550,24 @@
     transition: background-color 0.2s;
   }
   
+  .edit-category-btn {
+    position: absolute;
+    bottom: 13%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px;
+    background-color: transparent;
+    color: #1930ff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 80%;
+    transition: background-color 0.2s;
+  }
+  .edit-category-btn:hover {
+    text-decoration: underline;
+  }
+  
   .delete-category-btn:hover {
     background-color: #cc0000;
   }

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import BottomNav from '../../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import '../../styles/AdminInventory.css';
+import '../../styles/new/staff.css';
 import Navbar from '../../components/NavBar';
 
 const StaffInventory = () => {
@@ -178,48 +177,65 @@ const StaffInventory = () => {
     };
 
     return (
-        <div className="inventory-page">
-            <Navbar hideWelcome={true}/>
-            <header>
-                <h1>Inventory</h1>
-            </header>
+        <div className="staff-page">
+            <div className="staff-container">
+                <div className="welcome-section">
+                    <Navbar hideWelcome={true}/>
+                </div>
 
-            <div className="categories-grid">
-                {categories.map((category) => (
-                    <div 
-                        key={category._id} 
-                        className="category-card"
-                        onClick={() => handleCategoryClick(category.name)}
-                    >
-                        <div className="category-image">
-                            <img 
-                                src={category.image ? 
-                                    category.image : 
-                                    process.env.PUBLIC_URL + "/dashboard-imgs/placeholder.svg"} 
-                                alt={category.name}
-                                onError={(e) => {
-                                    e.target.onerror = null; // Prevent infinite loop
-                                    e.target.src = process.env.PUBLIC_URL + "/dashboard-imgs/placeholder.svg";
-                                }}
-                            />
-                        </div>
-                        <div className="category-info">
-                            <h3>{category.name}</h3>
-                            <p>{category.description}</p>
-                            <button 
-                                className="delete-category-btn"
-                                onClick={(e) => handleDeleteClick(e, category)}
-                            >
-                                Delete
-                            </button>
-                        </div>
+                <header className="staff-header">
+                   
+                </header>
+
+                <div className="staff-section">
+                    <div className="section-header">
+                        <h2>Categories</h2>
                     </div>
-                ))}
-                
-                <div className="category-card new-category" onClick={handleCreateCategory}>
-                    <div className="create-category-content">
-                        <span>+</span>
-                        <span>Create new category</span>
+
+                    <div className="categories-grid">
+                        {categories.map((category) => (
+                            <div 
+                                key={category._id} 
+                                className="category-card"
+                                onClick={() => handleCategoryClick(category.name)}
+                            >
+                                <div className="category-image">
+                                    <img 
+                                        src={getImageUrl(category.image)} 
+                                        alt={category.name}
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = process.env.PUBLIC_URL + "/dashboard-imgs/placeholder.svg";
+                                        }}
+                                    />
+                                </div>
+                                <div className="category-info">
+                                    <h3>{category.name}</h3>
+                                    <p className="category-description">{category.description}</p>
+                                </div>
+                                <button 
+                                    className="edit-button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        // Add edit functionality
+                                    }}
+                                >
+                                    Edit
+                                </button>
+                                <button 
+                                    className="delete-button"
+                                    onClick={(e) => handleDeleteClick(e, category)}
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        ))}
+                        <div className="category-card new-category" onClick={handleCreateCategory}>
+                            <div className="create-category-content">
+                                
+                                <span>Create new category</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
