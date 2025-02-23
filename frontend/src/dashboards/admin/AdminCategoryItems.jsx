@@ -817,31 +817,36 @@ const AdminCategoryItems = () => {
                         <tbody>
                             {getFilteredItems().map((item) => (
                                 <tr key={item._id}>
-                                    <td>{item.id}</td>
+                                    <td data-label="ID">{item.id}</td>
                                     <td 
+                                        data-label="Item"
                                         onClick={() => handleItemClick(item)}
                                         style={{ cursor: 'pointer' }}
                                         className="item-name-cell"
                                     >
                                         {item.name}
                                     </td>
-                                    <td>{item.serialNo}</td>
-                                    <td>{item.subCategory || 'N/A'}</td>
-                                    <td>
+                                    <td data-label="Serial No.">{item.serialNo}</td>
+                                    <td data-label="Sub-category">{item.subCategory || 'N/A'}</td>
+                                    <td data-label="Status">
                                         <span className={`status-badge ${item.status ? item.status.toLowerCase().replace(' ', '-') : ''}`}>
                                             {item.status || 'Good Condition'}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td data-label="Check-in/Check-out">
                                         <span className={`availability-badge ${item.availability === 'Check-in' ? 'check-in' : 'check-out'}`}>
                                             {item.availability}
                                         </span>
                                     </td>
-                                    <td>{borrowings[item._id]?.borrower || '-'}</td>
-                                    <td>{borrowings[item._id]?.receiptData?.approvedBy || '-'}</td>
-                                    <td>{borrowings[item._id]?.borrowDate ? new Date(borrowings[item._id].borrowDate).toLocaleDateString() : '-'}</td>
-                                    <td>{item.qty}</td>
-                                    <td className="actions-cell">
+                                    <td data-label="Assigned To">{borrowings[item._id]?.borrower || '-'}</td>
+                                    <td data-label="Approved By">{borrowings[item._id]?.receiptData?.approvedBy || '-'}</td>
+                                    <td data-label="Date">
+                                        {borrowings[item._id]?.borrowDate 
+                                            ? new Date(borrowings[item._id].borrowDate).toLocaleDateString() 
+                                            : '-'}
+                                    </td>
+                                    <td data-label="Stock">{item.qty}</td>
+                                    <td data-label="Action" className="actions-cell">
                                         <div className="action-buttons-container">
                                             {item.itemType !== 'Consumable' && (
                                                 <img 

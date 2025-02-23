@@ -6,6 +6,7 @@ import ItemInformation from '../../components/ItemInformation';
 import '../../styles/ViewItems.css';
 import Navbar from '../../components/NavBar';
 import { toast } from 'react-toastify';
+import { smartSearch, getHighlightedText } from '../../utils/smartSearch';
 
 const StaffInventoryItems = () => {
     const [items, setItems] = useState([]);
@@ -40,6 +41,7 @@ const StaffInventoryItems = () => {
     // New states for search functionality
     const [searchExpanded, setSearchExpanded] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
 
     const navItems = [
         { path: '/staff', icon: 'home', label: 'Home' },
@@ -79,14 +81,20 @@ const StaffInventoryItems = () => {
 
     // Filter items based on the search term
     const getFilteredItems = () => {
-        if (!searchTerm) return items;
-        return items.filter((item) => {
-            const matchName =
-                item.name?.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchId =
-                item.id?.toLowerCase().includes(searchTerm.toLowerCase());
-            return matchName || matchId;
-        });
+        if (!searchTerm || searchTerm.trim() === '') return items;
+        return smartSearch(items, searchTerm);
+    };
+
+    const renderHighlightedText = (text, searchTerm) => {
+        if (!searchTerm || searchTerm.trim() === '') return text;
+        const { parts, hasMatch } = getHighlightedText(text, searchTerm);
+        if (!hasMatch) return text;
+
+        return parts.map((part, index) => (
+            part.toLowerCase() === searchTerm.toLowerCase() ? (
+                <span key={index} className="highlight">{part}</span>
+            ) : part
+        ));
     };
 
     const handleBack = () => {
@@ -336,7 +344,10 @@ const StaffInventoryItems = () => {
                                 />
                             </div>
                             <div className="item-info">
-                                <h3>{item.name}</h3>
+                                <div className="item-details">
+                                    <h3>{renderHighlightedText(item.name, searchTerm)}</h3>
+                                    <p>ID: {renderHighlightedText(item.id, searchTerm)}</p>
+                                </div>
                                 <p className="sub-category">{item.subCategory || 'Sub category here'}</p>
                                 <p className="item-status">Status: {item.status}</p>
                                 <p className="item-quantity">Quantity: {item.qty}</p>

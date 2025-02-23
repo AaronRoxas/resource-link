@@ -1257,15 +1257,15 @@
     transform: scale(1.05);
 }
 
-/* Table Styles */
+/* Items Table Design for All Screens */
 .items-table {
     width: 100%;
     border-collapse: collapse;
     background: white;
     border-radius: 8px;
-    overflow: hidden;
+    overflow-x: auto; /* allows horizontal scroll on smaller screens */
     margin-top: 20px;
-    table-layout: fixed;
+    table-layout: auto;
 }
 
 .items-table th,
@@ -1279,213 +1279,7 @@
     text-overflow: ellipsis;
 }
 
-/* Column widths */
-.items-table th:nth-child(1), /* ID */
-.items-table td:nth-child(1) {
-    width: 8%;
-}
-
-.items-table th:nth-child(2), /* Item */
-.items-table td:nth-child(2) {
-    width: 12%;
-}
-
-.items-table th:nth-child(3), /* Serial No. */
-.items-table td:nth-child(3) {
-    width: 10%;
-}
-
-.items-table th:nth-child(4), /* Sub-category */
-.items-table td:nth-child(4) {
-    width: 12%;
-}
-
-.items-table th:nth-child(5), /* Status */
-.items-table td:nth-child(5) {
-    width: 10%;
-}
-
-.items-table th:nth-child(6), /* Check-in/Check-out */
-.items-table td:nth-child(6) {
-    width: 12%;
-}
-
-.items-table th:nth-child(7), /* Assigned To */
-.items-table td:nth-child(7) {
-    width: 10%;
-}
-
-.items-table th:nth-child(8), /* Approved By */
-.items-table td:nth-child(8) {
-    width: 10%;
-}
-
-.items-table th:nth-child(9), /* Date */
-.items-table td:nth-child(9) {
-    width: 8%;
-}
-
-.items-table th:nth-child(10), /* Stock */
-.items-table td:nth-child(10) {
-    width: 8%;
-    text-align: center;
-}
-
-.items-table th:last-child, /* Action */
-.items-table td:last-child {
-    width: 100px;
-    text-align: center;
-}
-
-.items-table th {
-    background-color: #f8f9fa;
-    font-weight: 600;
-    color: #333;
-    padding: 10px 12px;
-}
-
-.items-table tr:hover {
-    background-color: #f8f9fa;
-}
-
-.items-table td {
-    color: #666;
-}
-
-.items-table .status-cell {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.items-table .action-cell {
-    display: flex;
-    gap: 4px;
-    justify-content: center;
-}
-
-.action-button {
-    padding: 4px 8px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.2s;
-    min-width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Filter Modal */
-
-.filter-content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 400px;
-}
-
-.filter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.filter-header h2 {
-    margin: 0;
-    font-size: 18px;
-}
-
-.filter-close {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-.filter-group {
-    margin-bottom: 15px;
-}
-
-.filter-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: #666;
-}
-
-.filter-group select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.filter-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.filter-button {
-    padding: 8px 16px;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.filter-button.clear {
-    background: #f5f5f5;
-    border: 1px solid #ddd;
-}
-
-.filter-button.apply {
-    background: #2196F3;
-    color: white;
-    border: none;
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-    .expanded-search {
-        width: 100%;
-    }
-    
-    .expanded-search input {
-        width: 100%;
-    }
-
-    .header-icon {
-        width: 32px;
-        height: 32px;
-        padding: 6px;
-    }
-
-    .items-table th {
-        display: none;
-    }
-
-    .items-table td {
-        display: block;
-        padding: 8px 12px;
-    }
-
-    .items-table td:before {
-        content: attr(data-label);
-        font-weight: 600;
-        margin-right: 8px;
-    }
-
-    .action-cell {
-        justify-content: flex-start;
-    }
-}
+/* No Media Query Transform - Full table design preserved for all screen sizes */
 
 /* Add User Styles */
 .add-user-container {
