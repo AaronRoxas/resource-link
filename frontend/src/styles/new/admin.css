@@ -536,6 +536,14 @@
     cursor: pointer;
     padding: 0;
 }
+.category-form-group input{
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  padding: 8px 12px;
+  width: 100%;
+  margin-bottom: 10px;
+}
 
 .category-image-upload {
     display: flex;
@@ -1361,7 +1369,7 @@
   color: #007bff;
 }
 
-.add-user-container .create-button {
+.add-user-container .create-button, .category-create-button {
   width: 100%;
   padding: 12px;
   background-color: #4188FF;
@@ -1424,7 +1432,7 @@
 }
 
 /* Add User Modal Styles */
-.add-user-modal {
+.add-user-modal, .manage-user-modal {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -1438,7 +1446,7 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.add-user-modal .close-button {
+.add-user-modal .close-button, .manage-user-modal .close-button {
   position: absolute;
   top: 16px;
   right: 16px;
@@ -1502,7 +1510,7 @@
   font-size: 14px;
 }
 
-.add-user-modal .create-button {
+.add-user-modal .create-button,.edit-actions .save-button {
   width: 100%;
   padding: 12px;
   background: #4188FF;
@@ -1514,6 +1522,34 @@
   margin-top: 24px;
   transition: background 0.2s;
 }
+
+.edit-actions .cancel-button{
+  width: 100%;
+  padding: 12px;
+  background: rgb(252, 95, 95);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  margin: 14px 0px;
+  transition: background 0.2s;
+}
+
+.delete-actions .cancel-button {
+  width: 100%;
+  padding: 12px;
+  background: #dfdfdf;
+  color: rgb(0, 0, 0);
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: background 0.2s;
+}
+
+
 
 .add-user-modal .create-button:hover {
   background: #3672db;

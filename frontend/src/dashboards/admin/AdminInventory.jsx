@@ -212,54 +212,65 @@ const AdminInventory = () => {
 
             {/* Create Category Modal */}
             {showModal && (
-                <div className="modal-backdrop">
-                    <div className="modal-container">
-                        <div className="modal-header">
+                <div className="category-modal-backdrop">
+                    <div className="category-form-container">
+                        <div className="category-form-header">
                             <h2>Create new category</h2>
+                            <button className="category-close-button" onClick={handleCloseModal}>×</button>
                         </div>
-                        <form onSubmit={handleSubmitCategory} className="modal-form">
-                            <div className="image-upload-container">
-                                <label htmlFor="categoryImage" className="image-upload-label">
-                                    {imagePreview ? (
-                                        <img src={imagePreview} alt="Category preview" />
-                                    ) : (
-                                        <span className="plus-icon">+</span>
-                                    )}
-                                </label>
+                        <form onSubmit={handleSubmitCategory}>
+                            <div className="category-image-upload">
                                 <input
-                                    id="categoryImage"
                                     type="file"
+                                    id="categoryImage"
                                     accept="image/*"
                                     onChange={handleImageSelect}
                                     style={{ display: 'none' }}
                                 />
+                                <label htmlFor="categoryImage" className="category-upload-placeholder">
+                                    {imagePreview ? (
+                                        <img 
+                                            src={imagePreview} 
+                                            alt="Category preview" 
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                    ) : (
+                                        <>
+                                            <span className="category-plus-icon">+</span>
+                                        </>
+                                    )}
+                                </label>
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="categoryName">Name <span className="required">*</span></label>
+                            
+                            <div className="category-form-group">
+                                <label>Name <span className="required">*</span></label>
                                 <input
-                                    id="categoryName"
                                     type="text"
                                     value={newCategory.name}
-                                    onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+                                    onChange={(e) => setNewCategory({
+                                        ...newCategory,
+                                        name: e.target.value
+                                    })}
                                     required
                                 />
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="categoryDescription">Description</label>
+                            <div className="category-form-group">
+                                <label>Description</label>
                                 <input
-                                    id="categoryDescription"
                                     type="text"
                                     value={newCategory.description}
-                                    onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
+                                    onChange={(e) => setNewCategory({
+                                        ...newCategory,
+                                        description: e.target.value
+                                    })}
                                 />
                             </div>
-                            <button type="submit" className="create-button">Create</button>
-                            <button type="button" className="cancel-button" onClick={handleCloseModal}>Cancel</button>
+
+                            <button type="submit" className="category-create-button">Create</button>
                         </form>
                     </div>
                 </div>
             )}
-
             {/* Delete Confirmation Modal */}
             {showDeleteModal && (
                 <div className="modal-backdrop">

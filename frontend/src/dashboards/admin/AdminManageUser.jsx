@@ -327,13 +327,12 @@ const AdminManageUser = () => {
         <div className="manage-user-modal">
           <div className="manage-user-modal-content">
             <div className="manage-user-modal-header">
-              <button onClick={() => setShowDeleteModal(false)}>✕</button>
             </div>
             <div className="delete-confirmation">
               <h3>Are you sure you want to delete <u>{userToDelete?.first_name} {userToDelete?.last_name}</u>?</h3>
               <div className="delete-actions">
-                <button className="cancel-button" onClick={() => setShowDeleteModal(false)}>Cancel</button>
                 <button className="delete-button" onClick={handleDeleteConfirm}>Delete</button>
+                <button className="cancel-button" onClick={() => setShowDeleteModal(false)}>Cancel</button>
               </div>
             </div>
           </div>
@@ -344,7 +343,6 @@ const AdminManageUser = () => {
         <div className="manage-user-modal">
           <div className="manage-user-modal-content">
             <div className="manage-user-modal-header">
-              <button onClick={() => setShowEditModal(false)}>✕</button>
             </div>
             <div className="edit-user-form">
               <h3>Edit User</h3>
@@ -384,8 +382,8 @@ const AdminManageUser = () => {
                 </select>
               </div>
               <div className="edit-actions">
-                <button className="cancel-button" onClick={() => setShowEditModal(false)}>Cancel</button>
                 <button className="save-button" onClick={handleEditSubmit}>Save Changes</button>
+                <button className="cancel-button" onClick={() => setShowEditModal(false)}>Cancel</button>
               </div>
               <div className="reset-password-link">
                 <a 

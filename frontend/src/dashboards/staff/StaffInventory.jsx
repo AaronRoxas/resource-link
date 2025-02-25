@@ -231,8 +231,8 @@ const StaffInventory = () => {
                             </div>
                         ))}
                         <div className="category-card new-category" onClick={handleCreateCategory}>
-                            <div className="create-category-content">
-                                
+                            <div className="new-category-content">
+                                <span class="plus-icon">+</span>
                                 <span>Create new category</span>
                             </div>
                         </div>
