@@ -97,7 +97,10 @@ const NavBar = ({ hideWelcome }) => {
     <>
       <ToastContainer />
       <NavContainer>
-        <LogoImg src="/onboard-imgs/second-logo.png" alt="Logo"   />
+        <LogoContainer>
+          <LogoImg src="/onboard-imgs/second-logo.png" alt="Logo" />
+          <LogoText>ResourceLink</LogoText>
+        </LogoContainer>
         <ProfileContainer>
           <ProfilePic 
             src="/dashboard-imgs/profile-placeholder.svg" 
@@ -235,15 +238,29 @@ const NavContainer = styled.nav`
   z-index: 1000;
 `
 
-const LogoImg = styled.img`
-  height: 30px;
-  width: auto;
+const LogoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
   cursor: pointer;
+  padding: 15px 40px;
+`
+
+const LogoImg = styled.img`
+  height: 45px;
+  width: 45px;
+`
+
+const LogoText = styled.span`
+  color: #007bff;
+  font-size: 24px;
+  font-weight: bold;
 `
 
 const ProfileContainer = styled.div`
   position: relative;
   cursor: pointer;
+  Apadding: 15px 40px;
 `
 
 const ProfilePic = styled.img`
@@ -251,6 +268,7 @@ const ProfilePic = styled.img`
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+
 `
 
 const DropdownMenu = styled.div`

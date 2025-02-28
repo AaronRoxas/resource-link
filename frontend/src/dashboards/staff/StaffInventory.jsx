@@ -10,9 +10,15 @@ const StaffInventory = () => {
     const [categoryItemCounts, setCategoryItemCounts] = useState({});
     const [showModal, setShowModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [newCategory, setNewCategory] = useState({
         name: ''
+    });
+    const [editCategory, setEditCategory] = useState({
+        name: '',
+        description: '',
+        image: ''
     });
     const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
@@ -62,6 +68,13 @@ const StaffInventory = () => {
         setImagePreview(null);
     };
 
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
+        setEditCategory({ name: '', description: '', image: '' });
+        setSelectedImage(null);
+        setImagePreview(null);
+    };
+
     const handleImageSelect = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -78,6 +91,18 @@ const StaffInventory = () => {
             };
             reader.readAsDataURL(file);
         }
+    };
+    
+    const handleEditClick = (e, category) => {
+        e.stopPropagation();
+        setSelectedCategory(category);
+        setEditCategory({
+            name: category.name,
+            description: category.description || '',
+            image: category.image || ''
+        });
+        setImagePreview(getImageUrl(category.image));
+        setShowEditModal(true);
     };
 
     const handleSubmitCategory = async (e) => {
@@ -106,6 +131,37 @@ const StaffInventory = () => {
         } catch (error) {
             console.error('Error creating category:', error.response?.data || error);
             toast.error(error.response?.data?.message || 'Failed to create category. Please try again.');
+        }
+    };
+    
+    const handleUpdateCategory = async (e) => {
+        e.preventDefault();
+        try {
+            // Prepare the update data
+            const categoryData = {
+                name: editCategory.name,
+                description: editCategory.description || '',
+                image: selectedImage ? (selectedImage.startsWith('data:') ? selectedImage : `data:image/jpeg;base64,${selectedImage}`) : editCategory.image,
+                subCategories: selectedCategory.subCategories
+            };
+
+            const response = await axios.put(
+                `https://resource-link-main-14c755858b60.herokuapp.com/api/categories/${selectedCategory._id}`,
+                categoryData,
+                { 
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            
+            await fetchCategories();
+            handleCloseEditModal();
+            toast.success('Category updated successfully');
+        } catch (error) {
+            console.error('Error updating category:', error.response?.data || error);
+            toast.error(error.response?.data?.message || 'Failed to update category. Please try again.');
         }
     };
 
@@ -215,10 +271,7 @@ const StaffInventory = () => {
                                 </div>
                                 <button 
                                     className="edit-button"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        // Add edit functionality
-                                    }}
+                                    onClick={(e) => handleEditClick(e, category)}
                                 >
                                     Edit
                                 </button>
@@ -331,6 +384,67 @@ const StaffInventory = () => {
                                 </button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {showEditModal && selectedCategory && (
+                <div className="category-modal-backdrop">
+                    <div className="category-form-container">
+                        <div className="category-form-header">
+                            <h2>Edit Category</h2>
+                            <button className="category-close-button" onClick={handleCloseEditModal}>×</button>
+                        </div>
+                        <form onSubmit={handleUpdateCategory}>
+                            <div className="category-image-upload">
+                                <input
+                                    type="file"
+                                    id="editCategoryImage"
+                                    accept="image/*"
+                                    onChange={handleImageSelect}
+                                    style={{ display: 'none' }}
+                                />
+                                <label htmlFor="editCategoryImage" className="category-upload-placeholder">
+                                    {imagePreview ? (
+                                        <img 
+                                            src={imagePreview} 
+                                            alt="Category preview" 
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                    ) : (
+                                        <>
+                                            <span className="category-plus-icon">+</span>
+                                        </>
+                                    )}
+                                </label>
+                            </div>
+                            
+                            <div className="category-form-group">
+                                <label>Name <span className="required">*</span></label>
+                                <input
+                                    type="text"
+                                    value={editCategory.name}
+                                    onChange={(e) => setEditCategory({
+                                        ...editCategory,
+                                        name: e.target.value
+                                    })}
+                                    required
+                                />
+                            </div>
+                            <div className="category-form-group">
+                                <label>Description</label>
+                                <input
+                                    type="text"
+                                    value={editCategory.description}
+                                    onChange={(e) => setEditCategory({
+                                        ...editCategory,
+                                        description: e.target.value
+                                    })}
+                                />
+                            </div>
+
+                            <button type="submit" className="category-create-button">Update</button>
+                        </form>
                     </div>
                 </div>
             )}

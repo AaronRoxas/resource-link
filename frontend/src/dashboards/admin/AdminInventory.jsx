@@ -24,6 +24,67 @@ const AdminInventory = () => {
         fetchItemCounts();
     }, []);
 
+    // Start of Edit Modal
+
+    const [editCategory, setEditCategory] = useState({
+        name: '',
+        description: '',
+        image: ''
+    });
+    const [showEditModal, setShowEditModal] = useState(false);
+    const handleUpdateCategory = async (e) => {
+        e.preventDefault();
+        try {
+            // Prepare the update data
+            const categoryData = {
+                name: editCategory.name,
+                description: editCategory.description || '',
+                image: selectedImage ? (selectedImage.startsWith('data:') ? selectedImage : `data:image/jpeg;base64,${selectedImage}`) : editCategory.image,
+                subCategories: selectedCategory.subCategories
+            };
+
+            const response = await axios.put(
+                `https://resource-link-main-14c755858b60.herokuapp.com/api/categories/${selectedCategory._id}`,
+                categoryData,
+                { 
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            
+            await fetchCategories();
+            handleCloseEditModal();
+            toast.success('Category updated successfully');
+        } catch (error) {
+            console.error('Error updating category:', error.response?.data || error);
+            toast.error(error.response?.data?.message || 'Failed to update category. Please try again.');
+        }
+    };
+
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
+        setEditCategory({ name: '', description: '', image: '' });
+        setSelectedImage(null);
+        setImagePreview(null);
+    };
+
+    const handleEditClick = (e, category) => {
+        e.stopPropagation();
+        setSelectedCategory(category);
+        setEditCategory({
+            name: category.name,
+            description: category.description || '',
+            image: category.image || ''
+        });
+        setImagePreview(getImageUrl(category.image));
+        setShowEditModal(true);
+    };
+
+
+
+    // End of Edit Modal
     const fetchCategories = async () => {
         try {
             const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/categories', {
@@ -185,8 +246,7 @@ const AdminInventory = () => {
                                 <button 
                                     className="edit-button"
                                     onClick={(e) => {
-                                        e.stopPropagation();
-                                        // TODO: Add edit functionality
+                                        handleEditClick(e, category);
                                     }}
                                 >
                                     Edit
@@ -209,6 +269,67 @@ const AdminInventory = () => {
                     </div>
                 </div>
             </div>
+
+            {showEditModal && selectedCategory && (
+                <div className="category-modal-backdrop">
+                    <div className="category-form-container">
+                        <div className="category-form-header">
+                            <h2>Edit Category</h2>
+                            <button className="category-close-button" onClick={handleCloseEditModal}>×</button>
+                        </div>
+                        <form onSubmit={handleUpdateCategory}>
+                            <div className="category-image-upload">
+                                <input
+                                    type="file"
+                                    id="editCategoryImage"
+                                    accept="image/*"
+                                    onChange={handleImageSelect}
+                                    style={{ display: 'none' }}
+                                />
+                                <label htmlFor="editCategoryImage" className="category-upload-placeholder">
+                                    {imagePreview ? (
+                                        <img 
+                                            src={imagePreview} 
+                                            alt="Category preview" 
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                    ) : (
+                                        <>
+                                            <span className="category-plus-icon">+</span>
+                                        </>
+                                    )}
+                                </label>
+                            </div>
+                            
+                            <div className="category-form-group">
+                                <label>Name <span className="required">*</span></label>
+                                <input
+                                    type="text"
+                                    value={editCategory.name}
+                                    onChange={(e) => setEditCategory({
+                                        ...editCategory,
+                                        name: e.target.value
+                                    })}
+                                    required
+                                />
+                            </div>
+                            <div className="category-form-group">
+                                <label>Description</label>
+                                <input
+                                    type="text"
+                                    value={editCategory.description}
+                                    onChange={(e) => setEditCategory({
+                                        ...editCategory,
+                                        description: e.target.value
+                                    })}
+                                />
+                            </div>
+
+                            <button type="submit" className="category-create-button">Update</button>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             {/* Create Category Modal */}
             {showModal && (

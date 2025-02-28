@@ -82,7 +82,7 @@ const WithdrawReceipt = ({ item, onClose }) => {
                         <div>
                             <h4>{item.itemId?.name}</h4>
                             <p>{item.itemId?.category}</p>
-                            <p>Quantity: {item.quantity}</p>
+                            <p>Qty: {item.receiptData?.qty}</p>
                         </div>
                     </div>
                 </div>
@@ -129,9 +129,15 @@ const TeacherInventory = () => {
                 console.log('Borrowed Items:', borrowingsRes.data);
                 console.log('Withdrawals:', withdrawalsRes.data);
                 
+                // Log a sample withdrawal to see its structure
+                if (withdrawalsRes.data.length > 0) {
+                    console.log('Sample Withdrawal Item:', withdrawalsRes.data[0]);
+                }
+                
                 // Map the status from withdrawals to match the receipt data structure
                 const formattedWithdrawals = withdrawalsRes.data.map(withdrawal => ({
                     ...withdrawal,
+                    type: 'withdrawal', // Add type property to identify withdrawals
                     receiptData: {
                         ...withdrawal.receiptData,
                         status: withdrawal.status // Use the status from the withdrawal model
@@ -173,6 +179,15 @@ const TeacherInventory = () => {
     const currentUser = localStorage.getItem('first_name') + ' ' + localStorage.getItem('last_name');
 
     const handleItemClick = (item) => {
+        // Determine if this is a withdrawal based on properties
+        if (!item.type) {
+            // If type is not set, check for withdrawal-specific properties
+            if (item.receiptData?.qty && !item.borrowDate) {
+                item.type = 'withdrawal';
+            } else {
+                item.type = 'borrowing';
+            }
+        }
         setSelectedItem(item);
     };
 
@@ -274,9 +289,9 @@ const TeacherInventory = () => {
             </header>
 
             <div className="borrowed-items-grid">
-                {/* Show borrowed items */}
+                {/* Show borrowed items and withdrawals */}
                 {paginate([
-                    ...filterItems(borrowedItems.filter(item => item.borrower === currentUser), 'borrowing'),
+                    ...filterItems(borrowedItems.filter(item => item.borrower === currentUser).map(item => ({...item, type: 'borrowing'})), 'borrowing'),
                     ...filterItems(withdrawals.filter(item => item.borrower === currentUser), 'withdrawal')
                 ]).map(item => (
                     <div 
@@ -291,13 +306,28 @@ const TeacherInventory = () => {
                             <h3>{item.itemId ? item.itemId.name : 'Item not found'}</h3>
                             <p className="category">
                                 {item.itemId ? item.itemId.category : 'Category not found'}
+                                {item.type === 'withdrawal' && ` • Qty: ${item.receiptData?.qty}`}
                             </p>
                             <div className="borrow-details">
-                                <p><b>Borrow request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
-                                <p>{item.receiptData?.status?.toLowerCase() === 'on-going' 
-                                    ? 'Borrowed On: ' 
-                                    : 'Borrow On: '}{new Date(item.borrowDate).toLocaleDateString()}</p>
-                                <p>Return On: {new Date(item.returnDate).toLocaleDateString()}</p>
+                                {item.type === 'withdrawal' ? (
+                                    <>
+                                        <p><b>Withdraw request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
+                                        <p>Date: {new Date(item.createdAt).toLocaleDateString()}</p>
+                                        <p>Time: {new Date(item.createdAt).toLocaleTimeString('en-US', {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: true
+                                        })}</p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p><b>Borrow request ID: {item.receiptData?.requestId?.slice(0, 10)}</b></p>
+                                        <p>{item.receiptData?.status?.toLowerCase() === 'on-going' 
+                                            ? 'Borrowed On: ' 
+                                            : 'Borrow On: '}{new Date(item.borrowDate).toLocaleDateString()}</p>
+                                        <p>Return On: {new Date(item.returnDate).toLocaleDateString()}</p>
+                                    </>
+                                )}
                                 <span className={`status-pill ${getStatus(item)}`}>
                                     {formatStatus(getStatus(item))}
                                 </span>
@@ -318,7 +348,7 @@ const TeacherInventory = () => {
             {/* Add pagination controls */}
             <div className="pagination">
                 {Array.from({ length: Math.ceil(
-                    (filterItems(borrowedItems.filter(item => item.borrower === currentUser), 'borrowing').length +
+                    (filterItems(borrowedItems.filter(item => item.borrower === currentUser).map(item => ({...item, type: 'borrowing'})), 'borrowing').length +
                     filterItems(withdrawals.filter(item => item.borrower === currentUser), 'withdrawal').length) 
                     / itemsPerPage
                 )}).map((_, index) => (

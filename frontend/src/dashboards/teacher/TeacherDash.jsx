@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Footer from '../../components/Footer'
+
 const TeacherDash = () => {
   const navigate = useNavigate()
   const [categories, setCategories] = useState([])
@@ -37,12 +38,14 @@ const TeacherDash = () => {
   const navItems = [
     { path: '/teacher', icon: 'active-home', label: 'Home' },
     { path: '/teacherInventory', icon: 'cube', label: 'Inventory' },
-];
+  ];
+
   return (
     <div className="teacher-dash-container">
       <div className="teacher-dash-content">
         <NavBar/>
         
+
         <div className="teacher-dash-header">
           <div className="teacher-dash-search-wrapper">
             <input 

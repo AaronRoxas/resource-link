@@ -43,6 +43,9 @@ const StaffInventoryItems = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
 
+    const [showEditSubCategoryModal, setShowEditSubCategoryModal] = useState(false);
+    const [editingSubCategory, setEditingSubCategory] = useState(null);
+
     const navItems = [
         { path: '/staff', icon: 'home', label: 'Home' },
         { path: '/qr', icon: 'qr', label: '' },
@@ -268,6 +271,41 @@ const StaffInventoryItems = () => {
         }
     };
 
+    const handleEditSubCategory = (subCategory) => {
+        setEditingSubCategory(subCategory);
+        setShowEditSubCategoryModal(true);
+    };
+
+    const handleDeleteSubCategory = async (subCategoryName) => {
+        try {
+            await axios.delete(
+                `https://resource-link-main-14c755858b60.herokuapp.com/api/categories/${category._id}/subcategories/${subCategoryName}`
+            );
+            toast.success('Subcategory deleted successfully!');
+            fetchCategoryItems();
+        } catch (error) {
+            console.error('Error deleting subcategory:', error);
+            toast.error('Failed to delete subcategory');
+        }
+    };
+
+    const handleSubmitEditSubCategory = async (e) => {
+        e.preventDefault();
+        try {
+            await axios.put(
+                `https://resource-link-main-14c755858b60.herokuapp.com/api/categories/${category._id}/subcategories/${editingSubCategory.name}`,
+                { newName: editingSubCategory.newName }
+            );
+            toast.success('Subcategory updated successfully!');
+            setShowEditSubCategoryModal(false);
+            setEditingSubCategory(null);
+            fetchCategoryItems();
+        } catch (error) {
+            console.error('Error updating subcategory:', error);
+            toast.error('Failed to update subcategory');
+        }
+    };
+
     return (
         <div className="view-category-items">
             <Navbar hideWelcome={true}/>
@@ -294,7 +332,7 @@ const StaffInventoryItems = () => {
                             </div>
                         )}
                         <div className="icon-group">
-                        {!searchExpanded && (
+                            {!searchExpanded && (
                                 <img
                                     src="/table-imgs/search.svg"
                                     alt="Search"
@@ -320,7 +358,26 @@ const StaffInventoryItems = () => {
                                     </div>
                                 )}
                             </div>
-
+                            <div className="dropdown-container">
+                                <img 
+                                    src="/table-imgs/edit.svg" 
+                                    alt="Edit Subcategories" 
+                                    className="header-icon"
+                                    onClick={() => setShowEditSubCategoryModal(true)}
+                                />
+                                {showEditSubCategoryModal && (
+                                    <div className="dropdown-menu">
+                                        {category?.subCategories?.map((sub, index) => (
+                                            <button 
+                                                key={index} 
+                                                onClick={() => handleEditSubCategory(sub)}
+                                            >
+                                                {sub.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -760,6 +817,56 @@ const StaffInventoryItems = () => {
                 </div>
             )}
 
+            {showEditSubCategoryModal && editingSubCategory && (
+                <div className="modal-backdrop">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h2>Edit Subcategory</h2>
+                            <button 
+                                className="close-button"
+                                onClick={() => {
+                                    setShowEditSubCategoryModal(false);
+                                    setEditingSubCategory(null);
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <form onSubmit={handleSubmitEditSubCategory}>
+                            <div className="form-group">
+                                <label>Name</label>
+                                <input
+                                    type="text"
+                                    value={editingSubCategory.newName || editingSubCategory.name}
+                                    onChange={(e) => setEditingSubCategory({
+                                        ...editingSubCategory,
+                                        newName: e.target.value
+                                    })}
+                                    required
+                                />
+                            </div>
+                            <div className="form-actions">
+                                <button type="submit" className="update-button">
+                                    Update
+                                </button>
+                                <button 
+                                    type="button" 
+                                    className="delete-button"
+                                    onClick={() => {
+                                        if (window.confirm('Are you sure you want to delete this subcategory?')) {
+                                            handleDeleteSubCategory(editingSubCategory.name);
+                                            setShowEditSubCategoryModal(false);
+                                            setEditingSubCategory(null);
+                                        }
+                                    }}
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -88,12 +88,14 @@
 .users-table-container {
     background: white;
     border-radius: 10px;
-    overflow: hidden;
+    overflow-x: auto;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS devices */
 }
 
 .users-table {
     width: 100%;
+    min-width: 800px; /* Ensure table maintains minimum width on mobile */
     border-collapse: collapse;
 }
 
@@ -1549,18 +1551,40 @@
   transition: background 0.2s;
 }
 
-
-
-.add-user-modal .create-button:hover {
-  background: #3672db;
+.subcategory-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
 }
 
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.update-button {
+    padding: 0.5rem 1rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-button {
+    padding: 0.5rem 1rem;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.update-button:hover {
+    background-color: #45a049;
+}
+
+.delete-button:hover {
+    background-color: #da190b;
 }
