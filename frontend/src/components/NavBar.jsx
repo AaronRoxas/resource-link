@@ -18,7 +18,6 @@ const NavBar = ({ hideWelcome }) => {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     navigate('/home', { replace: true });
