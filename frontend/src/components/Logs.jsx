@@ -55,7 +55,8 @@ const Logs = () => {
       'added': 'action-added',
       'pending': 'action-pending',
       'updated': 'action-updated',
-      'withdraw': 'action-checkout'
+      'withdraw': 'action-checkout',
+      'declined': 'action-declined'
     };
     return styles[action.toLowerCase()] || '';
   };

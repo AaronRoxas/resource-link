@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../../styles/new/staff.css'
+import '../../styles/new/components.css';
 import QrScanner from 'react-qr-scanner';
 import ItemInformation from '../../components/ItemInformation';
 import { useNavigate, useLocation } from 'react-router-dom';
 import NavBar from '../../components/NavBar';
-
+import { checkDefaultPassword } from '../../services/authServices';
+import PasswordChangeModal from '../../components/PasswordChangeModal';
 
 const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -28,6 +30,8 @@ const StaffDash = () => {
   const [withdrawRequests, setWithdrawRequests] = useState([]);
   const [claimDate, setClaimDate] = useState('');
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [isDefaultPassword, setIsDefaultPassword] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   const fetchBorrowings = async () => {
     try {
@@ -58,8 +62,12 @@ const StaffDash = () => {
 
   useEffect(() => {
     fetchBorrowings();
-    fetchActivities();
     fetchWithdrawRequests();
+    fetchActivities();
+  }, []);
+
+  useEffect(() => {
+    checkForDefaultPassword();
   }, []);
 
   useEffect(() => {
@@ -117,15 +125,15 @@ const StaffDash = () => {
   const handleAccept = async (borrowId) => {
     try {
       // Update borrowing status to 'reserved'
-      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
+      await axios.patch(`http://localhost:5000/api/borrowings/${borrowId}/status`, {
         status: 'reserved'
       });
       
-      // Find the borrowing to get the item ID
+      // Also update the item status
       const borrowing = borrowings.find(b => b._id === borrowId);
       if (borrowing?.itemId?._id) {
         // Update the item's status to 'Reserved'
-        await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${borrowing.itemId._id}`, {
+        await axios.patch(`http://localhost:5000/api/items/${borrowing.itemId._id}`, {
           status: 'Reserved'
         });
       }
@@ -133,6 +141,7 @@ const StaffDash = () => {
       // Close modal and refresh data
       setShowModal(false);
       fetchBorrowings();
+      fetchActivities(); // Refresh activities to show the new action
     } catch (error) {
       console.error('Error accepting borrow request:', error);
     }
@@ -140,13 +149,14 @@ const StaffDash = () => {
 
   const handleDecline = async (borrowId) => {
     try {
-      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
+      await axios.patch(`http://localhost:5000/api/borrowings/${borrowId}/status`, {
         status: 'declined'
       });
       
       // Close modal and refresh data
       setShowModal(false);
       fetchBorrowings(); // Make sure you have this function to refresh the borrowings list
+      fetchActivities(); // Refresh activities to show the new declined action
     } catch (error) {
       console.error('Error declining borrow request:', error);
     }
@@ -264,7 +274,8 @@ const StaffDash = () => {
       'added': 'action-added',
       'updated': 'action-updated',
       'pending': 'action-pending',
-      'withdraw': 'action-checkout'
+      'withdraw': 'action-checkout',
+      'declined': 'action-declined'
     };
     return styles[action.toLowerCase()] || '';
   };
@@ -288,7 +299,7 @@ const StaffDash = () => {
         const staffName = staffData?.name;
 
         const response = await axios.patch(
-            `https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals/${withdrawId}/status`,
+            `http://localhost:5000/api/withdrawals/${withdrawId}/status`,
             {
                 status: 'approved',
                 approvedBy: staffName
@@ -298,6 +309,7 @@ const StaffDash = () => {
         // Close the withdraw modal instead of the generic modal
         setShowWithdrawModal(false);
         fetchWithdrawRequests();
+        fetchActivities(); // Refresh activities to show the new action
     } catch (error) {
         console.error('Error accepting withdrawal:', error);
     }
@@ -309,21 +321,56 @@ const StaffDash = () => {
       const staffData = JSON.parse(localStorage.getItem('userData'));
       const staffName = staffData?.name;
 
-      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals/${withdrawId}/status`, {
+      await axios.patch(`http://localhost:5000/api/withdrawals/${withdrawId}/status`, {
         status: 'declined',
         approvedBy: staffName
       });
       
       setShowWithdrawModal(false);
       fetchWithdrawRequests();
+      fetchActivities(); // Refresh activities to show the new declined action
     } catch (error) {
       console.error('Error declining withdraw request:', error);
+    }
+  };
+
+  const checkForDefaultPassword = async () => {
+    // Check if user is logged in
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      return;
+    }
+    
+    // First check if we already know this is a default password from login
+    const isDefaultFromLogin = localStorage.getItem('isDefaultPassword') === 'true';
+    if (isDefaultFromLogin) {
+      setIsDefaultPassword(true);
+      setShowPasswordModal(true);
+      return;
+    }
+    
+    // If not determined at login, check with the server
+    try {
+      const isDefault = await checkDefaultPassword();
+      if (isDefault) {
+        setIsDefaultPassword(true);
+        setShowPasswordModal(true);
+      }
+    } catch (error) {
+      console.error('Error checking password:', error);
     }
   };
 
   return (
     
     <div className="staff-dashboard">
+      {/* Password Change Modal */}
+      <PasswordChangeModal 
+        isOpen={showPasswordModal} 
+        onClose={() => setShowPasswordModal(false)} 
+        onPasswordChanged={() => setIsDefaultPassword(false)} 
+      />
+      
       <NavBar/>
 
         {/* Inventory Alerts Section */}
@@ -382,7 +429,7 @@ const StaffDash = () => {
               {[
                 ...borrowings
                   .filter(borrow => 
-                    ['reserved', 'pending', 'declined'].includes(borrow.receiptData?.status?.toLowerCase())
+                    ['reserved', 'pending'].includes(borrow.receiptData?.status?.toLowerCase())
                   )
                   .map(borrow => ({
                     ...borrow,
@@ -391,7 +438,7 @@ const StaffDash = () => {
                   })),
                 ...withdrawRequests
                   .filter(request => 
-                    ['pending', 'declined'].includes(request.status?.toLowerCase())
+                    ['pending'].includes(request.status?.toLowerCase())
                   )
                   .map(request => ({
                     ...request,
@@ -628,7 +675,7 @@ const StaffDash = () => {
                     </button>
                     <button 
                       className="decline-button"
-                      onClick={() => handleWithdrawDecline(selectedBorrow._id)}
+                      onClick={() => handleDecline(selectedBorrow._id)}
                     >
                       Decline
                     </button>

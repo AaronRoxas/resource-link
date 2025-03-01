@@ -199,7 +199,9 @@ const TeacherInventory = () => {
             'overdue': 'Overdue',
             'approved': 'Approved',
             'returned': 'Returned',
-            'rejected': 'Rejected'
+            'rejected': 'Rejected',
+            'withdraw': 'Withdraw',
+            'declined': 'Declined'
         };
         return statusMap[status?.toLowerCase()] || status;
     };
@@ -213,44 +215,58 @@ const TeacherInventory = () => {
             return 'overdue';
         }
         
+        // For withdrawal items, check status
+        if (item.type === 'withdrawal') {
+            if (item.status?.toLowerCase() === 'withdraw') {
+                return 'withdraw';
+            }
+            if (item.status?.toLowerCase() === 'declined') {
+                return 'declined';
+            }
+        }
+        
         return item.receiptData?.status?.toLowerCase();
     };
 
     const filterItems = (items, type) => {
         // First filter based on status if filter is active
-        let filteredItems = statusFilter === 'all' 
-            ? items 
-            : items.filter(item => {
-                const status = type === 'withdrawal' 
-                    ? item.status?.toLowerCase()
-                    : item.receiptData?.status?.toLowerCase();
-                return status === statusFilter.toLowerCase();
-            });
-
-        // Then sort based on status priority
-        return filteredItems.sort((a, b) => {
-            const getStatusPriority = (item, type) => {
+        let filteredItems = items;
+        if (statusFilter !== 'all') {
+            filteredItems = items.filter(item => {
                 const status = type === 'withdrawal' 
                     ? item.status?.toLowerCase()
                     : item.receiptData?.status?.toLowerCase();
                 
-                // Define priority order (lower number = higher priority)
-                switch(status) {
-                    case 'overdue': return 1;
-                    case 'on-going': return 2;
-                    case 'pending': return 3;
-                    case 'reserved': return 4;
-                    case 'approved': return 5;
-                    case 'declined': return 6;
-                    case 'returned': return 7;
-                    default: return 8;
+                if (statusFilter.toLowerCase() === 'withdraw' && type === 'withdrawal') {
+                    return item.status?.toLowerCase() === 'withdraw';
                 }
-            };
+                
+                return status === statusFilter.toLowerCase();
+            });
+        }
 
-            const priorityA = getStatusPriority(a, type);
-            const priorityB = getStatusPriority(b, type);
-
-            return priorityA - priorityB;
+        // Sort items: On-going first, then by creation time
+        return filteredItems.sort((a, b) => {
+            const statusA = type === 'withdrawal' 
+                ? a.status?.toLowerCase()
+                : a.receiptData?.status?.toLowerCase();
+            
+            const statusB = type === 'withdrawal' 
+                ? b.status?.toLowerCase()
+                : b.receiptData?.status?.toLowerCase();
+            
+            // If one is on-going and the other isn't, prioritize on-going
+            if (statusA === 'on-going' && statusB !== 'on-going') {
+                return -1;
+            }
+            if (statusA !== 'on-going' && statusB === 'on-going') {
+                return 1;
+            }
+            
+            // If both have the same status or neither is on-going, sort by creation time (newest first)
+            const dateA = new Date(a.createdAt || a.receiptData?.borrowTime);
+            const dateB = new Date(b.createdAt || b.receiptData?.borrowTime);
+            return dateB - dateA;
         });
     };
 
@@ -284,6 +300,7 @@ const TeacherInventory = () => {
                         <option value="returned">Returned</option>
                         <option value="approved">Approved</option>
                         <option value="declined">Declined</option>
+                        <option value="withdraw">Withdraw</option>
                     </select>
                 </div>
             </header>

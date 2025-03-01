@@ -48,16 +48,32 @@ const MainPage = () => {
     setError('');
 
     try {
-      const response = await axios.post(
-        'https://resource-link-main-14c755858b60.herokuapp.com/api/auth/login',
-        { email, password },
-        {
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'application/json'
+      // Try local server first, then fallback to production
+      let response;
+      try {
+        response = await axios.post(
+          'https://resource-link-main-14c755858b60.herokuapp.com/api/auth/login',
+          { email, password },
+          {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json'
+            }
           }
-        }
-      );
+        );
+      } catch (error) {
+        console.log('Local server not available, falling back to production');
+        response = await axios.post(
+          'https://resource-link-main-14c755858b60.herokuapp.com/api/auth/login',
+          { email, password },
+          {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+      }
 
       localStorage.setItem('authToken', response.data.token);
       localStorage.setItem('role', response.data.role);
@@ -73,6 +89,12 @@ const MainPage = () => {
         role: response.data.role,
         employee_id: response.data.employee_id
       }));
+
+      // Check if the password is the default "1234"
+      const isDefaultPassword = password === '1234';
+      
+      // Store this information in localStorage so dashboards can use it
+      localStorage.setItem('isDefaultPassword', isDefaultPassword);
 
       if (response.data.dashboardUrl) {
         navigate(response.data.dashboardUrl);
@@ -252,7 +274,7 @@ const MainPage = () => {
           <span>ResourceLink</span>
         </div>
         <div className="footer-copyright">
-          © Copyright ResourceLink 2024 All Rights Reserved.
+          &copy; Copyright ResourceLink 2024 All Rights Reserved.
         </div>
         <div className="footer-links">
           <a>Privacy Policy</a>

@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { checkDefaultPassword } from '../../services/authServices';
 import '../../styles/new/admin.css';
 import NavBar from '../../components/NavBar';
-import { useNavigate } from 'react-router-dom';
+import PasswordChangeModal from '../../components/PasswordChangeModal';
 
 const AdminDash = () => {
     const [inventoryAlerts, setInventoryAlerts] = useState([]);
     const [reservedItems, setReservedItems] = useState([]);
     const [logs, setLogs] = useState([]);
+    const [isDefaultPassword, setIsDefaultPassword] = useState(false);
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,10 +30,6 @@ const AdminDash = () => {
             }
         };
 
-        fetchInventoryAlerts();
-    }, []);
-
-    useEffect(() => {
         const fetchReservedItems = async () => {
             try {
                 const response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
@@ -45,10 +45,6 @@ const AdminDash = () => {
             }
         };
 
-        fetchReservedItems();
-    }, []);
-
-    useEffect(() => {
         const fetchActivities = async () => {
             try {
                 const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/activities');
@@ -68,7 +64,40 @@ const AdminDash = () => {
             }
         };
 
+        fetchInventoryAlerts();
+        fetchReservedItems();
         fetchActivities();
+    }, []);
+
+    useEffect(() => {
+        const checkForDefaultPassword = async () => {
+            // Check if user is logged in
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                return;
+            }
+            
+            // First check if we already know this is a default password from login
+            const isDefaultFromLogin = localStorage.getItem('isDefaultPassword') === 'true';
+            if (isDefaultFromLogin) {
+                setIsDefaultPassword(true);
+                setShowPasswordModal(true);
+                return;
+            }
+            
+            // If not determined at login, check with the server
+            try {
+                const isDefault = await checkDefaultPassword();
+                if (isDefault) {
+                    setIsDefaultPassword(true);
+                    setShowPasswordModal(true);
+                }
+            } catch (error) {
+                console.error('Error checking password:', error);
+            }
+        };
+
+        checkForDefaultPassword();
     }, []);
 
     const formatDate = (date) => {
@@ -89,9 +118,17 @@ const AdminDash = () => {
 
     return (
         <div className="admin-dash">
+            <NavBar />
+            
+            {/* Password Change Modal */}
+            <PasswordChangeModal 
+                isOpen={showPasswordModal} 
+                onClose={() => setShowPasswordModal(false)} 
+                onPasswordChanged={() => setIsDefaultPassword(false)} 
+            />
+            
             <div className="admin-dash-container">
                 <div className="welcome-section">
-                    <NavBar />
                 </div>
 
                 <div className="admin-section">

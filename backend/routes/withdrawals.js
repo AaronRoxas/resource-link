@@ -151,6 +151,21 @@ router.patch('/:id/status', async (req, res) => {
         withdrawal.status = req.body.status;
         await withdrawal.save();
 
+        // Create activity log for declined withdrawal
+        if (req.body.status === 'declined') {
+            const item = await Item.findById(withdrawal.itemId);
+            const activity = new Activity({
+                borrower: withdrawal.borrower,
+                borrowerRole: 'Teacher',
+                itemId: withdrawal.itemId,
+                itemName: item ? item.name : 'Unknown Item',
+                action: 'declined',
+                timestamp: new Date(),
+                approvedBy: req.body.approvedBy
+            });
+            await activity.save();
+        }
+
         res.json(withdrawal);
     } catch (error) {
         console.error('Server error:', error);

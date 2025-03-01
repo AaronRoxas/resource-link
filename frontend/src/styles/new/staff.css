@@ -99,6 +99,11 @@
   color: #FFA726;
 }
 
+.status-pill.status-declined,.action-badge.action-declined {
+  background-color: #FFE9E9;
+  color: #D14343;
+}
+
 /* Section headers */
 .staff-section .section-header {
   display: flex;
@@ -297,7 +302,7 @@
 }
 
 .staff-dashboard .accept-button {
-  background-color: #14AE5C;
+  background-color: #4285f4;;
   color: white;
 }
 

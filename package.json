@@ -3,7 +3,7 @@
     "cors": "^2.8.5"
   },
   "name": "resourcelink",
-  "version": "1.0.0",
+  "version": "2.0",
   "description": "[Project URL](https://resource-link.vercel.app/)",
   "main": "index.js",
   "scripts": {

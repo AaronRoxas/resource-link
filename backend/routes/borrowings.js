@@ -116,6 +116,22 @@ router.patch('/:id/status', async (req, res) => {
         if (approvedBy) borrowing.receiptData.approvedBy = approvedBy;
 
         const updatedBorrowing = await borrowing.save();
+
+        // Create activity log for declined borrowing
+        if (status === 'declined') {
+            const item = await Item.findById(borrowing.itemId);
+            const activity = new Activity({
+                borrower: borrowing.borrower,
+                borrowerRole: 'Teacher',
+                itemId: borrowing.itemId,
+                itemName: item ? item.name : 'Unknown Item',
+                action: 'declined',
+                timestamp: new Date(),
+                approvedBy: approvedBy || ''
+            });
+            await activity.save();
+        }
+
         res.json(updatedBorrowing);
     } catch (error) {
         res.status(500).json({ message: error.message });

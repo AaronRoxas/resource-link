@@ -88,8 +88,13 @@
     color: #8250C4;
   }
   .action-badge.action-pending {
-    background-color: #F8E8C2;
+    background-color: #FFF4D5;
     color: #A5780F;
+  }
+  
+  .action-badge.action-declined {
+    background-color: #FFE9E9;
+    color: #D14343;
   }
   
   .pagination {

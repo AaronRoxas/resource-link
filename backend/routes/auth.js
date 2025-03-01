@@ -194,40 +194,73 @@ router.get('/check-employee-id/:id', async (req, res) => {
   }
 });
 
-// Add this new route in auth.js
-router.post('/change-password', async (req, res) => {
+// Check if user has default password
+router.get('/check-default-password', async (req, res) => {
   try {
-    const { currentPassword, newPassword } = req.body;
+    // Extract token from Authorization header
     const authHeader = req.headers.authorization;
-    
-    if (!authHeader) {
-      return res.status(401).json({ message: 'No authorization token provided' });
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Authorization token required' });
     }
-
+    
     const token = authHeader.split(' ')[1];
+    
+    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Find user
     const user = await User.findById(decoded.userId);
-
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+    
+    // Check if password is default (1234)
+    const isDefaultPassword = await bcrypt.compare('1234', user.password);
+    
+    res.status(200).json({ 
+      isDefaultPassword,
+      message: isDefaultPassword ? 'User has default password' : 'User does not have default password' 
+    });
+  } catch (error) {
+    console.error('Error checking default password:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
-    // Verify current password using the comparePassword method from User model
-    const isMatch = await user.comparePassword(currentPassword);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Current password is incorrect' });
+// Change password route
+router.post('/change-password', async (req, res) => {
+  try {
+    // Extract token from Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Authorization token required' });
     }
-
-    // Set the new password - this will trigger the pre-save middleware in User model
-    // which will automatically hash the password
+    
+    const token = authHeader.split(' ')[1];
+    
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Get new password from request body
+    const { newPassword } = req.body;
+    if (!newPassword) {
+      return res.status(400).json({ message: 'New password is required' });
+    }
+    
+    // Find user
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Update password
     user.password = newPassword;
     await user.save();
-
-    res.json({ message: 'Password updated successfully' });
-
+    
+    res.status(200).json({ message: 'Password changed successfully' });
   } catch (error) {
-    console.error('Change password error:', error);
-    res.status(500).json({ message: 'Error changing password' });
+    console.error('Error changing password:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

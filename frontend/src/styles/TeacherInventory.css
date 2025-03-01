@@ -272,6 +272,21 @@
     background-color: #FFD5D5;
     color: #FF4747;
 }
+
+.status-pill.returned {
+    background-color: #D5F2FF;
+    color: #0088CC;
+}
+
+.status-pill.withdraw {
+    background-color: #F2D5FF;
+    color: #8800CC;
+}
+
+.status-pill.declined {
+    background-color: #FFD5D5;
+    color: #FF4747;
+}
 @media screen and (max-width: 1480px) and (min-width: 524px) {
     /* html, body {
         height: 100%;

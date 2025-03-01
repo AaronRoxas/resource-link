@@ -20,7 +20,7 @@ const activitySchema = new mongoose.Schema({
   },
   action: {
     type: String,
-    enum: ['check-in', 'check-out', 'added', 'removed', 'updated', 'Withdraw', 'pending'],
+    enum: ['check-in', 'check-out', 'added', 'removed', 'updated', 'Withdraw', 'pending', 'declined'],
     required: true
   },
   timestamp: {

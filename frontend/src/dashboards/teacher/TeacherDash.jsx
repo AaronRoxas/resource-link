@@ -5,25 +5,65 @@ import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Footer from '../../components/Footer'
+import { checkDefaultPassword } from '../../services/authServices'
+import PasswordChangeModal from '../../components/PasswordChangeModal'
 
 const TeacherDash = () => {
   const navigate = useNavigate()
   const [categories, setCategories] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [isDefaultPassword, setIsDefaultPassword] = useState(false)
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/categories', {
-          withCredentials: true
-        });
-        setCategories(response.data);
+        let response;
+        try {
+          response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/categories');
+        } catch (error) {
+          console.log('Local server not available, falling back to production');
+          response = await fetch('https://resource-link-main-14c755858b60.herokuapp.com/api/categories');
+        }
+        const data = await response.json();
+        setCategories(data);
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
     };
 
     fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const checkForDefaultPassword = async () => {
+      // Check if user is logged in
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        return;
+      }
+      
+      // First check if we already know this is a default password from login
+      const isDefaultFromLogin = localStorage.getItem('isDefaultPassword') === 'true';
+      if (isDefaultFromLogin) {
+        setIsDefaultPassword(true);
+        setShowPasswordModal(true);
+        return;
+      }
+      
+      // If not determined at login, check with the server
+      try {
+        const isDefault = await checkDefaultPassword();
+        if (isDefault) {
+          setIsDefaultPassword(true);
+          setShowPasswordModal(true);
+        }
+      } catch (error) {
+        console.error('Error checking password:', error);
+      }
+    };
+
+    checkForDefaultPassword();
   }, []);
 
   const handleCategoryClick = (categoryName) => {
@@ -42,6 +82,13 @@ const TeacherDash = () => {
 
   return (
     <div className="teacher-dash-container">
+      {/* Password Change Modal */}
+      <PasswordChangeModal 
+        isOpen={showPasswordModal} 
+        onClose={() => setShowPasswordModal(false)} 
+        onPasswordChanged={() => setIsDefaultPassword(false)} 
+      />
+      
       <div className="teacher-dash-content">
         <NavBar/>
         
