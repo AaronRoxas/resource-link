@@ -112,8 +112,9 @@ router.post('/users/:id/reset-password', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Set password to '1234'
+    // Set password to '1234' and clear password reset request flag
     user.password = '1234';
+    user.passwordResetRequested = false;
     await user.save();
 
     res.json({ message: 'Password reset successfully' });

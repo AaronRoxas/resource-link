@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import './styles/MainPage.css';
+import './styles/forgot-password.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -29,6 +30,9 @@ const MainPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
   const navigate = useNavigate();
 
   const handlers = useSwipeable({
@@ -39,7 +43,47 @@ const MainPage = () => {
   });
 
   const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setError('');
+    setEmail('');
+    setPassword('');
+  };
+
+  const openForgotPassword = () => {
+    setIsModalOpen(false);
+    setIsForgotPasswordOpen(true);
+    setForgotPasswordSuccess(false);
+  };
+
+  const closeForgotPassword = () => {
+    setIsForgotPasswordOpen(false);
+    setForgotPasswordEmail('');
+    setForgotPasswordSuccess(false);
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      await axios.post(
+        'https://resource-link-main-14c755858b60.herokuapp.com/api/auth/forgot-password',
+        { email: forgotPasswordEmail },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      setForgotPasswordSuccess(true);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to process request. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Login logic from LoginComponent
   const handleLogin = async (e) => {
@@ -225,6 +269,20 @@ const MainPage = () => {
         </div>
       </div>
 
+      <footer className="footer">
+        <div className="footer-logo">
+          <img src="/dashboard-imgs/nav-logo.svg" alt="ResourceLink Logo" />
+          <span>ResourceLink</span>
+        </div>
+        <div className="footer-copyright">
+          &copy; Copyright ResourceLink 2024 All Rights Reserved.
+        </div>
+        <div className="footer-links">
+          <a>Privacy Policy</a>
+          <a>Terms & Conditions</a>
+        </div>
+      </footer>
+
       {isModalOpen && (
         <div className="login-modal-overlay" onClick={closeModal}>
           <div className="login-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -254,7 +312,7 @@ const MainPage = () => {
                   <input type="checkbox" />
                   <span>Remember me</span>
                 </label>
-                <a href="/forgot-password" className="forgot-password">
+                <a href="#" onClick={openForgotPassword} className="forgot-password">
                   Forgot password?
                 </a>
               </div>
@@ -268,21 +326,45 @@ const MainPage = () => {
         </div>
       )}
 
-      <footer className="footer">
-        <div className="footer-logo">
-          <img src="/dashboard-imgs/nav-logo.svg" alt="ResourceLink Logo" />
-          <span>ResourceLink</span>
+      {isForgotPasswordOpen && (
+        <div className="login-modal-overlay">
+          <div className="login-modal forgot-password-modal">
+            <div className="login-modal-header">
+              <h2>{forgotPasswordSuccess ? 'Request Sent' : 'Forgot Password'}</h2>
+              
+            </div>
+            {!forgotPasswordSuccess ? (
+              <form onSubmit={handleForgotPassword}>
+                <p>Enter your email address and we'll notify an administrator to reset your password.</p>
+                <div className="form-group">
+                  <label htmlFor="forgotEmail">Email</label>
+                  <input
+                    type="email"
+                    id="forgotEmail"
+                    value={forgotPasswordEmail}
+                    onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                {error && <div className="error-message">{error}</div>}
+                <button type="submit" className="login-button" disabled={loading}>
+                  {loading ? 'Submitting...' : 'Submit Request'}
+                </button>
+                <button className="cancel-button" onClick={closeForgotPassword}>Cancel</button>
+              </form>
+            ) : (
+              <div className="success-message">
+                <p>Your password reset request has been sent to the administrator. You will be notified once your password has been reset.</p>
+                <button className="login-button" onClick={closeForgotPassword}>
+                  Close
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-        <div className="footer-copyright">
-          &copy; Copyright ResourceLink 2024 All Rights Reserved.
-        </div>
-        <div className="footer-links">
-          <a>Privacy Policy</a>
-          <a>Terms & Conditions</a>
-        </div>
-      </footer>
+      )}
     </div>
   );
-}
+};
 
 export default MainPage;

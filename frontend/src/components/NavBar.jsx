@@ -243,6 +243,37 @@ const LogoContainer = styled.div`
   gap: 8px;
   cursor: pointer;
   padding: 15px 40px;
+
+  /* Tablet styles */
+  @media (max-width: 768px) {
+    padding: 12px 24px;
+    gap: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 15px 40px;
+  }
+
+  /* Mobile styles */
+  @media (max-width: 480px) {
+    padding: 0px;
+    gap: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+
+
+  /* Small mobile styles */
+  @media (max-width: 320px) {
+    padding: 0px;
+    gap: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
 `
 
 const LogoImg = styled.img`

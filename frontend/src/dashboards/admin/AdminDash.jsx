@@ -118,7 +118,7 @@ const AdminDash = () => {
 
     return (
         <div className="admin-dash">
-            <NavBar />
+            <NavBar hideWelcome={true}/>
             
             {/* Password Change Modal */}
             <PasswordChangeModal 
@@ -131,7 +131,7 @@ const AdminDash = () => {
                 <div className="welcome-section">
                 </div>
 
-                <div className="admin-section">
+                <div className="admin-section" id='inventory-section'>
                     <div className="section-header">
                         <h2>Inventory Alerts</h2>
                         <button className="view-all" onClick={() => navigate('/admin/inventory-alerts')}>View all</button>

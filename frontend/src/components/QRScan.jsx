@@ -109,7 +109,7 @@ const QRScan = () => {
           <div className="search-container">
             <input 
               type="text" 
-              placeholder="DV-0000" 
+              placeholder="Item ID" 
               className="search-input"
               value={searchId}
               onChange={(e) => setSearchId(e.target.value)}

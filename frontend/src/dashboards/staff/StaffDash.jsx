@@ -125,7 +125,7 @@ const StaffDash = () => {
   const handleAccept = async (borrowId) => {
     try {
       // Update borrowing status to 'reserved'
-      await axios.patch(`http://localhost:5000/api/borrowings/${borrowId}/status`, {
+      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
         status: 'reserved'
       });
       
@@ -133,7 +133,7 @@ const StaffDash = () => {
       const borrowing = borrowings.find(b => b._id === borrowId);
       if (borrowing?.itemId?._id) {
         // Update the item's status to 'Reserved'
-        await axios.patch(`http://localhost:5000/api/items/${borrowing.itemId._id}`, {
+        await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${borrowing.itemId._id}`, {
           status: 'Reserved'
         });
       }
@@ -149,7 +149,7 @@ const StaffDash = () => {
 
   const handleDecline = async (borrowId) => {
     try {
-      await axios.patch(`http://localhost:5000/api/borrowings/${borrowId}/status`, {
+      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
         status: 'declined'
       });
       
@@ -299,7 +299,7 @@ const StaffDash = () => {
         const staffName = staffData?.name;
 
         const response = await axios.patch(
-            `http://localhost:5000/api/withdrawals/${withdrawId}/status`,
+            `https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals/${withdrawId}/status`,
             {
                 status: 'approved',
                 approvedBy: staffName
@@ -321,7 +321,7 @@ const StaffDash = () => {
       const staffData = JSON.parse(localStorage.getItem('userData'));
       const staffName = staffData?.name;
 
-      await axios.patch(`http://localhost:5000/api/withdrawals/${withdrawId}/status`, {
+      await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals/${withdrawId}/status`, {
         status: 'declined',
         approvedBy: staffName
       });
@@ -371,7 +371,7 @@ const StaffDash = () => {
         onPasswordChanged={() => setIsDefaultPassword(false)} 
       />
       
-      <NavBar/>
+      <NavBar hideWelcome={true}/>
 
         {/* Inventory Alerts Section */}
       <section className="staff-section">
@@ -700,7 +700,7 @@ const StaffDash = () => {
             <div className="search-section">
               <input 
                 type="text" 
-                placeholder="D-0000" 
+                placeholder="Item ID" 
                 className="search-input"
                 value={searchId}
                 onChange={(e) => setSearchId(e.target.value)}

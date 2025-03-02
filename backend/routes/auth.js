@@ -62,7 +62,7 @@ router.post('/login', async (req, res) => {
     res.status(200).json({
       token,
       role: user.role,
-      first_name: user.first_name,  // Added this
+      first_name: user.first_name,  
       last_name: user.last_name, 
       dashboardUrl,
       message: 'Login successful'
@@ -200,9 +200,9 @@ router.get('/check-default-password', async (req, res) => {
     // Extract token from Authorization header
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ message: 'Authorization token required' });
+      return res.status(401).json({ message: 'No token provided' });
     }
-    
+
     const token = authHeader.split(' ')[1];
     
     // Verify token
@@ -213,16 +213,45 @@ router.get('/check-default-password', async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
-    // Check if password is default (1234)
+
+    // Check if password is the default "1234"
     const isDefaultPassword = await bcrypt.compare('1234', user.password);
     
-    res.status(200).json({ 
-      isDefaultPassword,
-      message: isDefaultPassword ? 'User has default password' : 'User does not have default password' 
-    });
+    res.json({ isDefaultPassword });
   } catch (error) {
     console.error('Error checking default password:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Forgot password route
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Validate input
+    if (!email) {
+      return res.status(400).json({ message: 'Please provide an email address' });
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      // For security reasons, don't reveal that the user doesn't exist
+      return res.status(200).json({ message: 'If your email is registered, a password reset request will be sent to the administrator' });
+    }
+
+    // Set password reset requested flag
+    user.passwordResetRequested = true;
+    await user.save();
+
+    // Send response
+    res.status(200).json({
+      message: 'Password reset request sent to administrator'
+    });
+
+  } catch (error) {
+    console.error('Forgot password error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

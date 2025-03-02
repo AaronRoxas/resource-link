@@ -3,6 +3,7 @@ import NavBar from '../../components/NavBar';
 import AddUser from './AddUser';
 import axios from 'axios';
 import '../../styles/new/admin.css';
+import '../../styles/forgot-password.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -42,6 +43,12 @@ const AdminManageUser = () => {
       }
     };
     fetchUsers();
+
+    // Set up interval to check for password reset requests
+    const intervalId = setInterval(fetchUsers, 60000); // Check every minute
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   // Close dropdown when clicking outside
@@ -119,7 +126,7 @@ const AdminManageUser = () => {
   const handleEditSubmit = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/users/${editingUser._id}`,
+        `https://resource-link-main-14c755858b60.herokuapp.com/api/users/${editingUser._id}`,
         editFormData,
         {
           withCredentials: true,
@@ -148,7 +155,7 @@ const AdminManageUser = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/auth/users/${userToDelete._id}`, {
+      await axios.delete(`https://resource-link-main-14c755858b60.herokuapp.com/api/auth/users/${userToDelete._id}`, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
@@ -161,6 +168,31 @@ const AdminManageUser = () => {
     } catch (error) {
       console.error('Error deleting user:', error);
       toast.error(error.response?.data?.message || 'Failed to delete user');
+    }
+  };
+
+  const handleResetPassword = async (userId) => {
+    try {
+      await axios.post(
+        `https://resource-link-main-14c755858b60.herokuapp.com/api/users/${userId}/reset-password`,
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      // Update the user's passwordResetRequested status in the local state
+      setUsers(users.map(user => 
+        user._id === userId ? { ...user, passwordResetRequested: false } : user
+      ));
+      
+      toast.success('Password reset to 1234');
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      toast.error('Failed to reset password');
     }
   };
 
@@ -266,15 +298,31 @@ const AdminManageUser = () => {
             </thead>
             <tbody>
               {currentUsers.map((user) => (
-                <tr key={user._id}>
+                <tr key={user._id} className={user.passwordResetRequested ? "password-reset-requested" : ""}>
                   <td>{user.employee_id}</td>
-                  <td>{`${user.first_name} ${user.last_name}`}</td>
+                  <td>
+                    {user.passwordResetRequested && (
+                      <span className="password-reset-icon" title="Password reset requested">
+                        ⚠️
+                      </span>
+                    )}
+                    {`${user.first_name} ${user.last_name}`}
+                  </td>
                   <td>{user.email}</td>
                   <td>{user.role}</td>
                   <td className="action-buttons">
                     <button style={{color: '#4188FF'}} className="edit-btn" onClick={() => handleEditUser(user)}>
                       Edit
                     </button>
+                    {user.passwordResetRequested && (
+                      <button 
+                        style={{color: '#FF8C00'}} 
+                        className="reset-btn" 
+                        onClick={() => handleResetPassword(user._id)}
+                      >
+                        Reset Password
+                      </button>
+                    )}
                     <button style={{color: 'red'}} className="delete-btn" onClick={() => handleDeleteUser(user)}>
                       Delete
                     </button>

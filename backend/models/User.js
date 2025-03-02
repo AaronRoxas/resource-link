@@ -50,6 +50,10 @@ const userSchema = new mongoose.Schema({
   is_active: {
     type: Boolean,
     default: true
+  },
+  passwordResetRequested: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true
