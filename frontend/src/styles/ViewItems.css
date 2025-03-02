@@ -309,12 +309,3 @@
     border-radius: 4px;
     margin-left: 8px;
 }
-.delete-button {
-    width: 20%;
-    padding: 10px;
-    background: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}

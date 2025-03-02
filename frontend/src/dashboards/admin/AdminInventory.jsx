@@ -394,12 +394,12 @@ const AdminInventory = () => {
             )}
             {/* Delete Confirmation Modal */}
             {showDeleteModal && (
-                <div className="modal-backdrop">
-                    <div className="modal-container delete-modal">
-                        <div className="modal-header">
+                <div className="category-modal-backdrop">
+                    <div className="category-form-container">
+                        <div className="category-form-header">
                             <h2>Delete Category</h2>
                             <button 
-                                className="close-button"
+                                className="category-close-button"
                                 onClick={() => {
                                     setShowDeleteModal(false);
                                     setSelectedCategory(null);
@@ -408,11 +408,11 @@ const AdminInventory = () => {
                                 &times;
                             </button>
                         </div>
-                        <div className="modal-content">
+                        <div className="delete-confirmation">
                             <p>Are you sure you want to delete "{selectedCategory?.name}"?</p>
-                            <p className="warning-text">This action cannot be undone.</p>
+                            <p className="warning">This action cannot be undone.</p>
                         </div>
-                        <div className="modal-actions">
+                        <div className="delete-actions">
                             <button 
                                 className="cancel-button"
                                 onClick={() => {
