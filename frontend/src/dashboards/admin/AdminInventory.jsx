@@ -17,6 +17,8 @@ const AdminInventory = () => {
     });
     const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -133,6 +135,7 @@ const AdminInventory = () => {
             return;
         }
 
+        setIsSubmitting(true);
         try {
             const categoryData = {
                 name: newCategory.name.trim(),
@@ -156,10 +159,12 @@ const AdminInventory = () => {
             setNewCategory({ name: '', description: '' });
             setSelectedImage(null);
             setImagePreview(null);
+            setIsSubmitting(false);
             toast.success('Category created successfully');
         } catch (error) {
             console.error('Error creating category:', error);
             toast.error(error.response?.data?.message || 'Failed to create category');
+            setIsSubmitting(false);
         }
     };
 
@@ -184,6 +189,7 @@ const AdminInventory = () => {
         if (!selectedCategory) return;
 
         try {
+            setIsDeleting(true);
             await axios.delete(
                 `https://resource-link-main-14c755858b60.herokuapp.com/api/categories/${selectedCategory._id}`,
                 { withCredentials: true }
@@ -196,6 +202,8 @@ const AdminInventory = () => {
         } catch (error) {
             console.error('Error deleting category:', error);
             toast.error('Failed to delete category');
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -387,7 +395,20 @@ const AdminInventory = () => {
                                 />
                             </div>
 
-                            <button type="submit" className="category-create-button">Create</button>
+                            <button 
+                                type="submit" 
+                                className="category-create-button"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <span className="spinner"></span>
+                                        Creating...
+                                    </>
+                                ) : (
+                                    'Create'
+                                )}
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -412,9 +433,18 @@ const AdminInventory = () => {
                             <p>Are you sure you want to delete "{selectedCategory?.name}"?</p>
                             <p className="warning">This action cannot be undone.</p>
                         </div>
-                        <div className="delete-actions">
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', padding: '1rem' }}>
                             <button 
-                                className="cancel-button"
+                                style={{
+                                    backgroundColor: '#f8f9fa',
+                                    border: '1px solid #dee2e6',
+                                    color: '#495057',
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    marginRight: '0.5rem'
+                                }}
                                 onClick={() => {
                                     setShowDeleteModal(false);
                                     setSelectedCategory(null);
@@ -423,10 +453,20 @@ const AdminInventory = () => {
                                 Cancel
                             </button>
                             <button 
-                                className="delete-button"
+                                style={{
+                                    backgroundColor: '#dc3545',
+                                    border: '1px solid #dc3545',
+                                    color: 'white',
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    opacity: isDeleting ? 0.7 : 1
+                                }}
                                 onClick={handleDeleteCategory}
+                                disabled={isDeleting}
                             >
-                                Delete
+                                {isDeleting ? 'Deleting...' : 'Delete'}
                             </button>
                         </div>
                     </div>

@@ -223,7 +223,7 @@ const AdminChart = () => {
           <div className="chart-section">
             <div className="chart-header">
               <h2>Stocks Overview</h2>
-              <a href="#" className="view-more">View More</a>
+              {/* <a href="#" className="view-more">View More</a> */}
             </div>
             <div className="chart-container">
               <Pie data={stockChartData} options={chartOptions} />
@@ -233,7 +233,7 @@ const AdminChart = () => {
           <div className="chart-section">
             <div className="chart-header">
               <h2>Most Borrowed/Withdrew</h2>
-              <a href="#" className="view-more">View More</a>
+              {/* <a href="#" className="view-more">View More</a> */}
             </div>
             <div className="chart-container">
               <Pie data={chartData} options={chartOptions} />
@@ -243,7 +243,7 @@ const AdminChart = () => {
           <div className="chart-section">
             <div className="chart-header">
               <h2>Asset Conditions</h2>
-              <a href="#" className="view-more">View More</a>
+              {/* <a href="#" className="view-more">View More</a> */}
             </div>
             <div className="chart-container">
               <Pie data={conditionChartData} options={chartOptions} />

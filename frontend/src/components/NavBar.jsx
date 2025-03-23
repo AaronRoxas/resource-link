@@ -39,8 +39,8 @@ const NavBar = ({ hideWelcome }) => {
       return;
     }
 
-    if (passwords.newPassword.length < 4) {
-      setError('New password must be at least 4 characters');
+    if (passwords.newPassword.length < 6) {
+      setError('New password must be at least 6 characters');
       return;
     }
 
@@ -96,7 +96,7 @@ const NavBar = ({ hideWelcome }) => {
     <>
       <ToastContainer />
       <NavContainer>
-        <LogoContainer>
+        <LogoContainer onClick={() => navigate('/home', { replace: true })}>
           <LogoImg src="/onboard-imgs/second-logo.png" alt="Logo" />
           <LogoText>ResourceLink</LogoText>
         </LogoContainer>

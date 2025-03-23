@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -43,6 +43,7 @@ const AdminCategoryItems = () => {
     const [searchExpanded, setSearchExpanded] = useState(false);
     const [showEditSubCategoryModal, setShowEditSubCategoryModal] = useState(false);
     const [editingSubCategory, setEditingSubCategory] = useState(null);
+    const fileInputRef = useRef(null);
 
     const getFilteredItems = () => {
         return items.filter(item => {
@@ -226,6 +227,7 @@ const AdminCategoryItems = () => {
 
     const handleSubmitItem = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
         try {
             let imageBase64 = '';
             if (newItem.image) {
@@ -298,6 +300,8 @@ const AdminCategoryItems = () => {
             console.error('Error submitting item:', error);
             console.error('Error details:', error.response?.data);
             toast.error('Failed to add item');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -357,7 +361,6 @@ const AdminCategoryItems = () => {
                 withCredentials: true
             });
             toast.success('Item deleted successfully!');
-            fetchCategoryItems();
         } catch (error) {
             console.error('Error deleting item:', error);
             toast.error('Failed to delete item');
@@ -621,27 +624,33 @@ const AdminCategoryItems = () => {
                             <form onSubmit={handleSubmitItem}>
                                 <div className="form-group">
                                     <label>Add Image</label>
-                                    <div className="image-upload-box">
+                                    <div className="image-upload-box" onClick={() => fileInputRef.current?.click()}>
                                         {newItem.image ? (
                                             <img 
-                                                src={URL.createObjectURL(newItem.image)} 
+                                                src={typeof newItem.image === 'string' ? newItem.image : URL.createObjectURL(newItem.image)} 
                                                 alt="Preview" 
                                                 className="image-preview"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setNewItem({ ...newItem, image: null });
+                                                }}
                                             />
                                         ) : (
                                             <div className="upload-placeholder">
                                                 <span>+</span>
                                             </div>
                                         )}
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => setNewItem({
-                                                ...newItem,
-                                                image: e.target.files[0]
-                                            })}
-                                        />
                                     </div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        ref={fileInputRef}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            image: e.target.files[0]
+                                        })}
+                                        style={{ display: 'none' }}
+                                    />
                                 </div>
                                 <div className="form-group">
                                     <label>Sub-category <span className="required">*</span></label>
@@ -701,12 +710,20 @@ const AdminCategoryItems = () => {
                                         type="number"
                                         value={newItem.purchaseCost}
                                         min={1}
-                                        onChange={(e) => setNewItem({
-                                            ...newItem,
-                                            purchaseCost: e.target.value
-                                        })}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (!isNaN(value) && !value.includes("e")) { // Prevents non-numeric input
+                                            setNewItem({ ...newItem, purchaseCost: value });
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "e" || e.key === "-" || e.key === "+") {
+                                            e.preventDefault(); // Blocks typing 'e', '-', and '+'
+                                            }
+                                        }}
                                         required
-                                    />
+                                        />
+
                                 </div>
                                 <div className="form-group">
                                     <label>Notes</label>
@@ -718,8 +735,8 @@ const AdminCategoryItems = () => {
                                         })}
                                     />
                                 </div>
-                                <button type="submit" className="done-button">
-                                    Done
+                                <button type="submit" className="done-button" disabled={isLoading}>
+                                    {isLoading ? 'Submitting...' : 'Done'}
                                 </button>
                             </form>
                         </div>
@@ -741,27 +758,33 @@ const AdminCategoryItems = () => {
                             <form onSubmit={handleSubmitItem}>
                                 <div className="form-group">
                                     <label>Add Image</label>
-                                    <div className="image-upload-box">
+                                    <div className="image-upload-box" onClick={() => fileInputRef.current?.click()}>
                                         {newItem.image ? (
                                             <img 
                                                 src={typeof newItem.image === 'string' ? newItem.image : URL.createObjectURL(newItem.image)} 
                                                 alt="Preview" 
                                                 className="image-preview"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setNewItem({ ...newItem, image: null });
+                                                }}
                                             />
                                         ) : (
                                             <div className="upload-placeholder">
                                                 <span>+</span>
                                             </div>
                                         )}
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => setNewItem({
-                                                ...newItem,
-                                                image: e.target.files[0]
-                                            })}
-                                        />
                                     </div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        ref={fileInputRef}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            image: e.target.files[0]
+                                        })}
+                                        style={{ display: 'none' }}
+                                    />
                                 </div>
                                 <div className="form-group">
                                     <input type="text" value="Consumable" readOnly hidden />
@@ -850,8 +873,8 @@ const AdminCategoryItems = () => {
                                         })}
                                     />
                                 </div>
-                                <button type="submit" className="done-button">
-                                    Done
+                                <button type="submit" className="done-button" disabled={isLoading}>
+                                    {isLoading ? 'Submitting...' : 'Done'}
                                 </button>
                             </form>
                         </div>

@@ -6,6 +6,8 @@ import '../../styles/new/staff.css';
 import Navbar from '../../components/NavBar';
 
 const StaffInventory = () => {
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [categories, setCategories] = useState([]);
     const [categoryItemCounts, setCategoryItemCounts] = useState({});
     const [showModal, setShowModal] = useState(false);
@@ -107,14 +109,20 @@ const StaffInventory = () => {
 
     const handleSubmitCategory = async (e) => {
         e.preventDefault();
+        if (!newCategory.name.trim()) {
+            toast.error('Category name is required');
+            return;
+        }
+
+        setIsSubmitting(true);
         try {
             const categoryData = {
-                name: newCategory.name,
-                description: newCategory.description || '',
+                name: newCategory.name.trim(),
+                description: newCategory.description?.trim() || '',
                 image: selectedImage || ''
             };
 
-            const response = await axios.post(
+            await axios.post(
                 'https://resource-link-main-14c755858b60.herokuapp.com/api/categories',
                 categoryData,
                 { 
@@ -126,21 +134,32 @@ const StaffInventory = () => {
             );
             
             await fetchCategories();
-            handleCloseModal();
+            setShowModal(false);
+            setNewCategory({ name: '', description: '' });
+            setSelectedImage(null);
+            setImagePreview(null);
+            setIsSubmitting(false);
             toast.success('Category created successfully');
         } catch (error) {
-            console.error('Error creating category:', error.response?.data || error);
-            toast.error(error.response?.data?.message || 'Failed to create category. Please try again.');
+            console.error('Error creating category:', error);
+            toast.error(error.response?.data?.message || 'Failed to create category');
+            setIsSubmitting(false);
         }
     };
     
     const handleUpdateCategory = async (e) => {
         e.preventDefault();
+        if (!editCategory.name.trim()) {
+            toast.error('Category name is required');
+            return;
+        }
+
+        setIsSubmitting(true);
         try {
             // Prepare the update data
             const categoryData = {
-                name: editCategory.name,
-                description: editCategory.description || '',
+                name: editCategory.name.trim(),
+                description: editCategory.description?.trim() || '',
                 image: selectedImage ? (selectedImage.startsWith('data:') ? selectedImage : `data:image/jpeg;base64,${selectedImage}`) : editCategory.image,
                 subCategories: selectedCategory.subCategories
             };
@@ -158,10 +177,12 @@ const StaffInventory = () => {
             
             await fetchCategories();
             handleCloseEditModal();
+            setIsSubmitting(false);
             toast.success('Category updated successfully');
         } catch (error) {
             console.error('Error updating category:', error.response?.data || error);
             toast.error(error.response?.data?.message || 'Failed to update category. Please try again.');
+            setIsSubmitting(false);
         }
     };
 
@@ -176,41 +197,14 @@ const StaffInventory = () => {
     };
 
     const handleDeleteCategory = async () => {
+        if (!selectedCategory) return;
+
         try {
-            console.log('Attempting to delete category:', {
-                id: selectedCategory._id,
-                name: selectedCategory.name
-            });
-
-            const categoryExists = categories.some(cat => cat._id === selectedCategory._id);
-            if (!categoryExists) {
-                toast.error('Category not found in current list');
-                setShowDeleteModal(false);
-                setSelectedCategory(null);
-                return;
-            }
-
-            const response = await axios.delete(
+            setIsDeleting(true);
+            await axios.delete(
                 `https://resource-link-main-14c755858b60.herokuapp.com/api/categories/${selectedCategory._id}`,
-                { 
-                    withCredentials: true,
-                    validateStatus: function (status) {
-                        return status < 500;
-                    }
-                }
+                { withCredentials: true }
             );
-
-            if (response.status === 404) {
-                toast.error('Category not found on server. It may have been already deleted.');
-                setShowDeleteModal(false);
-                setSelectedCategory(null);
-                await fetchCategories();
-                return;
-            }
-
-            if (response.status !== 200) {
-                throw new Error(`Failed to delete category: ${response.data.message || 'Unknown error'}`);
-            }
             
             await fetchCategories();
             setShowDeleteModal(false);
@@ -218,10 +212,11 @@ const StaffInventory = () => {
             toast.success('Category deleted successfully');
         } catch (error) {
             console.error('Error deleting category:', error);
-            toast.error(error.response?.data?.message || 'Failed to delete category');
+            toast.error('Failed to delete category');
+        } finally {
+            setIsDeleting(false);
         }
     };
-
     const getImageUrl = (imageData) => {
         if (!imageData || imageData === 'null' || imageData === null) {
             return "/dashboard-imgs/placeholder.svg";
@@ -312,7 +307,7 @@ const StaffInventory = () => {
                                 <label htmlFor="categoryImage" className="category-upload-placeholder">
                                     {imagePreview ? (
                                         <img 
-                                            src={imagePreview} 
+                                            src={imagePreview || '/dashboard-imgs/placeholder.svg'} 
                                             alt="Category preview" 
                                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                         />
@@ -348,7 +343,20 @@ const StaffInventory = () => {
                                 />
                             </div>
 
-                            <button type="submit" className="category-create-button">Create</button>
+                            <button 
+                                type="submit" 
+                                className="category-create-button"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <span className="spinner"></span>
+                                        Creating...
+                                    </>
+                                ) : (
+                                    'Create'
+                                )}
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -360,29 +368,54 @@ const StaffInventory = () => {
                         <div className="category-form-header">
                             <h2>Delete Category</h2>
                             <button 
-                                className="category-close-button" 
-                                onClick={() => setShowDeleteModal(false)}
+                                className="category-close-button"
+                                onClick={() => {
+                                    setShowDeleteModal(false);
+                                    setSelectedCategory(null);
+                                }}
                             >
-                                ×
+                                &times;
                             </button>
                         </div>
                         <div className="delete-confirmation">
                             <p>Are you sure you want to delete "{selectedCategory?.name}"?</p>
                             <p className="warning">This action cannot be undone.</p>
-                            <div className="delete-actions">
-                                <button 
-                                    className="cancel-button"
-                                    onClick={() => setShowDeleteModal(false)}
-                                >
-                                    Cancel
-                                </button>
-                                <button 
-                                    className="delete-button"
-                                    onClick={handleDeleteCategory}
-                                >
-                                    Delete
-                                </button>
-                            </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', padding: '1rem' }}>
+                            <button 
+                                style={{
+                                    backgroundColor: '#f8f9fa',
+                                    border: '1px solid #dee2e6',
+                                    color: '#495057',
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    marginRight: '0.5rem'
+                                }}
+                                onClick={() => {
+                                    setShowDeleteModal(false);
+                                    setSelectedCategory(null);
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                style={{
+                                    backgroundColor: '#dc3545',
+                                    border: '1px solid #dc3545',
+                                    color: 'white',
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    opacity: isDeleting ? 0.7 : 1
+                                }}
+                                onClick={handleDeleteCategory}
+                                disabled={isDeleting}
+                            >
+                                {isDeleting ? 'Deleting...' : 'Delete'}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -443,11 +476,25 @@ const StaffInventory = () => {
                                 />
                             </div>
 
-                            <button type="submit" className="category-create-button">Update</button>
+                            <button 
+                                type="submit" 
+                                className="category-create-button"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <span className="spinner"></span>
+                                        Updating...
+                                    </>
+                                ) : (
+                                    'Update'
+                                )}
+                            </button>
                         </form>
                     </div>
                 </div>
             )}
+
         </div>
     );
 };
