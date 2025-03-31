@@ -91,60 +91,78 @@ const MainPage = () => {
     setLoading(true);
     setError('');
 
-    try {
-      // Try local server first, then fallback to production
-      let response;
-      try {
-        response = await axios.post(
-          'https://resource-link-main-14c755858b60.herokuapp.com/api/auth/login',
-          { email, password },
-          {
-            withCredentials: true,
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-      } catch (error) {
-        console.log('Local server not available, falling back to production');
-        response = await axios.post(
-          'https://resource-link-main-14c755858b60.herokuapp.com/api/auth/login',
-          { email, password },
-          {
-            withCredentials: true,
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-      }
+    const failedAttemptsKey = `failedAttempts_${email}`;
+    const lockoutKey = `lockout_${email}`;
+    const lockoutDuration = 10 * 60 * 1000; // 10 minutes in milliseconds
 
+    // Check if the email is currently locked out
+    const lockoutTime = localStorage.getItem(lockoutKey);
+    if (lockoutTime && Date.now() < parseInt(lockoutTime)) {
+      const remainingTime = parseInt(lockoutTime) - Date.now();
+      const minutes = Math.floor(remainingTime / 60000);
+      const seconds = Math.ceil((remainingTime % 60000) / 1000);
+      setError(`Too many failed attempts. Please try again in ${minutes} minute(s) and ${seconds} second(s).`);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Attempt login
+      const response = await axios.post(
+        'https://resource-link-main-14c755858b60.herokuapp.com/api/auth/login',
+        { email, password },
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      // Reset failed attempts on successful login
+      localStorage.removeItem(failedAttemptsKey);
+      localStorage.removeItem(lockoutKey);
+
+      // Store user data and navigate
       localStorage.setItem('authToken', response.data.token);
       localStorage.setItem('role', response.data.role);
       localStorage.setItem('first_name', response.data.first_name);
       localStorage.setItem('last_name', response.data.last_name);
       localStorage.setItem('email', email);
       localStorage.setItem('employee_id', response.data.employee_id);
-      
-      localStorage.setItem('user', JSON.stringify({
-        first_name: response.data.first_name,
-        last_name: response.data.last_name,
-        email: email,
-        role: response.data.role,
-        employee_id: response.data.employee_id
-      }));
 
-      // Check if the password is the default "1234"
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          first_name: response.data.first_name,
+          last_name: response.data.last_name,
+          email: email,
+          role: response.data.role,
+          employee_id: response.data.employee_id,
+        })
+      );
+
       const isDefaultPassword = password === '1234';
-      
-      // Store this information in localStorage so dashboards can use it
       localStorage.setItem('isDefaultPassword', isDefaultPassword);
 
       if (response.data.dashboardUrl) {
         navigate(response.data.dashboardUrl);
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      // Handle failed login
+      const failedAttempts = parseInt(localStorage.getItem(failedAttemptsKey)) || 0;
+      const newFailedAttempts = failedAttempts + 1;
+
+      if (newFailedAttempts >= 3) {
+        // Lock out the user for 10 minutes
+        localStorage.setItem(lockoutKey, Date.now() + lockoutDuration);
+        localStorage.removeItem(failedAttemptsKey); // Reset failed attempts
+        setError('Too many failed attempts. Please try again in 10 minutes.');
+      } else {
+        // Increment failed attempts
+        localStorage.setItem(failedAttemptsKey, newFailedAttempts);
+        setError('Invalid credentials. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

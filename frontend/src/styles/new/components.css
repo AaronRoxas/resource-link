@@ -22,6 +22,30 @@
   overflow-y: auto;
 }
 
+.change-pw-modal-content{
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.change-pw-modal-overlay{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
 .modal-header {
   padding: 16px;
   border-bottom: 1px solid var(--border-color);
@@ -348,20 +372,8 @@
 }
 
 /* Password Change Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
 
-.password-modal .modal-content {
+.password-modal .change-pw-modal-content {
   background-color: white;
   padding: 2rem;
   border-radius: 8px;
@@ -406,7 +418,7 @@
 }
 
 .password-modal .btn-primary {
-  background-color: #4CAF50;
+  background-color: #2214e6;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -417,7 +429,7 @@
 }
 
 .password-modal .btn-primary:hover {
-  background-color: #45a049;
+  background-color: #3a12ec;
 }
 
 .password-modal .btn-primary:disabled {
@@ -444,7 +456,7 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .modal-content {
+  .change-pw-modal-content {
     width: 95%;
     margin: var(--spacing-sm);
     padding: var(--spacing-md);

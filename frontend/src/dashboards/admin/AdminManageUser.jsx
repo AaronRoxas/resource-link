@@ -388,6 +388,7 @@ const AdminManageUser = () => {
       )}
 
       {showEditModal && (
+        <div className="manage-user-overlay">
         <div className="manage-user-modal">
           <div className="manage-user-modal-content">
             <div className="manage-user-modal-header">
@@ -462,6 +463,8 @@ const AdminManageUser = () => {
             </div>
           </div>
         </div>
+        </div>
+
       )}
 
     </div>

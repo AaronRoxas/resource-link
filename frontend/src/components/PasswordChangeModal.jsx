@@ -52,9 +52,9 @@ const PasswordChangeModal = ({ isOpen, onClose, onPasswordChanged }) => {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content password-modal">
-        <h2>Change Default Password</h2>
+    <div className="change-pw-modal-overlay">
+      <div className="change-pw-modal-content password-modal">
+        <h1>Change Default Password</h1>
         <p>Your account is currently using the default password. For security reasons, please change your password before continuing.</p>
         
         {success ? (
