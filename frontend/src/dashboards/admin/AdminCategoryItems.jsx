@@ -44,6 +44,10 @@ const AdminCategoryItems = () => {
     const [showEditSubCategoryModal, setShowEditSubCategoryModal] = useState(false);
     const [editingSubCategory, setEditingSubCategory] = useState(null);
     const fileInputRef = useRef(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
 
     const getFilteredItems = () => {
         return items.filter(item => {
@@ -930,6 +934,73 @@ const AdminCategoryItems = () => {
                         </div>
                     </div>
                 )}
+
+
+                {showDeleteModal && (
+                    <div className="category-modal-backdrop">
+                        <div className="category-form-container">
+                            <div className="category-form-header">
+                                <h2>Delete Item</h2>
+                                
+                                <button 
+                                    className="category-close-button"
+                                    onClick={() => {
+                                        setShowDeleteModal(false);
+                                        setSelectedItems(null);
+                                    }}
+                                >
+                                    &times;
+                                </button>
+                            </div>
+                            <div className="delete-confirmation">
+                            <hr />
+                                <p>Are you sure you want to delete "{selectedItems?.name}"?</p>
+                                <p className="warning">This action cannot be undone.</p>
+                                
+                            </div>
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', padding: '1rem' }}>
+                                <button 
+                                    style={{
+                                        backgroundColor: '#f8f9fa',
+                                        border: '1px solid #dee2e6',
+                                        color: '#495057',
+                                        padding: '0.5rem 1rem',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        marginRight: '0.5rem'
+                                    }}
+                                    onClick={() => {
+                                        setShowDeleteModal(false);
+                                        setSelectedItems(null);
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    style={{
+                                        backgroundColor: '#dc3545',
+                                        border: '1px solid #dc3545',
+                                        color: 'white',
+                                        padding: '0.5rem 1rem',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        opacity: isDeleting ? 0.7 : 1
+                                    }}
+                                    onClick={() => {
+                                        handleDeleteItem(selectedItems);
+                                        setShowDeleteModal(false);
+                                    }}
+                                    disabled={isDeleting}
+                                >
+                                    {isDeleting ? 'Deleting...' : 'Delete'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <div className="items-table">
                     <table>
                         <thead>
@@ -994,7 +1065,10 @@ const AdminCategoryItems = () => {
                                                 src={deletingItemId === item._id ? "/table-imgs/spinner.svg" : "/table-imgs/delete.svg"}
                                                 alt="Delete" 
                                                 className="action-icon"
-                                                onClick={() => handleDeleteItem(item)}
+                                                onClick={() => {
+                                                    setSelectedItems(item);
+                                                    setShowDeleteModal(true);
+                                                }}
                                                 style={{ 
                                                     paddingLeft: item.itemType !== 'Consumable' ? '8px' : '0',
                                                     cursor: deletingItemId === item._id ? 'not-allowed' : 'pointer',

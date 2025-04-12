@@ -34,7 +34,7 @@ const NavBar = ({ hideWelcome }) => {
 
   const handleSubmit = async () => {
     // Validation
-    if (!passwords.currentPassword || !passwords.newPassword || !passwords.confirmPassword) {
+    if (!passwords.newPassword || !passwords.confirmPassword) {
       setError('All fields are required');
       return;
     }
@@ -58,7 +58,6 @@ const NavBar = ({ hideWelcome }) => {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         },
         body: JSON.stringify({
-          currentPassword: passwords.currentPassword,
           newPassword: passwords.newPassword
         })
       });
@@ -72,7 +71,6 @@ const NavBar = ({ hideWelcome }) => {
       // Success - Replace alert with toast
       setShowPasswordModal(false);
       setPasswords({
-        currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       });
@@ -163,13 +161,6 @@ const NavBar = ({ hideWelcome }) => {
             {error && <ErrorMessage>{error}</ErrorMessage>}
             <input
               type="password"
-              name="currentPassword"
-              placeholder="Current Password"
-              value={passwords.currentPassword}
-              onChange={handlePasswordChange}
-            />
-            <input
-              type="password"
               name="newPassword"
               placeholder="New Password"
               value={passwords.newPassword}
@@ -187,7 +178,6 @@ const NavBar = ({ hideWelcome }) => {
                 onClick={() => {
                   setShowPasswordModal(false);
                   setPasswords({
-                    currentPassword: '',
                     newPassword: '',
                     confirmPassword: ''
                   });

@@ -25,6 +25,8 @@ const AdminManageUser = () => {
     email: '',
     role: ''
   });
+
+  const [isDeleting, setIsDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage] = useState(7); // Show 7 users per page
 
@@ -150,10 +152,12 @@ const AdminManageUser = () => {
 
   const handleDeleteUser = (user) => {
     setUserToDelete(user);
+    setIsDeleting(false);
     setShowDeleteModal(true);
   };
 
   const handleDeleteConfirm = async () => {
+    setIsDeleting(true);
     try {
       await axios.delete(`https://resource-link-main-14c755858b60.herokuapp.com/api/auth/users/${userToDelete._id}`, {
         withCredentials: true,
@@ -161,6 +165,7 @@ const AdminManageUser = () => {
           'Content-Type': 'application/json'
         }
       });
+
       setUsers(users.filter(user => user._id !== userToDelete._id));
       setShowDeleteModal(false);
       setUserToDelete(null);
@@ -323,7 +328,8 @@ const AdminManageUser = () => {
                         Reset Password
                       </button>
                     )}
-                    <button style={{color: 'red'}} className="delete-btn" onClick={() => handleDeleteUser(user)}>
+                    <button style={{color: 'red'}}  className="delete-btn" onClick={() => handleDeleteUser(user)}>
+                    
                       Delete
                     </button>
                   </td>
@@ -372,6 +378,7 @@ const AdminManageUser = () => {
       )}
 
       {showDeleteModal && (
+        <div className="category-modal-backdrop">
         <div className="manage-user-modal">
           <div className="manage-user-modal-content">
             <div className="manage-user-modal-header">
@@ -379,11 +386,19 @@ const AdminManageUser = () => {
             <div className="delete-confirmation">
               <h3>Are you sure you want to delete <u>{userToDelete?.first_name} {userToDelete?.last_name}</u>?</h3>
               <div className="delete-actions">
-                <button className="delete-button" onClick={handleDeleteConfirm}>Delete</button>
+                <button className="delete-button"
+                 onClick={handleDeleteConfirm} 
+                 disabled={isDeleting}>
+                {isDeleting ? 'Deleting...' : 'Delete'}</button>
+
+
+
                 <button className="cancel-button" onClick={() => setShowDeleteModal(false)}>Cancel</button>
               </div>
             </div>
           </div>
+          </div>
+        
         </div>
       )}
 
