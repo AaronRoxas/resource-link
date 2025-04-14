@@ -34,7 +34,7 @@ resource-link/
 └── README.md
 ```
 
-## 🧑‍💻 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -75,7 +75,7 @@ resource-link/
    ```bash
    # Start the backend server
    cd backend
-   npm start
+   nodemon
 
    # In a new terminal, start the frontend application
    cd ../frontend
