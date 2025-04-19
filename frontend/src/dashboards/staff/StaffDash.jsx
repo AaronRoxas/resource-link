@@ -462,7 +462,7 @@ const StaffDash = () => {
             <tbody>
               {activities
                 .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-                .slice(0, 5) // Keep only the 5 most recent activities
+                .slice(0, 3) // Keep only the 5 most recent activities
                 .map((activity) => (
                   <tr key={activity._id}>
                     <td>

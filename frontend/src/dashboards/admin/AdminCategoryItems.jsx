@@ -365,6 +365,10 @@ const AdminCategoryItems = () => {
                 withCredentials: true
             });
             toast.success('Item deleted successfully!');
+            
+            // Remove deleted item from UI without reload
+            setItems((prevItems) => prevItems.filter(i => i._id !== item._id));
+            
         } catch (error) {
             console.error('Error deleting item:', error);
             toast.error('Failed to delete item');
@@ -716,19 +720,29 @@ const AdminCategoryItems = () => {
                                         type="number"
                                         value={newItem.purchaseCost}
                                         min={1}
+                                        max={1000000000}        
                                         onChange={(e) => {
-                                            const value = e.target.value;
-                                            if (!isNaN(value) && !value.includes("e")) { // Prevents non-numeric input
-                                            setNewItem({ ...newItem, purchaseCost: value });
+                                        const value = e.target.value;
+                                        if (!isNaN(value) && !value.includes("e") && value.length <= 10) {
+                                            const numericValue = Number(value);
+                                            if (numericValue >= 1 && numericValue <= 1000000000) {
+                                            setNewItem({ ...newItem, purchaseCost: numericValue });
                                             }
+                                        }
                                         }}
                                         onKeyDown={(e) => {
-                                            if (e.key === "e" || e.key === "-" || e.key === "+") {
-                                            e.preventDefault(); // Blocks typing 'e', '-', and '+'
-                                            }
+                                        // Block typing of e, E, -, +, and enforce max length via key input
+                                        if (["e", "E", "-", "+"].includes(e.key)) {
+                                            e.preventDefault();
+                                        }
+
+                                        // Optional: prevent typing more than 10 digits 
+                                        if (e.target.value.length >= 10 && !["Backspace", "Delete", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+                                            e.preventDefault();
+                                        }
                                         }}
                                         required
-                                        />
+                                    />
 
                                 </div>
                                 <div className="form-group">
@@ -744,6 +758,11 @@ const AdminCategoryItems = () => {
                                 <button type="submit" className="done-button" disabled={isLoading}>
                                     {isLoading ? 'Submitting...' : 'Done'}
                                 </button>
+                                <button 
+                                type="button" 
+                                className='cancel-button' 
+                                onClick={() => {setShowAddItemModal(false);setShowItemTypeModal(true);}}>
+                                Back</button>
                             </form>
                         </div>
                     </div>
@@ -849,12 +868,20 @@ const AdminCategoryItems = () => {
                                     <input
                                         type="number"
                                         value={newItem.purchaseCost}
-                                        onChange={(e) => setNewItem({
-                                            ...newItem,
-                                            purchaseCost: e.target.value
-                                        })}
+                                        min={1}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (!isNaN(value) && !value.includes("e")) { // Prevents non-numeric input
+                                            setNewItem({ ...newItem, purchaseCost: value });
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "e" || e.key === "-" || e.key === "+") {
+                                            e.preventDefault(); // Blocks typing 'e', '-', and '+'
+                                            }
+                                        }}
                                         required
-                                    />
+                                        />
                                 </div>
                                 <div className="form-group">
                                     <label>Qty <span className="required">*</span></label>
@@ -882,6 +909,11 @@ const AdminCategoryItems = () => {
                                 <button type="submit" className="done-button" disabled={isLoading}>
                                     {isLoading ? 'Submitting...' : 'Done'}
                                 </button>
+                                <button 
+                                type="button" 
+                                className='cancel-button' 
+                                onClick={() => {setShowAddConsumableModal(false);setShowItemTypeModal(true);}}>
+                                Back</button>
                             </form>
                         </div>
                     </div>

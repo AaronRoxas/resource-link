@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import NavBar from '../../components/NavBar';
 import ItemInformation from '../../components/ItemInformation';
 import '../../styles/ViewItems.css';
 import Navbar from '../../components/NavBar';
@@ -11,6 +10,8 @@ import { smartSearch, getHighlightedText } from '../../utils/smartSearch';
 const StaffInventoryItems = () => {
     const [items, setItems] = useState([]);
     const [categoryName, setCategoryName] = useState('');
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [selectedItems, setSelectedItems] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
     const { categoryName: urlCategoryName } = useParams();
     const navigate = useNavigate();
@@ -41,16 +42,10 @@ const StaffInventoryItems = () => {
     // New states for search functionality
     const [searchExpanded, setSearchExpanded] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showEditSubCategoryModal, setShowEditSubCategoryModal] = useState(false);
     const [editingSubCategory, setEditingSubCategory] = useState(null);
-
-    const navItems = [
-        { path: '/staff', icon: 'home', label: 'Home' },
-        { path: '/qr', icon: 'qr', label: '' },
-        { path: '/staff/inventory', icon: 'active-cube', label: 'Inventory' }
-    ];
+    const fileInputRef = useRef(null);
 
     const fetchCategoryItems = async () => {
         try {
@@ -102,10 +97,6 @@ const StaffInventoryItems = () => {
 
     const handleBack = () => {
         navigate('/staff/inventory');
-    };
-
-    const handleCloseItemInfo = () => {
-        setSelectedItem(null);
     };
 
     const handleItemClick = (item) => {
@@ -212,6 +203,7 @@ const StaffInventoryItems = () => {
 
     const handleSubmitItem = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
         try {
             let imageBase64 = '';
             if (newItem.image) {
@@ -225,7 +217,14 @@ const StaffInventoryItems = () => {
                     });
                 }
             }
-
+    
+            // Assign a default ID if none is provided
+            const itemId = newItem.id || generateAbbreviatedId(newItem.name);
+    
+            // Calculate the status based on quantity
+            const quantity = newItem.type === 'Non-Consumable' ? 1 : newItem.qty;
+            const status = quantity < 10 ? 'Low Stock' : 'Good Condition';
+    
             const itemData = {
                 name: newItem.name,
                 purchaseDate: newItem.purchaseDate,
@@ -234,21 +233,33 @@ const StaffInventoryItems = () => {
                 category: categoryName,
                 subCategory: newItem.subCategory,
                 itemImage: imageBase64,
-                status: 'Good Condition',
+                status: status,
                 itemType: newItem.type,
-                id: newItem.id,
-                qty: newItem.type === 'Non-Consumable' ? 1 : newItem.qty,
+                id: itemId, // Use the generated or provided ID
+                qty: quantity,
                 serialNo: newItem.type === 'Non-Consumable' ? newItem.serialNo : undefined
             };
-
-            await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', itemData, {
-                withCredentials: true,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            toast.success('Item added successfully!');
+    
+            const existingItem = items.find(item => item.id === itemId);
+    
+            if (existingItem) {
+                await axios.put(`https://resource-link-main-14c755858b60.herokuapp.com/api/inventory/${existingItem._id}`, itemData, {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                toast.success('Item updated successfully!');
+            } else {
+                await axios.post('https://resource-link-main-14c755858b60.herokuapp.com/api/inventory', itemData, {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                toast.success('Item added successfully!');
+            }
+    
             setShowAddConsumableModal(false);
             setShowAddItemModal(false);
             setNewItem({
@@ -259,7 +270,7 @@ const StaffInventoryItems = () => {
                 purchaseCost: '',
                 notes: '',
                 image: null,
-                subCategory: '',
+                subCategory: category?.subCategories?.[0]?.name || '',
                 qty: 0,
                 id: ''
             });
@@ -268,9 +279,37 @@ const StaffInventoryItems = () => {
             console.error('Error submitting item:', error);
             console.error('Error details:', error.response?.data);
             toast.error('Failed to add item');
+        } finally {
+            setIsLoading(false);
         }
     };
 
+        const generateAbbreviatedId = (itemName) => {
+            if (!itemName) return '';
+    
+            // Take first 2-3 letters of category name as prefix
+            const categoryPrefix = categoryName
+                .slice(0, 3)  // Take first 3 letters
+                .replace(/[aeiou]/gi, '')  // Remove vowels
+                .slice(0, 2)  // Take first 2 consonants
+                .toUpperCase();
+            
+            // Find all existing IDs that start with this prefix
+            const similarIds = items
+                .filter(item => item.id.startsWith(categoryPrefix))
+                .map(item => {
+                    const num = parseInt(item.id.split('-')[1]);
+                    return isNaN(num) ? 0 : num;
+                });
+    
+            const nextNum = similarIds.length > 0 ? Math.max(...similarIds) + 1 : 1;
+            const formattedNum = String(nextNum).padStart(4, '0');
+            
+            return `${categoryPrefix}-${formattedNum}`;
+        };
+        
+
+    
     const handleEditSubCategory = (subCategory) => {
         setEditingSubCategory(subCategory);
         setShowEditSubCategoryModal(true);
@@ -328,7 +367,7 @@ const StaffInventoryItems = () => {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     autoFocus
                                 />
-                                <span className='filter-items-close' onClick={() => setSearchExpanded(false)}>X </span>
+                                <span className='filter-items-close' style={{cursor:"pointer"}} onClick={() => setSearchExpanded(false)}>X </span>
                             </div>
                         )}
                         <div className="icon-group">
@@ -413,10 +452,12 @@ const StaffInventoryItems = () => {
                                         e.stopPropagation();
                                         handleEditItem(item);
                                     }}>Edit</button>
-                                    <button style={{color: 'red'}} onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDeleteItem(item);
-                                    }}>Delete</button>
+                                    <button style={{color: 'red'}}
+                                            onClick={() => {
+                                                setSelectedItems(item);
+                                                setShowDeleteModal(true);
+                                    }}
+                                    >Delete</button>
                                 </div>
                             </div>
                         </div>
@@ -558,128 +599,156 @@ const StaffInventoryItems = () => {
                 </div>
             )}
 
-            {showAddItemModal && (
-                <div className="modal-backdrop">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h2>Add new Item</h2>
-                            <button 
-                                className="close-button"
-                                onClick={() => setShowAddItemModal(false)}
-                            >
-                                ×
-                            </button>
-                        </div>
-                        <form onSubmit={handleSubmitItem}>
-                            <div className="form-group">
-                                <label>Add Image</label>
-                                <div className="image-upload-box">
-                                    {newItem.image ? (
-                                        <img 
-                                            src={URL.createObjectURL(newItem.image)} 
-                                            alt="Preview" 
-                                            className="image-preview"
-                                        />
-                                    ) : (
-                                        <div className="upload-placeholder">
-                                            <span>+</span>
-                                        </div>
-                                    )}
+                {showAddItemModal && (
+                    <div className="modal-backdrop">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2>Add new Item</h2>
+                                <button 
+                                    className="close-button"
+                                    onClick={() => setShowAddItemModal(false)}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            <form onSubmit={handleSubmitItem}>
+                                <div className="form-group">
+                                    <label>Add Image</label>
+                                    <div className="image-upload-box" onClick={() => fileInputRef.current?.click()}>
+                                        {newItem.image ? (
+                                            <img 
+                                                src={typeof newItem.image === 'string' ? newItem.image : URL.createObjectURL(newItem.image)} 
+                                                alt="Preview" 
+                                                className="image-preview"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setNewItem({ ...newItem, image: null });
+                                                }}
+                                            />
+                                        ) : (
+                                            <div className="upload-placeholder">
+                                                <span>+</span>
+                                            </div>
+                                        )}
+                                    </div>
                                     <input
                                         type="file"
                                         accept="image/*"
+                                        ref={fileInputRef}
                                         onChange={(e) => setNewItem({
                                             ...newItem,
                                             image: e.target.files[0]
                                         })}
+                                        style={{ display: 'none' }}
                                     />
                                 </div>
-                            </div>
-                            <div className="form-group">
-                                <input type="text" value="Consumable" readOnly hidden />
-                            </div>
-                            <div className="form-group">
-                                <label>Sub-category <span className="required">*</span></label>
-                                <select
-                                    value={newItem.subCategory}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        subCategory: e.target.value
-                                    })}
-                                    required
-                                >
-                                    {category?.subCategories?.length > 0 ? (
-                                        category.subCategories.map((sub, index) => (
-                                            <option key={index} value={sub.name}>{sub.name}</option>
-                                        ))
-                                    ) : (
-                                        <option value="">No subcategories available</option>
-                                    )}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label>Name <span className="required">*</span></label>
-                                <input
-                                    type="text"
-                                    value={newItem.name}
-                                    onChange={handleNameChange}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Serial No <span className="required">*</span></label>
-                                <input
-                                    type="text"
-                                    value={newItem.serialNo}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        serialNo: e.target.value
-                                    })}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Purchase Date <span className="required">*</span></label>
-                                <input
-                                    type="date"
-                                    value={newItem.purchaseDate}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        purchaseDate: e.target.value
-                                    })}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Purchase Cost <span className="required">*</span></label>
-                                <input
-                                    type="number"
-                                    value={newItem.purchaseCost}
-                                    min={1}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        purchaseCost: e.target.value
-                                    })}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Notes</label>
-                                <textarea
-                                    value={newItem.notes}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        notes: e.target.value
-                                    })}
-                                />
-                            </div>
-                            <button type="submit" className="done-button">
-                                Done
-                            </button>
-                        </form>
+                                <div className="form-group">
+                                    <label>Sub-category <span className="required">*</span></label>
+                                    <select
+                                        
+                                        value={newItem.subCategory}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            subCategory: e.target.value
+                                        })}
+                                        required
+                                    >
+                                        <option value="" selected disabled>Select Sub-categories</option>
+                                        {category?.subCategories?.length > 0 ? (
+                                            category.subCategories.map((sub, index) => (
+                                                <option key={index} value={sub.name}>{sub.name}</option>
+                                            ))
+                                        ) : (
+                                            <option value="">No subcategories available</option>
+                                        )}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Name <span className="required">*</span></label>
+                                    <input
+                                        type="text"
+                                        value={newItem.name}
+                                        onChange={handleNameChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Serial No <span className="required">*</span>.</label>
+                                    <input
+                                        type="text"
+                                        value={newItem.serialNo}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            serialNo: e.target.value
+                                        })}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Purchase Date <span className="required">*</span></label>
+                                    <input
+                                        type="date"
+                                        value={newItem.purchaseDate}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            purchaseDate: e.target.value
+                                        })}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Purchase Cost <span className="required">*</span></label>
+                                    <input
+                                        type="number"
+                                        value={newItem.purchaseCost}
+                                        min={1}    
+                                        onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (!isNaN(value) && !value.includes("e") && value.length <= 10) {
+                                            const numericValue = Number(value);
+                                            if (numericValue >= 1 && numericValue <= 1000000000) {
+                                            setNewItem({ ...newItem, purchaseCost: numericValue });
+                                            }
+                                        }
+                                        }}
+                                        onKeyDown={(e) => {
+                                        // Block typing of e, E, -, +, and enforce max length via key input
+                                        if (["e", "E", "-", "+"].includes(e.key)) {
+                                            e.preventDefault();
+                                        }
+
+                                        //prevent typing more than 10 digits 
+                                        if (e.target.value.length >= 10 && !["Backspace", "Delete", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+                                            e.preventDefault();
+                                        }
+                                        }}
+                                        required
+                                    />
+
+                                </div>
+                                <div className="form-group">
+                                    <label>Notes</label>
+                                    <textarea
+                                        value={newItem.notes}
+                                        onChange={(e) => setNewItem({
+                                            ...newItem,
+                                            notes: e.target.value
+                                        })}
+                                    />
+                                </div>
+                                <button type="submit" className="done-button" disabled={isLoading}>
+                                    {isLoading ? 'Submitting...' : 'Done'}
+                                </button>
+                                <button 
+                                type="button" 
+                                className='cancel-button' 
+                                onClick={() => {setShowAddItemModal(false);setShowItemTypeModal(true);}}>
+                                Back</button>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+
 
             {showAddConsumableModal && (
                 <div className="modal-backdrop">
@@ -774,14 +843,32 @@ const StaffInventoryItems = () => {
                             <div className="form-group">
                                 <label>Purchase Cost <span className="required">*</span></label>
                                 <input
-                                    type="number"
-                                    value={newItem.purchaseCost}
-                                    onChange={(e) => setNewItem({
-                                        ...newItem,
-                                        purchaseCost: e.target.value
-                                    })}
-                                    required
-                                />
+                                        type="number"
+                                        value={newItem.purchaseCost}
+                                        min={1}
+                                        max={1000000000}        
+                                        onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (!isNaN(value) && !value.includes("e") && value.length <= 10) {
+                                            const numericValue = Number(value);
+                                            if (numericValue >= 1 && numericValue <= 1000000000) {
+                                            setNewItem({ ...newItem, purchaseCost: numericValue });
+                                            }
+                                        }
+                                        }}
+                                        onKeyDown={(e) => {
+                                        // Block typing of e, E, -, +, and enforce max length via key input
+                                        if (["e", "E", "-", "+"].includes(e.key)) {
+                                            e.preventDefault();
+                                        }
+
+                                        // Optional: prevent typing more than 10 digits 
+                                        if (e.target.value.length >= 10 && !["Backspace", "Delete", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+                                            e.preventDefault();
+                                        }
+                                        }}
+                                        required
+                                    />
                             </div>
                             <div className="form-group">
                                 <label>Qty <span className="required">*</span></label>
@@ -808,9 +895,14 @@ const StaffInventoryItems = () => {
                                 />
                             </div>
                             <div className="form-group">
-                                <button type="submit" className="done-button">
-                                    Done
+                                <button type="submit" className="done-button" disabled={isLoading}>
+                                    {isLoading ? 'Submitting...' : 'Done'}
                                 </button>
+                                <button 
+                                type="button" 
+                                className='cancel-button' 
+                                onClick={() => {setShowAddConsumableModal(false);setShowItemTypeModal(true);}}>
+                                Back</button>
                             </div>
                         </form>
                     </div>
@@ -867,6 +959,71 @@ const StaffInventoryItems = () => {
                     </div>
                 </div>
             )}
+
+                            {showDeleteModal && (
+                    <div className="category-modal-backdrop">
+                        <div className="category-form-container">
+                            <div className="category-form-header">
+                                <h2>Delete Item</h2>
+                                
+                                <button 
+                                    className="category-close-button"
+                                    onClick={() => {
+                                        setShowDeleteModal(false);
+                                        setSelectedItems(null);
+                                    }}
+                                >
+                                    &times;
+                                </button>
+                            </div>
+                            <div className="delete-confirmation">
+                            <hr />
+                                <p>Are you sure you want to delete "{selectedItems?.name}"?</p>
+                                <p className="warning">This action cannot be undone.</p>
+                                
+                            </div>
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', padding: '1rem' }}>
+                                <button 
+                                    style={{
+                                        backgroundColor: '#f8f9fa',
+                                        border: '1px solid #dee2e6',
+                                        color: '#495057',
+                                        padding: '0.5rem 1rem',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        marginRight: '0.5rem'
+                                    }}
+                                    onClick={() => {
+                                        setShowDeleteModal(false);
+                                        setSelectedItems(null);
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    style={{
+                                        backgroundColor: '#dc3545',
+                                        border: '1px solid #dc3545',
+                                        color: 'white',
+                                        padding: '0.5rem 1rem',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        opacity: isDeleting ? 0.7 : 1
+                                    }}
+                                    onClick={() => {
+                                        handleDeleteItem(selectedItems);
+                                        setShowDeleteModal(false);
+                                    }}
+                                    disabled={isDeleting}
+                                >
+                                    {isDeleting ? 'Deleting...' : 'Delete'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
         </div>
     );
 };
