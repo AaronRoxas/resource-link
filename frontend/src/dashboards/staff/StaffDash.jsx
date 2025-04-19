@@ -90,14 +90,6 @@ const StaffDash = () => {
     fetchInventoryAlerts();
   }, []);
 
-  // Call the function
-
-  // Define the navigation items
-  const navItems = [
-    { path: '/staff', icon: 'active-home', label: 'Home' },
-    { path: '/qr', icon: 'qr' },
-    { path: '/staff/inventory', icon: 'cube', label: 'Inventory' },
-  ];
 
   const handleStatusClick = (item) => {
     if (item.type === 'withdraw') {
@@ -161,29 +153,6 @@ const StaffDash = () => {
       console.error('Error declining borrow request:', error);
     }
   };
-
-  // const handleCheckout = async (borrowId) => {
-  //   try {
-  //     // Update the status to 'borrowed'
-  //     await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings/${borrowId}/status`, {
-  //       status: 'borrowed'
-  //     });
-
-  //     // Update the item's availability
-  //     const borrowing = borrowings.find(b => b._id === borrowId);
-  //     if (borrowing?.itemId) {
-  //       await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${borrowing.itemId._id}`, {
-  //         availability: 'Borrowed'
-  //       });
-  //     }
-      
-  //     // Close modal and refresh the borrowings list
-  //     setShowModal(false);
-  //     fetchBorrowings();
-  //   } catch (error) {
-  //     console.error('Error checking out item:', error);
-  //   }
-  // };
 
   const handleCheckoutClick = () => {
     setShowModal(false); // Close the reservation receipt modal
@@ -388,7 +357,7 @@ const StaffDash = () => {
               </tr>
             </thead>
             <tbody>
-              {inventoryAlerts.slice(0, 5).map((item) => (
+              {inventoryAlerts.slice(0, 3).map((item) => (
                 <tr key={item._id}>
                   <td>{item.id}</td>
                   <td>{item.name}</td>
@@ -764,8 +733,6 @@ const StaffDash = () => {
           </div>
         </div>
       )}
-
-      {/* Add QR Scanner Modal */}
     
       {/* Add new Withdraw Modal */}
       {showWithdrawModal && selectedBorrow && (

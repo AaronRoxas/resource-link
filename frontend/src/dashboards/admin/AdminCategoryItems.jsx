@@ -659,6 +659,7 @@ const AdminCategoryItems = () => {
                                 <div className="form-group">
                                     <label>Sub-category <span className="required">*</span></label>
                                     <select
+                                        
                                         value={newItem.subCategory}
                                         onChange={(e) => setNewItem({
                                             ...newItem,
@@ -666,6 +667,7 @@ const AdminCategoryItems = () => {
                                         })}
                                         required
                                     >
+                                        <option value="" selected disabled>Select Sub-categories</option>
                                         {category?.subCategories?.length > 0 ? (
                                             category.subCategories.map((sub, index) => (
                                                 <option key={index} value={sub.name}>{sub.name}</option>

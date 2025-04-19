@@ -26,11 +26,6 @@ const StaffInventory = () => {
     const [imagePreview, setImagePreview] = useState(null);
     const navigate = useNavigate();
 
-    const navItems = [
-        { path: '/staff', icon: 'home', label: 'Home' },
-        { path: '/qr', icon: 'qr', label: '' },
-        { path: '/staff/inventory', icon: 'active-cube', label: 'Inventory' }
-    ];
 
     useEffect(() => {
         fetchCategories();

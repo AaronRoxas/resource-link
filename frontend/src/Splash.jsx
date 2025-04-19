@@ -18,7 +18,6 @@ const Splash = () => {
       <div className="splash-content">
         
         <div className="logo">
-          {/* Logo goes here */}
           <span className="logo-placeholder"> 
             <img src="/home-imgs/splashlogo.png" alt="ResourceLink Logo" />
           </span>

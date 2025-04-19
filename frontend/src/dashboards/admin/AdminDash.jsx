@@ -151,7 +151,7 @@ const AdminDash = () => {
                                         <td colSpan="3" className="empty-state">No alerts found</td>
                                     </tr>
                                 ) : (
-                                    inventoryAlerts.slice(0, 5).map((alert) => (
+                                    inventoryAlerts.slice(0, 3).map((alert) => (
                                         <tr key={alert._id}>
                                             <td>{alert.id}</td>
                                             <td>{alert.name}</td>
@@ -189,7 +189,7 @@ const AdminDash = () => {
                                         <td colSpan="4" className="empty-state">No reserved items</td>
                                     </tr>
                                 ) : (
-                                    reservedItems.slice(0, 5).map((item) => (
+                                    reservedItems.slice(0, 3).map((item) => (
                                         <tr key={item._id}>
                                             <td>{formatDate(item.receiptData?.borrowTime)}</td>
                                             <td>{item.borrower}</td>
@@ -228,7 +228,7 @@ const AdminDash = () => {
                                         <td colSpan="4" className="empty-state">No logs found</td>
                                     </tr>
                                 ) : (
-                                    logs.map((log) => (
+                                    logs.slice(0, 3).map((log) => (
                                         <tr key={log._id}>
                                             <td>{formatDate(log.date)} {formatTime(log.date)}</td>
                                             <td>{log.user}</td>

@@ -4,7 +4,6 @@ import { Navigate } from 'react-router-dom';
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const authToken = localStorage.getItem('authToken');
   const userRole = localStorage.getItem('role');
-  
   if (!authToken) {
     return <Navigate to="/home" replace />;
   }
@@ -15,7 +14,6 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
                        userRole === 'staff' ? '/staff' : '/home';
     return <Navigate to={defaultPath} replace />;
   }
-
   return children;
 };
 
