@@ -16,7 +16,7 @@ const capitalizeFirstLetter = (string) => {
 const StaffDash = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const [processingAction, setProcessingAction] = useState(null);
   const [borrowings, setBorrowings] = useState([]);
   const [selectedBorrow, setSelectedBorrow] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -64,6 +64,15 @@ const StaffDash = () => {
     fetchBorrowings();
     fetchWithdrawRequests();
     fetchActivities();
+
+    const interval = setInterval(() => {
+      fetchBorrowings();
+      fetchWithdrawRequests();
+      fetchActivities();
+    }, 3000); // 10000 ms = 10 seconds
+  
+    // Clean up interval on unmount
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -638,15 +647,25 @@ const StaffDash = () => {
                   <div className="action-buttons">
                     <button 
                       className="accept-button" 
-                      onClick={() => handleAccept(selectedBorrow._id)}
+                      disabled={processingAction === 'accept'}
+                      onClick={async () => {
+                        setProcessingAction('accept');
+                        await handleAccept(selectedBorrow._id);
+                        setProcessingAction(null);
+                      }}
                     >
-                      Accept
+                      {processingAction === 'accept' ? 'Accepting' : 'Accept'}
                     </button>
                     <button 
                       className="decline-button"
-                      onClick={() => handleDecline(selectedBorrow._id)}
+                      disabled={processingAction === 'decline'}
+                      onClick={async () => {
+                        setProcessingAction('decline');
+                        await handleDecline(selectedBorrow._id);
+                        setProcessingAction(null);
+                      }}
                     >
-                      Decline
+                      {processingAction === 'decline' ? 'Declining' : 'Decline'}
                     </button>
                   </div>
                 )}

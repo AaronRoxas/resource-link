@@ -64,6 +64,15 @@ const AdminDash = () => {
     fetchBorrowings();
     fetchWithdrawRequests();
     fetchActivities();
+
+    const interval = setInterval(() => {
+      fetchBorrowings();
+      fetchWithdrawRequests();
+      fetchActivities();
+    }, 3000); // 10000 ms = 10 seconds
+  
+    // Clean up interval on unmount
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {

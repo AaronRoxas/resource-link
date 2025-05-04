@@ -223,7 +223,7 @@ const StaffInventoryItems = () => {
     
             // Calculate the status based on quantity
             const quantity = newItem.type === 'Non-Consumable' ? 1 : newItem.qty;
-            const status = quantity < 10 ? 'Low Stock' : 'Good Condition';
+            const status = quantity < 1 ? 'In Use' : 'Good Condition';
     
             const itemData = {
                 name: newItem.name,
@@ -960,7 +960,7 @@ const StaffInventoryItems = () => {
                 </div>
             )}
 
-                            {showDeleteModal && (
+                {showDeleteModal && (
                     <div className="category-modal-backdrop">
                         <div className="category-form-container">
                             <div className="category-form-header">

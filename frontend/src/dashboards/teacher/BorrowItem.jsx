@@ -12,6 +12,7 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
     const [currentStock, setCurrentStock] = useState(item.qty);
     const [showReceipt, setShowReceipt] = useState(false);
     const [receiptData, setReceiptData] = useState(null);
+    const [processingAction, setProcessingAction] = useState(null);
 
     const handleWithdraw = async () => {
         try {
@@ -336,9 +337,16 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                     <button 
                         type="button"
                         className="borrow-btn primary"
-                        onClick={handleSubmit}
+                        // onClick={handleSubmit}
+                        onClick={async () =>{
+                            setProcessingAction('accept');
+                            await(handleSubmit);
+                            setProcessingAction(null);
+                        }}
                     >
-                        {item.itemType === 'Consumable' ? 'Withdraw' : 'Borrow'}
+                        {processingAction
+                            ? (item.itemType === 'Consumable' ? 'Withdrawing' : 'Borrowing')
+                            : (item.itemType === 'Consumable' ? 'Withdraw' : 'Borrow')}
                     </button>
                 </div>
             </div>

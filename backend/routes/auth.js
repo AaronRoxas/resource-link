@@ -224,6 +224,23 @@ router.get('/check-default-password', async (req, res) => {
   }
 });
 
+router.post('/check-email', async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ exists: false, message: 'Email is required.' });
+  }
+  try {
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (user) {
+      return res.json({ exists: true });
+    } else {
+      return res.json({ exists: false });
+    }
+  } catch (err) {
+    return res.status(500).json({ exists: false, message: 'Server error.' });
+  }
+});
+
 // Forgot password route
 router.post('/forgot-password', async (req, res) => {
   try {

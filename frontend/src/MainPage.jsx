@@ -91,6 +91,28 @@ const MainPage = () => {
     setLoading(true);
     setError('');
 
+        // Check if email exists before login
+        try {
+          const checkEmailResponse = await axios.post(
+            'https://resource-link-main-14c755858b60.herokuapp.com/api/auth/check-email',
+            { email },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          if (!checkEmailResponse.data.exists) {
+            setError('Email not found.');
+            setLoading(false);
+            return;
+          }
+        } catch (err) {
+          setError('Error checking email. Please try again.');
+          setLoading(false);
+          return;
+        }
+
     const failedAttemptsKey = `failedAttempts_${email}`;
     const lockoutKey = `lockout_${email}`;
     const lockoutDuration = 10 * 60 * 1000; // 10 minutes in milliseconds
