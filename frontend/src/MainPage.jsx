@@ -28,6 +28,7 @@ const MainPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
@@ -66,8 +67,25 @@ const MainPage = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
+  
     try {
+      // 1. Check if email exists
+      const checkEmailResponse = await axios.post(
+        'https://resource-link-main-14c755858b60.herokuapp.com/api/auth/check-email',
+        { email: forgotPasswordEmail },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      if (!checkEmailResponse.data.exists) {
+        setError('Email not found.');
+        setLoading(false);
+        return;
+      }
+  
+      // 2. If exists, proceed with forgot password request
       await axios.post(
         'https://resource-link-main-14c755858b60.herokuapp.com/api/auth/forgot-password',
         { email: forgotPasswordEmail },
@@ -84,7 +102,6 @@ const MainPage = () => {
       setLoading(false);
     }
   };
-
   // Login logic from LoginComponent
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -305,7 +322,7 @@ const MainPage = () => {
           </button>
         </div>
         <div className="learn-more-graphics">
-          <img src="/home-imgs/learnmore.svg" alt="Learn More" className="learn-more-image" />
+          <img src="/home-imgs/learnmore.svg" alt="Learn More" className="learn-more-image airplane-float" />
         </div>
       </div>
 
@@ -315,7 +332,7 @@ const MainPage = () => {
           <span>ResourceLink</span>
         </div>
         <div className="footer-copyright">
-          &copy; Copyright ResourceLink 2024 All Rights Reserved.
+          &copy; Copyright ResourceLink 2025 All Rights Reserved.
         </div>
         <div className="footer-links">
           <a>Privacy Policy</a>
@@ -340,12 +357,26 @@ const MainPage = () => {
               </div>
               <div className="form-group">
                 <label>Password</label>
-                <input 
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <div className="password-input-container">
+                  <input 
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  {password && (
+                    <button 
+                      type="button" 
+                      className="password-toggle"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      <img 
+                        src={showPassword ? "/dashboard-imgs/eye-off.svg" : "/dashboard-imgs/eye.svg"} 
+                        alt={showPassword ? "Hide password" : "Show password"}
+                      />
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="form-options">
                 <label className="remember-me">
