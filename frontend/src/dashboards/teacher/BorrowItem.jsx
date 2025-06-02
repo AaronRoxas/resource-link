@@ -118,11 +118,11 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
         }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (item.itemType === 'Consumable') {
-            handleWithdraw();
+            await handleWithdraw();
         } else {
-            handleBorrowing();
+            await handleBorrowing();
         }
     };
 
@@ -337,15 +337,18 @@ const BorrowItem = ({ item, onClose, fetchItems }) => {
                     <button 
                         type="button"
                         className="borrow-btn primary"
-                        // onClick={handleSubmit}
-                        onClick={async () =>{
+                        disabled={processingAction !== null}
+                        onClick={async () => {
                             setProcessingAction('accept');
-                            await(handleSubmit);
-                            setProcessingAction(null);
+                            try {
+                                await handleSubmit();
+                            } finally {
+                                setProcessingAction(null);
+                            }
                         }}
                     >
                         {processingAction
-                            ? (item.itemType === 'Consumable' ? 'Withdrawing' : 'Borrowing')
+                            ? (item.itemType === 'Consumable' ? 'Withdrawing...' : 'Borrowing...')
                             : (item.itemType === 'Consumable' ? 'Withdraw' : 'Borrow')}
                     </button>
                 </div>

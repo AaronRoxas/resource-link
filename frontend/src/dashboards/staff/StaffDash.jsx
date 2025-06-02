@@ -36,6 +36,7 @@ const StaffDash = () => {
   const fetchBorrowings = async () => {
     try {
       const response = await axios.get('https://resource-link-main-14c755858b60.herokuapp.com/api/borrowings');
+      console.log('Fetched borrowings:', response.data);
       setBorrowings(response.data);
     } catch (error) {
       console.error('Error fetching borrowings:', error);
@@ -114,13 +115,12 @@ const StaffDash = () => {
   };
 
   const handleBorrowClick = (item) => {
-    if (item.receiptData?.status?.toLowerCase() === 'reserved') {
-      setSelectedBorrow(item);
-      setShowModal(true);
-    } else {
-      setSelectedBorrow(item);
-      setShowModal(true);
-    }
+    const status = item.receiptData?.status?.toLowerCase() || item.status?.toLowerCase();
+    console.log('Handling borrow click for item:', item); // Debug log
+    console.log('Item status:', status); // Debug log
+    
+    setSelectedBorrow(item);
+    setShowModal(true);
   };
 
   const handleAccept = async (borrowId) => {
@@ -130,10 +130,18 @@ const StaffDash = () => {
         status: 'reserved'
       });
       
+      // Immediately update the local state to reflect the change
+      setBorrowings(prevBorrowings => 
+        prevBorrowings.map(borrow => 
+          borrow._id === borrowId 
+            ? { ...borrow, receiptData: { ...borrow.receiptData, status: 'reserved' } }
+            : borrow
+        )
+      );
+      
       // Also update the item status
       const borrowing = borrowings.find(b => b._id === borrowId);
       if (borrowing?.itemId?._id) {
-        // Update the item's status to 'Reserved'
         await axios.patch(`https://resource-link-main-14c755858b60.herokuapp.com/api/items/${borrowing.itemId._id}`, {
           status: 'Reserved'
         });
@@ -142,7 +150,7 @@ const StaffDash = () => {
       // Close modal and refresh data
       setShowModal(false);
       fetchBorrowings();
-      fetchActivities(); // Refresh activities to show the new action
+      fetchActivities();
     } catch (error) {
       console.error('Error accepting borrow request:', error);
     }
@@ -154,10 +162,19 @@ const StaffDash = () => {
         status: 'declined'
       });
       
+      // Immediately update the local state to reflect the change
+      setBorrowings(prevBorrowings => 
+        prevBorrowings.map(borrow => 
+          borrow._id === borrowId 
+            ? { ...borrow, receiptData: { ...borrow.receiptData, status: 'declined' } }
+            : borrow
+        )
+      );
+      
       // Close modal and refresh data
       setShowModal(false);
-      fetchBorrowings(); // Make sure you have this function to refresh the borrowings list
-      fetchActivities(); // Refresh activities to show the new declined action
+      fetchBorrowings();
+      fetchActivities();
     } catch (error) {
       console.error('Error declining borrow request:', error);
     }
@@ -272,30 +289,36 @@ const StaffDash = () => {
 
   const handleWithdrawAccept = async (withdrawId) => {
     try {
-        // Get staff name from localStorage
-        const staffData = JSON.parse(localStorage.getItem('userData'));
-        const staffName = staffData?.name;
+      const staffData = JSON.parse(localStorage.getItem('userData'));
+      const staffName = staffData?.name;
 
-        const response = await axios.patch(
-            `https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals/${withdrawId}/status`,
-            {
-                status: 'approved',
-                approvedBy: staffName
-            }
-        );
-        
-        // Close the withdraw modal instead of the generic modal
-        setShowWithdrawModal(false);
-        fetchWithdrawRequests();
-        fetchActivities(); // Refresh activities to show the new action
+      await axios.patch(
+        `https://resource-link-main-14c755858b60.herokuapp.com/api/withdrawals/${withdrawId}/status`,
+        {
+          status: 'approved',
+          approvedBy: staffName
+        }
+      );
+      
+      // Immediately update the local state to reflect the change
+      setWithdrawRequests(prevRequests => 
+        prevRequests.map(request => 
+          request._id === withdrawId 
+            ? { ...request, status: 'approved' }
+            : request
+        )
+      );
+      
+      setShowWithdrawModal(false);
+      fetchWithdrawRequests();
+      fetchActivities();
     } catch (error) {
-        console.error('Error accepting withdrawal:', error);
+      console.error('Error accepting withdrawal:', error);
     }
   };
 
   const handleWithdrawDecline = async (withdrawId) => {
     try {
-      // Get staff name from localStorage
       const staffData = JSON.parse(localStorage.getItem('userData'));
       const staffName = staffData?.name;
 
@@ -304,9 +327,18 @@ const StaffDash = () => {
         approvedBy: staffName
       });
       
+      // Immediately update the local state to reflect the change
+      setWithdrawRequests(prevRequests => 
+        prevRequests.map(request => 
+          request._id === withdrawId 
+            ? { ...request, status: 'declined' }
+            : request
+        )
+      );
+      
       setShowWithdrawModal(false);
       fetchWithdrawRequests();
-      fetchActivities(); // Refresh activities to show the new declined action
+      fetchActivities();
     } catch (error) {
       console.error('Error declining withdraw request:', error);
     }
@@ -406,18 +438,22 @@ const StaffDash = () => {
             <tbody>
               {[
                 ...borrowings
-                  .filter(borrow => 
-                    ['reserved', 'pending'].includes(borrow.receiptData?.status?.toLowerCase())
-                  )
+                  .filter(borrow => {
+                    const status = borrow.receiptData?.status?.toLowerCase() || borrow.status?.toLowerCase();
+                    console.log('Borrow status:', status);
+                    return ['reserved', 'pending'].includes(status) && status !== 'declined';
+                  })
                   .map(borrow => ({
                     ...borrow,
-                    date: new Date(borrow.receiptData?.borrowTime),
+                    date: new Date(borrow.receiptData?.borrowTime || borrow.createdAt),
                     type: 'borrow'
                   })),
                 ...withdrawRequests
-                  .filter(request => 
-                    ['pending'].includes(request.status?.toLowerCase())
-                  )
+                  .filter(request => {
+                    const status = request.status?.toLowerCase();
+                    console.log('Withdraw status:', status);
+                    return ['pending'].includes(status) && status !== 'declined';
+                  })
                   .map(request => ({
                     ...request,
                     date: new Date(request.createdAt),
@@ -425,19 +461,20 @@ const StaffDash = () => {
                   }))
               ]
                 .sort((a, b) => b.date - a.date)
+                .slice(0, 3)
                 .map((item) => (
                   <tr key={item._id}>
                     <td>{item.date.toLocaleDateString()}</td>
                     <td>{item.borrower}</td>
                     <td>{item.itemId?.name}</td>
                     <td>
-                      <span className={`status-pill status-${item.type === 'withdraw' ? item.status : item.receiptData?.status?.toLowerCase()}`}>
+                      <span className={`status-pill status-${item.type === 'withdraw' ? item.status : (item.receiptData?.status || item.status)?.toLowerCase()}`}>
                         <span 
-                          className={`status-${item.type === 'withdraw' ? item.status : item.receiptData?.status?.toLowerCase()}`}
+                          className={`status-${item.type === 'withdraw' ? item.status : (item.receiptData?.status || item.status)?.toLowerCase()}`}
                           onClick={() => handleStatusClick(item)}
                           style={{ cursor: 'pointer' }}
                         >
-                          {capitalizeFirstLetter(item.type === 'withdraw' ? item.status : item.receiptData?.status)}
+                          {capitalizeFirstLetter(item.type === 'withdraw' ? item.status : (item.receiptData?.status || item.status))}
                         </span>
                       </span>
                     </td>
