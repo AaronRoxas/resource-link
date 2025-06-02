@@ -257,7 +257,7 @@ function App() {
         />
         {/* Other routes */}
       </Routes>
-      <ToastContainer position="top-right" autoClose={500} />
+      <ToastContainer position="top-right" autoClose={1000} />
     </Router>
   );
 }
